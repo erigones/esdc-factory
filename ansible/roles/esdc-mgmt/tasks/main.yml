@@ -1,0 +1,12 @@
+- include: os.yml
+- include: ssl.yml
+- include: redis.yml
+- include: nginx.yml
+- include: rabbitmq.yml
+- include: guacamole.yml
+- include: haproxy.yml
+- include: monitoring.yml
+- include: esdc.yml
+- include: test.yml
+- meta: flush_handlers
+- include: appliance.yml

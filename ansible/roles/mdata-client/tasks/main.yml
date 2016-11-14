@@ -1,0 +1,8 @@
+---
+- name: Install mdata-client package
+  yum: name="https://raw.githubusercontent.com/erigones/mdata-client-rpm/master/RPMS/x86_64/mdata-client-0.0.1-1.el6.x86_64.rpm" state=present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+- name: Install mdata-client package
+  yum: name="https://raw.githubusercontent.com/erigones/mdata-client-rpm/master/RPMS/x86_64/mdata-client-0.0.1-1.el7.x86_64.rpm" state=present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"

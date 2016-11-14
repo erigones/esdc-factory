@@ -1,0 +1,30 @@
+---
+# Expects:
+#   images_dir: to be an existing directory
+#   image_manifest: to be a .imgmanifest file path
+#   image_file_ext: image file extension
+
+- name: Set image_file and image_dir variables
+  set_fact:
+    image_file: "{{ image_manifest.replace('.imgmanifest', image_file_ext) }}"
+    image_dir: "{{ images_dir }}/{{ (lookup('file', '{{ image_manifest }}') | from_json)['uuid'] }}"
+
+- name: Check image_manifest and image_file
+  shell: test -f "{{ image_manifest }}" && test -f "{{ image_file }}" && ! test -h "{{ image_manifest }}"
+  register: test_result
+  ignore_errors: true
+
+- name: Create image folder {{ image_dir }}
+  file: path="{{ image_dir }}" state=directory
+  when: test_result|success
+
+- name: Create manifest and file symlinks in {{ image_dir }}
+  file: src="{{ item.src }}"
+        dest="{{ item.dest }}"
+        state=link
+  with_items:
+    - src: "{{ image_manifest }}"
+      dest: "{{ image_dir }}/manifest"
+    - src: "{{ image_file }}"
+      dest: "{{ image_dir }}/file"
+  when: test_result|success

@@ -1,0 +1,229 @@
+#version=RHEL7
+# System authorization information
+auth --enableshadow --passalgo=sha512
+eula --agreed
+# SSH account for anaconda
+sshpw --username=root {{ image_pass }} --plaintext
+
+# Use CDROM installation media
+text
+install
+firstboot --disabled
+ignoredisk --only-use=vda
+# Keyboard layouts
+keyboard --vckeymap=us --xlayouts='us'
+# System language
+lang en_US.UTF-8
+
+# Network information
+network  --bootproto=dhcp --noipv6 --activate --hostname=localhost.localdomain
+# Root password
+rootpw {{ image_pass }}
+timezone Etc/UTC
+# System bootloader configuration
+bootloader --timeout=3 --append="tsc=reliable divider=10 plymouth.enable=0 net.ifnames=0" --location=mbr
+
+# Partition clearing information
+clearpart --all --initlabel
+#part /boot --asprimary --fstype=ext4 --size=500
+part / --asprimary --fstype=ext4 --size=100 --grow
+
+poweroff
+unsupported_hardware
+
+url --url={{ builder_centos_mirror }}/7/os/x86_64/
+repo --name=updates --baseurl={{ builder_centos_mirror }}/7/updates/x86_64/
+repo --name=extras --baseurl={{ builder_centos_mirror }}/7/extras/x86_64/
+repo --name=epel --baseurl={{ builder_epel_mirror }}/7/x86_64/
+
+services --enabled="acpid,ntpd,network,iptables,ip6tables" --disabled="firewalld"
+
+logging --level=debug
+
+%packages --ignoremissing --nobase --excludedocs
+#@core
+-ModemManager-glib
+-NetworkManager*
+-avahi
+-avahi-autoipd
+-avahi-libs
+-device-mapper-event
+-device-mapper-event-libs
+-device-mapper-persistent-data
+-dmidecode
+-dnsmasq
+-dracut-network
+-ebtables
+-elfutils-libs
+-firewalld
+-glib-networking
+-gnutls
+-gsettings-desktop-schemas
+-iprutils
+-jansson
+-kernel-tools
+-kernel-tools-libs
+-kexec-tools
+-libdaemon
+-libgudev1
+-libmodman
+-libndp
+-libnl3
+-libnl3-cli
+-libpcap
+-libproxy
+-libsoup
+-libsysfs
+-libteam
+-lvm2
+-lvm2-libs
+-mozjs17
+-nettle
+-polkit
+-polkit-pkla-compat
+-ppp
+-python-backports
+-python-backports-ssl_match_hostname
+-python-configobj
+-python-pyudev
+-python-setuptools
+-python-slip
+-python-slip-dbus
+-snappy
+-teamd
+-tuned
+-virt-what
+-wpa_supplicant
+
+-pygobject3-base
+-gobject-introspection
+-python-slip-dbus
+-python-slip
+-dbus-python
+-dbus-glib
+
+-*-firmware
+-btrfs-progs
+-xfsprogs
+-plymouth*
+
+bzip2
+yum-utils
+acpid
+ntp
+man
+iptables-services
+net-tools
+libselinux-python
+epel-release
+%end
+
+%post
+if ! ping -q -c 2 google.com > /dev/null; then
+    echo "Network is down!"
+fi
+
+# /etc/resolv.conf was not completed (known issue)
+{% if zone_resolvers %}{% for ip in zone_resolvers %}
+echo "nameserver {{ ip }}" >> /etc/resolv.conf
+{% endfor %}{% endif %}
+
+echo "Enablimg tmp.mount service"
+systemctl enable tmp.mount
+
+# Linux likes a bit of swap, so we create one
+fallocate -l 512M /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+# and add it to fstab
+cat << EOF >> /etc/fstab
+/swapfile   swap    swap    defaults    0   0
+
+EOF
+
+# Network auto-configuration magic
+# Quotes around RCLOCAL will make bash disable param substitution.
+cat << 'RCLOCAL' > /etc/rc.d/rc.local
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+interfaces="$(ifconfig -a | grep ^eth | awk -F: '{print $1}')"
+
+for iface in ${interfaces[@]}; do
+    config="/etc/sysconfig/network-scripts/ifcfg-${iface}"
+
+    if [[ -f "${config}" ]]; then
+        if grep -q "dhcp" "${config}"; then
+            continue
+        fi
+    fi
+
+    ifdown ${iface}
+
+    echo "DEVICE=\"${iface}\"" > ${config}
+    echo "ONBOOT=\"yes\"" >> ${config}
+    echo "BOOTPROTO=\"dhcp\"" >> ${config}
+
+    ifup ${iface}
+
+    ipaddr="$(ifconfig ${iface} | grep 'inet addr:' | cut -d: -f2 | cut -d ' ' -f1)"
+
+    /sbin/arping -q -c 2 -A -I ${iface} ${ipaddr}
+done
+
+touch /var/lock/subsys/local
+RCLOCAL
+
+# Disable zeroconf
+echo NETWORKING=yes >> /etc/sysconfig/network
+echo NOZEROCONF=yes >> /etc/sysconfig/network
+
+echo "Setting hostname to localhost"
+echo localhost.localdomain > /etc/hostname
+
+# Configure hostname
+rm -f /etc/hostname
+hostnamectl set-hostname localhost.localdomain
+echo localhost.localdomain > /etc/hostname
+
+# Tune Linux vm.dirty_background_bytes
+# The following tuning causes dirty data to begin to be background flushed at
+# 100 Mbytes, so that it writes earlier and more often to avoid a large build
+# up and improving overall throughput.
+echo "Setting vm.dirty_background_bytes"
+echo "vm.dirty_background_bytes=100000000" >> /etc/sysctl.conf
+
+# Enable EPEL repository
+echo "Configure EPEL repository"
+yum install -y epel-release
+
+# Update yum.conf
+echo "Updating yum.conf"
+sed -i 's/installonly_limit=5/installonly_limit=2\nclean_requirements_on_remove=yes/g' /etc/yum.conf
+
+# Remove packages
+yum remove -y firewalld linux-firmware
+
+# Make sure we have updates applied
+echo "Updating packages via yum"
+yum update -y
+
+echo "Cleanup"
+yum clean packages
+rm -rf /root/install.log
+rm -rf /root/install.log.syslog
+rm -rf /root/anaconda-ks.cfg
+
+echo "Include prepare-image"
+curl -o /usr/sbin/prepare-image {{ builder_download_url }}/prepare-image
+chown root:root /usr/sbin/prepare-image
+chmod +x /usr/sbin/prepare-image
+restorecon -RF /usr/sbin/prepare-image
+
+# Cleanup
+/usr/sbin/prepare-image
+
+%end

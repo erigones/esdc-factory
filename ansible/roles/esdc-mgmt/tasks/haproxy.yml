@@ -1,0 +1,9 @@
+---
+- name: Install haproxy
+  yum: name=haproxy state=installed
+
+- name: Set SELinux policy boolean for haproxy
+  seboolean: name=haproxy_connect_any state=yes persistent=yes
+
+- name: Ensure that haproxy is running
+  service: name=haproxy enabled=yes state=started

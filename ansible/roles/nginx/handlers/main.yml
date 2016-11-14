@@ -1,0 +1,4 @@
+---
+# handlers file for nginx
+- name: restart nginx
+  service: name={{ nginx_service }} state=restarted

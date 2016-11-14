@@ -1,0 +1,199 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Build esDC USB image
+  force_handlers: true
+  hosts: builder
+  gather_facts: true  # Because of ansible_distribution check below
+
+  handlers:
+    - name: unmount USB image
+      shell: umount "{{ usb_tmp_mountpoint }}"
+      ignore_errors: yes
+
+    - name: remove loopback device
+      shell: lofiadm -d {{ lofiadm.stdout }}
+      when: lofiadm is defined
+      ignore_errors: yes
+
+  pre_tasks:
+    - name: This playbook is currently available only for SmartOS
+      assert: { that: "ansible_distribution == 'SmartOS'" }
+
+    - name: Check usb_type variable
+      assert: { that: "usb_type == 'hn' or usb_type == 'cn'" }
+
+    - name: Ensure that temp folder exists
+      file: path="{{ usb_tmp_dir }}" state=directory mode=0755
+
+  tasks:
+    - name: Cleanup temp folder
+      file: path="{{ item }}" state=absent
+      with_items:
+        - "{{ usb_tmp_stage }}"
+        - "{{ usb_tmp_mountpoint }}"
+        - "{{ usb_tmp_image }}"
+
+    - name: Create USB image temp folders
+      file: path="{{ item }}" state=directory mode=0755
+      with_items:
+        - "{{ usb_tmp_stage }}"
+        - "{{ usb_tmp_mountpoint }}"
+
+    - name: Ensure that USB image output directory exists
+      file: path="{{ builder.usb.dir }}/{{ release_type }}" state=directory mode=0755
+
+    - name: Create empty .joyliveusb file
+      file: path="{{ usb_tmp_stage }}/.joyliveusb" state=touch
+
+    - name: Create empty {{ item }}/ folder
+      file: path="{{ usb_tmp_stage }}/{{ item }}" state=directory mode=0755
+      with_items:
+        - datasets
+        - zones
+        - images
+        - archives
+        - isos
+        - private
+
+    - name: Copy base folder {{ item }}/
+      copy: src="files/usb/{{ item }}" dest="{{ usb_tmp_stage }}/"
+      with_items:
+        - scripts
+
+    - name: Create config.inc directory
+      file: path="{{ usb_tmp_stage }}/config.inc" state=directory
+
+    - name: Create "config.inc/generic" for usb_type {{ usb_type }}
+      template: src="templates/usb/config.inc/generic.j2" dest="{{ usb_tmp_stage }}/config.inc/generic" mode=0444
+
+    - name: Extract platform boot archive
+      unarchive: src="{{ platform_boot_archive }}" dest="{{ usb_tmp_stage }}"
+
+    - name: Copy GRUB files
+      copy: src="files/usb/boot/splash.xpm.gz" dest="{{ usb_tmp_stage }}/boot/"
+
+    - name: Create GRUB menu.lst
+      template: src="templates/usb/boot/menu.lst.j2" dest="{{ usb_tmp_stage }}/boot/grub/menu.lst" mode=0444
+
+    - name: Extract platform OS archive
+      unarchive: src="{{ platform_os_archive }}" dest="{{ usb_tmp_stage }}"
+
+    - name: Create os/{{ platform_version }} folder
+      file: path="{{ usb_tmp_stage }}/os/{{ platform_version }}" state=directory mode=0755
+
+    - name: Move platform folder
+      shell: chdir="{{ usb_tmp_stage }}" mv "platform-{{ platform_version }}" "os/{{ platform_version }}/platform"
+
+    - name: Get platform password
+      set_fact: 
+        platform_password: "{{ lookup('file', '{{ usb_tmp_stage }}/os/{{ platform_version }}/platform/root.password') }}"
+
+    - name: Move platform password file
+      shell: chdir="{{ usb_tmp_stage }}" mv "os/{{ platform_version }}/platform/root.password" "private/root.password.{{ platform_version }}"
+
+    - name: Install prompt-config.sh script
+      template: src="templates/usb/scripts/prompt-config.sh.j2" dest="{{ usb_tmp_stage }}/scripts/prompt-config.sh" mode=0755
+
+    - name: Install headnode.sh script
+      template: src="templates/usb/scripts/headnode.sh.j2" dest="{{ usb_tmp_stage }}/scripts/headnode.sh" mode=0755
+      when: usb_type == 'hn'
+
+    - name: Install computenode.sh script
+      template: src="templates/usb/scripts/computenode.sh.j2" dest="{{ usb_tmp_stage }}/scripts/computenode.sh" mode=0755
+      when: usb_type == 'cn'
+
+    - name: Stage legal file {{ item }}
+      get_url: url="{{ legal_url }}/{{ item.src }}" dest="{{ usb_tmp_stage }}/{{ item.dst }}" mode=0444
+      with_items: "{{ usb_legal_files }}"
+
+    - name: Stage zones
+      include: tasks/build/usb/zones.yml
+      with_items: "{{ usb_vms }}"
+      loop_control:
+        loop_var: app
+      when: usb_type == "hn"
+
+    - name: Stage images
+      include: tasks/build/usb/images.yml
+      with_items: "{{ usb_images }}"
+      loop_control:
+        loop_var: img
+      when: usb_type == "hn"
+
+    - name: Stage ISO images
+      include: tasks/build/usb/isos.yml
+      with_items: "{{ usb_isos }}"
+      loop_control:
+        loop_var: iso
+
+    - name: Stage archives
+      include: tasks/build/usb/archives.yml
+      with_items: "{{ usb_archives }}"
+      loop_control:
+        loop_var: arch
+
+    - name: Stage esdc-node archive
+      include: tasks/build/usb/esdc-node.yml
+
+    - name: Create USB image mountpoint
+      file: path="{{ usb_tmp_mountpoint }}" state=directory mode=0755
+
+    - name: Prepare empty USB image
+      shell: gzip -d -c "files/usb/images/{{ usb_type }}.img.gz" > "{{ usb_tmp_image }}"
+
+    - name: Create USB image loopback device
+      shell: lofiadm -a "{{ usb_tmp_image }}"
+      register: lofiadm
+      notify:
+        - unmount USB image
+        - remove loopback device
+
+    - name: Mount USB image loopback device
+      shell: mount -F pcfs -o foldcase,noclamptime,noatime {{ lofiadm.stdout }}:c "{{ usb_tmp_mountpoint }}"
+      notify:
+        - unmount USB image
+        - remove loopback device
+
+    - name: Copy stage files to USB image
+      synchronize: src="{{ usb_tmp_stage }}/" dest="{{ usb_tmp_mountpoint }}/" owner=no group=no perms=no times=no
+
+    - meta: flush_handlers  # Unmount USB image and remove loopback device
+
+    - name: Save USB image to output directory
+      shell: gzip -9 -c "{{ usb_tmp_image }}" > "{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}"
+
+    - name: Stat USB image file
+      stat: path="{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}" checksum_algorithm="sha1"
+      register: usb_image_stat
+
+    - name: Create release notes
+      template: src="templates/usb/notes.j2" dest="{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}.notes" mode=0644
+      vars:
+        usb_image_file: "esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}"
+        usb_image_file_sha1: "{{ usb_image_stat.stat.checksum }}"
+
+  post_tasks:
+    - name: Cleanup temp folder
+      file: path="{{ item }}" state=absent
+      with_items:
+        - "{{ usb_tmp_stage }}"
+        - "{{ usb_tmp_mountpoint }}"
+        - "{{ usb_tmp_image }}"
+
+    - name: Create manifest and symlinks
+      include: tasks/build/save-package.yml
+      vars:
+        save_dir: "{{ builder.usb.dir }}/{{ release_type }}"
+        pkg_base_name: "esdc-{{ release_edition }}-{{ usb_type }}"
+        pkg_name: "esdc-{{ release_edition }}-{{ usb_type }}-{{ version }}"
+        pkg_version: "{{ version }}"
+        pkg_ext: "{{ builder.usb.ext }}"
+        pkg_desc: "Danube Cloud {{ release_edition_long }} {% if usb_type == 'hn' %}headnode{% else %}compute node{% endif %} (platform: {{ platform_version }})"
+        pkg_link: "esdc-{{ release_edition }}-{{ usb_type }}-latest"
+        pkg_link_exts:
+            - "{{ builder.usb.ext }}"
+            - ".notes"

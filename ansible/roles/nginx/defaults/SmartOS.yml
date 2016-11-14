@@ -1,0 +1,9 @@
+nginx_packages:
+    - nginx
+
+nginx_user: www
+nginx_group: www
+
+nginx_service: pkgsrc/nginx
+
+nginx_config_dir: /opt/local/etc/nginx

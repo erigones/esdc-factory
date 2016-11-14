@@ -1,0 +1,32 @@
+---
+- name: Check whether builder directory structure is in place
+  shell: test -d "{{ item.value.dir }}"
+  with_dict: "{{ builder }}"
+  changed_when: false
+
+- name: Check HTTP access to builder URLs
+  uri: url="{{ item.value.url }}/" status_code=200 timeout=3 validate_certs=no
+  with_dict: "{{ builder }}"
+  changed_when: false
+
+- name: Create dummy files for a HTTP full test
+  file: path="{{ item.value.dir }}/_build_check" state=touch
+  with_dict: "{{ builder }}"
+  when: builder_http_full_check is defined and builder_http_full_check
+  changed_when: false
+
+- name: Test HTTP access to dummy files
+  uri: url="{{ item.value.url }}/_build_check" status_code=200 timeout=3 validate_certs=no
+  with_dict: "{{ builder }}"
+  when: builder_http_full_check is defined and builder_http_full_check
+  changed_when: false
+
+- name: Delete dummy test files
+  file: path="{{ item.value.dir }}/_build_check" state=absent
+  with_dict: "{{ builder }}"
+  when: builder_http_full_check is defined and builder_http_full_check
+  changed_when: false
+
+- name: Check whether build_ssh_key is loaded in ssh-agent
+  shell: ssh-add -L | grep "{{ builder_ssh_key.split()[1] }}"
+  changed_when: false

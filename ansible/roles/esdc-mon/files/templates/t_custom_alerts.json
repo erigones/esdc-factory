@@ -1,0 +1,353 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:45:05Z",
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_custom_alerts",
+                "macros": [],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "0",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "2",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Custom alert with severity 4 (High).",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "4",
+                        "key": "alert4",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Critical problem",
+                        "applications": [
+                            {
+                                "name": "Custom Alerts"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "1"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "0",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "2",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Custom alert with severity 5 (Disaster).",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "4",
+                        "key": "alert5",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Disaster",
+                        "applications": [
+                            {
+                                "name": "Custom Alerts"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "1"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "0",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "2",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Custom alert with severity 1 (Information).",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "4",
+                        "key": "alert1",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Information",
+                        "applications": [
+                            {
+                                "name": "Custom Alerts"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "1"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "0",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "2",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Custom alert with severity 3 (Average).",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "4",
+                        "key": "alert3",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Normal problem",
+                        "applications": [
+                            {
+                                "name": "Custom Alerts"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "1"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "0",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "2",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Custom alert with severity 0 (Not classified).",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "4",
+                        "key": "alert",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Not classified problem",
+                        "applications": [
+                            {
+                                "name": "Custom Alerts"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "1"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "0",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "2",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Custom alert with severity 2 (Warning).",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "4",
+                        "key": "alert2",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Warning",
+                        "applications": [
+                            {
+                                "name": "Custom Alerts"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "1"
+                    }
+                ],
+                "screens": [],
+                "applications": [
+                    {
+                        "name": "Custom Alerts"
+                    }
+                ],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_custom_alerts"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "triggers": [
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "2",
+                "dependencies": [],
+                "expression": "{t_custom_alerts:alert2.nodata(30)}=0",
+                "name": "{ITEM.LASTVALUE1}"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "{t_custom_alerts:alert3.nodata(30)}=0",
+                "name": "{ITEM.LASTVALUE1}"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "0",
+                "dependencies": [],
+                "expression": "{t_custom_alerts:alert.nodata(30)}=0",
+                "name": "{ITEM.LASTVALUE1}"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [],
+                "expression": "{t_custom_alerts:alert5.nodata(30)}=0",
+                "name": "{ITEM.LASTVALUE1}"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "1",
+                "dependencies": [],
+                "expression": "{t_custom_alerts:alert1.nodata(30)}=0",
+                "name": "{ITEM.LASTVALUE1}"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [],
+                "expression": "{t_custom_alerts:alert4.nodata(30)}=0",
+                "name": "{ITEM.LASTVALUE1}"
+            }
+        ]
+    }
+}

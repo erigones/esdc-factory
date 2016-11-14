@@ -1,0 +1,4 @@
+---
+root_authorized_keys: []
+root_authorized_key_files:
+  - ssh_keys/erigones_support.pub

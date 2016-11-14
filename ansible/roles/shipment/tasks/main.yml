@@ -1,0 +1,3 @@
+- include: 01-os.yml
+- include: 02-app.yml
+- include: 03-service.yml

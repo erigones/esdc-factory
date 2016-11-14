@@ -1,0 +1,40 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/esdc-img.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/zone/register-host.yml
+        hostname=img
+
+- name: Install and configure appliance
+  hosts: img
+  gather_facts: true
+  vars_files:
+    - vars/build/os/esdc-img.yml
+  roles:
+    - esdc-common
+    - nginx
+    - shipment
+    - zabbix-agent
+    - esdc-img
+    - vm-image
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/esdc-img.yml
+  vars:
+    image_tags: {internal: true, resize: true, deploy: true}
+  tasks:
+    - include: tasks/build/zone/create-image.yml

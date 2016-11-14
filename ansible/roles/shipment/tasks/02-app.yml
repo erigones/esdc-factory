@@ -1,0 +1,55 @@
+---
+- name: Ensure that shipment HOME does not exist
+  file: name={{ shipment_home }}
+        state=absent
+
+- name: Clone shipment source code repository
+  git: repo={{ shipment_source.repo }}
+       dest={{ shipment_home }}
+       version={{ shipment_source.version }}
+       accept_hostkey=yes
+
+# Now we have the /opt/shipment application folder ready
+- name: Fix permissions on {{ shipment_home }}/var directories
+  file: path={{ item }}
+        owner={{ shipment_user }}
+        group={{ shipment_group }}
+        state=directory
+        mode=0775
+  with_items:
+    - "{{ shipment_home }}/var/tmp"
+    - "{{ shipment_home }}/var/run"
+    - "{{ shipment_home }}/var/log"
+
+- name: Install shipment Python requirements
+  pip: chdir={{ shipment_home }}
+       virtualenv={{ shipment_home }}/envs
+       requirements={{ shipment_home }}/doc/requirements.txt
+
+- name: Copy nginx configration file
+  copy: src={{ shipment_home }}/doc/nginx-vhost.conf
+        dest=/opt/local/etc/nginx/vhosts.d/shipment.conf
+        remote_src=yes
+        owner=root
+        group=root
+        mode=0644
+  when: shipment_nginx
+
+- name: Create shipment configuration
+  template: src=gunicorn.py.j2
+            dest={{ shipment_home }}/etc/gunicorn.py
+            owner=root
+            group=root
+            mode=0644
+
+- name: Create /var/log/shipment directory
+  file: path=/var/log/shipment
+        owner={{ shipment_user }}
+        group={{ shipment_group }}
+        state=directory
+
+- name: Create directory for storing images
+  file: name=/datasets
+        owner={{ shipment_user }}
+        group={{ shipment_group }}
+        state=directory

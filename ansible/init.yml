@@ -1,0 +1,15 @@
+- name: Bootstrap the esDC VM Factory
+  hosts: builder
+  vars:
+    builder_http_full_check: true
+  tasks:
+    - name: Check whether {{ build_base_dir }} exists
+      shell: test -d "{{ build_base_dir }}"
+      changed_when: false
+
+    - name: Ensure builder directory structure is in place
+      file: path="{{ item.value.dir }}" state=directory mode=0775
+      with_dict: "{{ builder }}"
+
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check

@@ -1,0 +1,15 @@
+---
+- name: Check OS type/version
+  fail: msg="Invalid OS distribution type/version"
+  when: ansible_distribution != "CentOS"
+
+- name: Ensure sudo is installed
+  yum: name=sudo state=latest
+
+- name: Create /etc/sudoers
+  template: src=sudoers.j2
+            dest=/etc/sudoers
+            owner=root
+            group=root
+            mode=0600
+            validate="visudo -cf %s"

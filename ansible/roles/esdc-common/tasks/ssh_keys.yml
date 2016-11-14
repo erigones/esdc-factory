@@ -1,0 +1,9 @@
+---
+- name: Set up esDC-specific authorized keys for the root user
+  authorized_key: user=root key="{{ item }}"
+  with_file: "{{ root_authorized_key_files }}"
+
+- name: Set up build-specific authorized keys for the root user
+  authorized_key: user=root key="{{ item }}"
+  with_items: "{{ root_authorized_keys }}"
+  when: root_authorized_keys

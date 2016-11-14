@@ -1,0 +1,31 @@
+---
+- name: Ensure {{ builder_download_dir }} directory exists
+  file: path="{{ builder_download_dir }}" state=directory
+  delegate_to: builder
+
+- name: Copy kickstart file to download directory
+  template: src="{{ ks_template }}"
+            dest="{{ builder_download_dir }}/ks.cfg"
+            mode=0644
+  delegate_to: builder
+
+- name: Copy image-tools files to download directory
+  copy: src=files/centos-image-tools/
+        dest="{{ builder_download_dir }}/"
+  delegate_to: builder
+
+- name: Download kernel and initrd
+  get_url: url="{{ centos_mirror }}/{{ item.file }}"
+           dest="/zones/{{ zone_uuid }}/root/{{ item.file }}"
+           sha256sum="{{ item.sha256sum }}"
+  with_items: "{{ centos_files }}"
+
+- name: Ensure VM is running
+  vmadm: name="{{ zone_uuid }}" state=started
+
+- name: Wait until VM is installed
+  command: vmadm list -Hpo state uuid="{{ zone_uuid }}"
+  register: result
+  until: result.stdout.find("stopped") != -1
+  retries: 120
+  delay: 10

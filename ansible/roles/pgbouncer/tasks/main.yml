@@ -1,0 +1,44 @@
+---
+- name: Include OS-specific variables
+  include_vars: ../defaults/{{ ansible_distribution }}.yml
+
+- name: Install pgbouncer (CentOS)
+  yum: name={{ item }} state=installed
+  with_items:
+    - pgbouncer
+  when: ansible_distribution == "CentOS"
+
+- name: Install pgbouncer (SmartOS)
+  command: pkgin -y install {{ item }}
+  register: res
+  changed_when: "'nothing to do.' not in res.stdout"
+  with_items:
+    - pgbouncer
+  when: ansible_distribution == "SmartOS"
+
+- name: Create pgbouncer.ini
+  template: src=pgbouncer.ini.j2
+            dest={{ pgbouncer_config_dir }}/pgbouncer.ini
+            owner=root
+            group=root
+            mode=0644
+  notify: restart pgbouncer
+
+- name: Create pgbouncer passwords
+  command: bash -c "echo md5$(echo -n '{{ item.value.password}}{{ item.value.name }}' | md5sum | awk '{print $1}')"
+  with_dict: "{{ pgbouncer_users }}"
+  register: pgbouncer_hashed_passwords
+  changed_when: false
+  when: pgbouncer_users and pgbouncer_auth_type == "md5"
+
+- name: Populate pgbouncer userlist
+  template: src=userlist.txt.j2
+            dest={{ pgbouncer_auth_file }}
+            owner={{ pgbouncer_auth_file_user }}
+            group=postgres
+            mode=0640
+  when: pgbouncer_users
+  notify: restart pgbouncer
+
+- name: Enable pgbouncer
+  service: name=pgbouncer enabled=yes state=started

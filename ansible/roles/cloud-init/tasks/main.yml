@@ -1,0 +1,34 @@
+---
+- name: Install pyserial (EL6)
+  yum: name=ftp://ftp.pbone.net/mirror/ftp.sourceforge.net/pub/sourceforge/h/ha/hamux/6/noarch/pyserial-2.6-5.el6.noarch.rpm state=present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+- name: Install pyserial (EL7)
+  yum: name=pyserial state=present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: Install cloud-init
+  yum: name=cloud-init state=latest
+
+- name: Install additional cloud-init tools (EL7)
+  yum: name={{ item }} state=present
+  with_items:
+    - cloud-utils
+    - cloud-utils-growpart
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: Create cloud.cfg configuration file
+  copy: src={{ ansible_distribution }}-{{ ansible_distribution_major_version }}/cloud.cfg
+        dest=/etc/cloud/cloud.cfg
+        owner=root
+        group=root
+        mode=0644
+
+- name: Enable cloud-init services
+  service: name={{ item }} enabled=yes state=stopped
+  with_items:
+    - cloud-init
+    - cloud-init-local
+    - cloud-config
+    - cloud-final
+

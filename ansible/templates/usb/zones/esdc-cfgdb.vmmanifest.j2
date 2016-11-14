@@ -1,0 +1,44 @@
+{
+  "brand": "joyent",
+  "uuid": "ddca4052-effd-47fb-9e70-e6807025d8b4",
+  "image_uuid": "{{ IMAGE_UUID }}",
+  "max_physical_memory": 256,
+  "max_swap": 512,
+  "hostname": "cfgdb01.local",
+  "alias": "cfgdb01.local",
+  "zfs_io_priority": 100,
+  "cpu_cap": 200,
+  "cpu_shares": 100,
+  "resolvers": [
+    "@DNS_IP@"
+  ],
+  "nics": [
+    {
+      "primary": true,
+      "nic_tag": "admin",
+      "gateway": "@ADMIN_GATEWAY@",
+      "ip": "@CFGDB_IP@",
+      "netmask": "@ADMIN_NETMASK@",
+      "network_uuid": "d42bc4c3-ba17-43ee-a02a-74e667bd41fa"
+    }
+  ],
+  "customer_metadata": {
+    "org.erigones:cfgdb_password": "@ESDC_INSTALL_PASSWORD@",
+    "org.erigones:zabbix_ip": "@MON_IP@",
+    "root_authorized_keys": "@ROOT_AUTHORIZED_KEYS@"
+  },
+  "internal_metadata": {
+    "author": "Erigones",
+    "installed": true,
+    "alias": "cfgdb01",
+    "mon_ip": "@CFGDB_IP@",
+    "ostype": 5,
+    "mon_templates": "t_role-cfgdb"
+  },
+  "zpool": "zones",
+  "quota": 10,
+  "zfs_root_recsize": 131072,
+  "zfs_root_compression": "lz4",
+  "owner_uuid": "1",
+  "indestructible_zoneroot": true
+}

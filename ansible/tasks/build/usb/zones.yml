@@ -1,0 +1,25 @@
+---
+- name: Load appliance manifest
+  set_fact:
+    img_manifest: "{{ lookup('file', '{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition }}-{{ app.version | default(version) }}.imgmanifest') | from_json }}"
+
+- name: Hardlink appliance image in datasets/
+  file: src="{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition }}-{{ img_manifest.version }}{{ builder.appliance.ext }}"
+        dest="{{ usb_tmp_stage }}/datasets/{{ app.name }}-{{ img_manifest.version }}{{ builder.appliance.ext }}"
+        state=hard
+
+- name: Hardlink appliance manifest in datasets/
+  file: src="{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition }}-{{ img_manifest.version }}.imgmanifest"
+        dest="{{ usb_tmp_stage }}/datasets/{{ app.name }}-{{ img_manifest.version }}.imgmanifest"
+        state=hard
+
+- name: Create appliance folder in zones/
+  file: path="{{ usb_tmp_stage }}/zones/{{ app.name }}" state=directory mode=0755
+
+- name: Create appliance dataset file in zones/
+  copy: content="{{ app.name }}-{{ img_manifest.version }}.imgmanifest" dest="{{ usb_tmp_stage }}/zones/{{ app.name }}/dataset" mode=0444
+
+- name: Create appliance template in zones/
+  template: src="templates/usb/zones/{{ app.name }}.vmmanifest.j2" dest="{{ usb_tmp_stage }}/zones/{{ app.name }}/vmmanifest.tmpl" mode=0444
+  vars:
+    IMAGE_UUID: "{{ img_manifest.uuid }}"

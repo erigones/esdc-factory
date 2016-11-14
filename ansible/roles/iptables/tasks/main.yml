@@ -1,0 +1,15 @@
+---
+- name: Check OS type/version
+  fail: msg="Invalid OS distribution type/version"
+  when: ansible_distribution != "CentOS"
+
+- name: Copy firewall template
+  template: src=iptables.j2
+            dest=/etc/sysconfig/iptables
+            owner=root
+            group=root
+            mode=0600
+  notify: restart iptables
+
+- name: Ensure iptables is enabled
+  service: name=iptables enabled=yes state=started

@@ -1,0 +1,12 @@
+---
+- name: Install policycoreutils-python
+  yum: name=policycoreutils-python state=latest
+  when: selinux_permissive_domains is defined and selinux_state != "disabled"
+
+- name: Ensure SELinux is in {{ selinux_state }} state
+  selinux: state={{ selinux_state }} policy={{ selinux_policy }}
+
+- name: Configure permissive SELinux domains
+  selinux_permissive: name={{ item }} permissive=true
+  with_items: "{{ selinux_permissive_domains }}"
+  when: selinux_permissive_domains is defined and selinux_state != "disabled"

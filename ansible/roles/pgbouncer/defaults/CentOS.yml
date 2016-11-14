@@ -1,0 +1,5 @@
+pgbouncer_config_dir: /etc/pgbouncer
+
+pgbouncer_pidfile: "/var/run/pgbouncer/pgbouncer.pid"
+pgbouncer_auth_file: "/etc/pgbouncer/userlist.txt"
+pgbouncer_auth_file_user: "pgbouncer"

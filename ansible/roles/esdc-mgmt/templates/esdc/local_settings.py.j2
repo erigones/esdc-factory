@@ -1,0 +1,45 @@
+SECRET_KEY = """{{ secret_key.stdout }}"""
+
+DATABASES = {
+    'esdc': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '{{ pgsql_esdc.name }}',
+        'USER': '{{ pgsql_esdc.user }}',
+        'PASSWORD': '{{ pgsql_esdc.password }}',
+        'HOST': '{{ pgsql_esdc.host }}',
+        'PORT': '{{ pgsql_esdc.port }}',
+    },
+    'pdns': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '{{ pgsql_pdns.name }}',
+        'USER': '{{ pgsql_esdc.user }}',
+        'PASSWORD': '{{ pgsql_esdc.password }}',
+        'HOST': '{{ pgsql_pdns.host }}',
+        'PORT': '{{ pgsql_pdns.port }}',
+    },
+}
+DATABASES['default'] = DATABASES['esdc']
+
+CACHES = {
+    'redis': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': '{{ redis.host }}:{{ redis.port }}',
+        'TIMEOUT': None,
+        'OPTIONS': {
+            'DB': 0,
+            'PASSWORD': '{{ redis.password }}',
+            'PARSER_CLASS': 'redis.connection.HiredisParser'
+        },
+        'KEY_PREFIX': 'esdc',
+    }
+}
+CACHES['default'] = CACHES['redis']
+
+MON_ZABBIX_ENABLED = True
+MON_ZABBIX_SERVER_SSL_VERIFY = False
+{% if zabbix_api.username %}
+MON_ZABBIX_USERNAME = '{{ zabbix_api.username }}'
+{% endif %}
+{% if zabbix_api.password %}
+MON_ZABBIX_PASSWORD = '{{ zabbix_api.password }}'
+{% endif %}

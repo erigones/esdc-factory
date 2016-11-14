@@ -1,0 +1,48 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/esdc-mgmt.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/centos/register-host.yml
+        hostname=mgmt
+
+- name: Install and configure appliance
+  hosts: mgmt
+  gather_facts: true
+  vars_files:
+    - vars/build/os/esdc-mgmt.yml
+  roles:
+    - esdc-common
+    - selinux
+    - sudo
+    - iptables
+    - mdata-client
+    - qemu-guest-agent
+    - zabbix-agent
+    - postgresql
+    - pgbouncer
+    - cloud-init
+    - rc-scripts
+    - esdc-mgmt
+    - passwords
+    - vm-image
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/esdc-mgmt.yml
+  vars:
+    image_tags: {internal: true, resize: true, deploy: false}
+  tasks:
+    - include: tasks/build/centos/create-image.yml

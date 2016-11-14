@@ -1,0 +1,62 @@
+---
+# defaults file for nginx
+
+nginx_worker_processes: 1
+nginx_worker_connections: 1024
+
+nginx_sendfile: "on"
+nginx_tcp_nopush: "on"
+nginx_tcp_nodelay: "on"
+
+nginx_default_type: "application/octet-stream"
+
+# keepalive
+nginx_keepalive: "on"
+nginx_keepalive_requests: 100
+nginx_keepalive_timeout: 75
+nginx_client_header_timeout: 60
+nginx_client_body_timeout: 60
+nginx_send_timeout: 60
+
+# gzip
+nginx_gzip: "on"
+nginx_gzip_buffers: 32 4k
+nginx_gzip_comp_level: 1
+nginx_gzip_disable: "msie6"
+nginx_gzip_min_length: 20
+nginx_gzip_http_version: "1.1"
+nginx_gzip_proxied: expired no-cache no-store private auth
+nginx_gzip_vary: "on"
+nginx_gzip_types:
+  - text/plain
+  - text/css
+  - text/xml
+  - text/csv
+  - text/javascript
+  - application/x-javascript
+  - application/xml
+  - application/xml+rss
+  - application/javascript
+  - application/postscript
+  - application/pdf
+  - application/ecmascript
+  - application/json
+  - image/svg+xml
+
+# buffers
+nginx_client_body_buffer_size: "16k"
+nginx_client_header_buffer_size: "1k"
+nginx_client_max_body_size: "1m"
+nginx_large_client_header_buffers: "4 8k"
+nginx_connection_pool_size: 256
+nginx_request_pool_size: "4k"
+
+nginx_server_names_hash_bucket_size: 128
+nginx_server_names_hash_max_size: 512
+nginx_types_hash_max_size: 1024
+nginx_types_hash_bucket_size: 64
+
+nginx_server_tokens: "off"
+nginx_server_name_in_redirect: "off"
+
+nginx_ignore_invalid_headers: "on"

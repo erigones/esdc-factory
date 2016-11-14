@@ -1,0 +1,231 @@
+#!/usr/bin/bash
+
+#
+# Copyright (c) 2015-2016, Erigones, s. r. o.
+#
+
+unset LD_LIBRARY_PATH
+PATH=/usr/bin:/usr/sbin:/smartdc/bin
+export PATH
+export COMPUTENODE_SETUP_START=$(date +%s)
+
+set -o errexit
+set -o pipefail
+set -o xtrace
+
+export PS4='{% raw %}[\D{%FT%TZ}] ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }{% endraw %}'
+export BASH_XTRACEFD=2
+
+export CONSOLE_FD=4
+exec 2>>/var/log/computenode-install.log
+exec 4>>/dev/console
+
+# Time to wait for each VM to setup (in seconds)
+VM_DEPLOY_TIMEOUT=600
+
+# Helper functions
+function printf_log() {
+	printf "$@" >&${CONSOLE_FD}
+}
+
+function fatal() {
+	printf_log "%-80s\r" " "
+	printf_log "computenode configuration: fatal error: $*\n"
+	echo "computenode configuration: fatal error: $*"
+	exit 1
+}
+
+function errexit() {
+	[[ $1 -ne 0 ]] || exit 0
+	fatal "error exit status $1"
+}
+
+function cr_once() {
+	if [[ -z "${did_cr_once}" ]]; then
+		# This is to move us to the beginning of the line with the login: prompt
+		printf "\r" >&${CONSOLE_FD}
+		did_cr_once=1
+	fi
+}
+
+function create_setup_file() {
+	[[ -f /var/lib/setup.json ]] && rm -f /var/lib/setup.json
+	echo "{" \
+		"\"setup_time\": $(date +%s)," \
+		"\"complete\": true" \
+		"}" \
+		> /var/lib/setup.json
+	chmod 400 /var/lib/setup.json
+}
+
+# Main part
+USB_COPY=$(svcprop -p "joyentfs/usb_copy_path" svc:/system/filesystem/smartdc:default)
+
+. /lib/sdc/config.sh
+
+load_sdc_sysinfo
+load_sdc_config
+
+trap 'errexit $?' EXIT
+
+if [[ "${CONFIG_stop_before_setup}" == "true" ]]; then
+	# This option is for development purposes and it allows the installer to
+	# be stopped before any agents and computenode zones are installed.
+	exit 0
+fi
+
+if [[ -f /var/lib/setup.json ]]; then
+	exit 0
+fi
+
+function configure_erigonesd() {
+	echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
+	echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
+	echo "ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)" >> /opt/erigones/core/celery/local_config.py
+	chown root:root /opt/erigones/core/celery/local_config.py
+	chmod 0600 /opt/erigones/core/celery/local_config.py
+}
+
+function configure_zabbix() {
+	sed -i -e "s|@MON_IPADDR@|${MON_IP}|" /opt/zabbix/etc/zabbix_agentd.conf
+	sed -i -e "s|@NODE_HOSTNAME@|${SYSINFO_UUID}|" /opt/zabbix/etc/zabbix_agentd.conf
+}
+
+function install_isos() {
+	zfs list zones/iso &>/dev/null
+	if [[ $? -eq 0 && -d "${USB_COPY}/isos" ]]; then
+		for iso in "${USB_COPY}"/isos/*.iso; do
+			printf_log "%-56s Copying $(basename "${iso}") "
+			cp "${iso}" /iso/
+			printf_log "%4s\n" "done"
+		done
+	fi
+}
+
+function install_archives() {
+	{% for arch in usb_archives %}
+	if [[ ! -d "{{ arch.target }}" ]]; then
+		archive="{{ arch.name }}{{ builder.archive.ext }}"
+		printf_log "%-56s" "Preparing {{ arch.target }} by extracting ${archive} ..."
+		gtar xf "${USB_COPY}/archives/${archive}" -C / &> /dev/null
+		printf_log "%4s\n" "done"
+	fi
+	{% endfor %}
+
+	if [[ ! -d "{{ usb_archive_esdc.target }}" ]]; then
+		archive="{{ usb_archive_esdc.name }}{{ builder.archive.ext }}"
+		printf_log "%-56s" "Preparing {{ usb_archive_esdc.target }} by extracting ${archive} ..."
+		gtar xf "${USB_COPY}/archives/${archive}" -C /opt &> /dev/null
+		printf_log "%4s\n" "done"
+	fi
+}
+
+function _zk() {
+	zkcli="${USB_COPY}/scripts/zookeepercli"
+	cmd="${@}"
+
+	if ! "${zkcli}" -servers "${CFGDB_IP}:2181" -auth_usr "esdc" -auth_pwd "${ESDC_INSTALL_PASSWORD}" -c ${cmd} 2> /dev/null; then
+		fatal "Error: cfgdb command \"${cmd}\" failed"
+	fi
+}
+
+function query_cfgdb() {
+	printf_log "%-56s Retrieving headnode configuration information from cfgdb ..."
+
+    _mgmt_ip=$(_zk get "/esdc/settings/rabbitmq/host")
+    _mon_ip=$(_zk get "/esdc/settings/zabbix/host")
+    _rabbitmq_password=$(_zk get "/esdc/settings/rabbitmq/password")
+    _redis_password=$(_zk get "/esdc/settings/redis/password")
+
+    if [[ -z "${_mgmt_ip}" || -z "${_mon_ip}" || -z "${_rabbitmq_password}" || -z "${_redis_password}" ]]; then
+        fatal "Incomplete data in configuration database, aborting setup."
+    fi
+
+	printf_log "%-56s Registering compute node into cfgdb ..."
+
+	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
+	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "false"
+	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/hostname" "${SYSINFO_Hostname}"
+
+    MGMT_IP=${_mgmt_ip}
+    MON_IP=${_mon_ip}
+    RABBITMQ_PASSWORD=${_rabbitmq_password}
+    REDIS_PASSWORD=${_redis_password}
+
+	printf_log "%4s\n" "done"
+}
+
+function inform_user() {
+	computenode_setup_duration=$(($(date +%s) - COMPUTENODE_SETUP_START))
+
+	printf_log "%-56s Waiting for Danube Cloud Compute Node to initialize ..."
+	sleep 60
+	printf_log "%4s\n" "done"
+
+	printf_log "==> Setup complete (in %s seconds).\n" "${computenode_setup_duration}"
+	printf_log "==> Press [enter] to get login prompt.\n"
+}
+
+function generate_ssh_keys() {
+	# We need to setup SSH key pair, so backups and data replication just work
+	if [[ ! -f "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}" ]] && [[ ! -f "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}" ]]; then
+		printf_log "%-56s" "Generating SSH key pair... "
+		ssh-keygen -q -C "${CONFIG_hostname}" -t rsa -b 2048 -f "${CONFIG_config_inc_dir}/id_rsa" -q -N ''
+		chmod 400 "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}"
+		chmod 600 "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}"
+		mkdir -p /root/.ssh
+		cp "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}" "/root/.ssh/${CONFIG_ssh_private_key_file}"
+		cp "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}" "/root/.ssh/${CONFIG_ssh_public_key_file}"
+		printf_log "%4s\n" "done"
+	fi
+}
+
+function _validate_config_var() {
+	var="${1}"
+	value="${2}"
+
+	[[ -z "${value}" ]] && fatal "Missing \"${var}\" option in configuration file"
+
+	return 0
+}
+
+function validate_config() {
+	_validate_config_var "cfgdb_admin_ip" "${CONFIG_cfgdb_admin_ip}"
+	_validate_config_var "esdc_install_password" "${CONFIG_esdc_install_password}"
+}
+
+function random_string() {
+	local length="${1:-24}"
+	openssl rand -base64 "${length}" | tr -dc _A-Z-a-z-0-9
+}
+
+function reload_smf_manifests()
+{
+    printf_log "%-56s\n" "===> Reloading SMF manifests... "
+    /usr/sbin/svcadm restart svc:/system/manifest-import:default
+    printf_log "%4s\n" "done"
+}
+
+#
+# Here we go
+#
+
+cr_once
+printf_log "%-56s\n" "==> Setup starting..."
+validate_config
+install_archives
+generate_ssh_keys
+
+# Metatada for installation
+CFGDB_IP="${CONFIG_cfgdb_admin_ip}"
+ESDC_INSTALL_PASSWORD="${CONFIG_esdc_install_password}"
+
+query_cfgdb
+configure_erigonesd
+configure_zabbix
+
+install_isos
+create_setup_file
+reload_smf_manifests
+inform_user
+

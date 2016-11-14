@@ -1,0 +1,13 @@
+---
+nginx_repo_el6: http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+nginx_repo_el7: http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+
+nginx_packages:
+    - nginx
+
+nginx_user: nginx
+nginx_group: nginx
+
+nginx_service: nginx
+
+nginx_config_dir: /etc/nginx

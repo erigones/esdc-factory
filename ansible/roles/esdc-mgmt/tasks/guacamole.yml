@@ -1,0 +1,43 @@
+---
+- name: Install Guacamole and Java packages
+  yum: name={{ item }} state=latest enablerepo=epel-testing
+  with_items:
+    - guacd
+    - libguac
+    - libguac-client-vnc
+    - libvncserver
+    - tomcat
+
+- name: Download guacamole.war
+  get_url: dest=/var/lib/tomcat/webapps/guacamole.war url=http://downloads.sourceforge.net/project/guacamole/current/binary/guacamole-0.9.9.war?use_mirror=netcologne
+
+- name: Starting Tomcat autodeploy for guacamole.war
+  service: name=tomcat state=started
+
+- name: Waiting for autodeploy to finish
+  pause: seconds=10
+
+- name: Stopping Tomcat
+  service: name=tomcat state=stopped
+
+- name: Download additional JAR files
+  get_url: url={{ item }} dest=/var/lib/tomcat/webapps/guacamole/WEB-INF/lib/
+  with_items:
+    - http://central.maven.org/maven2/org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar
+    - http://search.maven.org/remotecontent?filepath=redis/clients/jedis/2.9.0/jedis-2.9.0.jar
+    - https://github.com/erigones/guacamole-auth-redis/releases/download/0.2.1/guacamole-auth-redis-0.2.1.jar
+
+- name: Setting correct owners of JAR files
+  file: path=/var/lib/tomcat/webapps/guacamole/WEB-INF/lib owner=tomcat group=tomcat recurse=yes
+
+- name: Create Guacamole configuration
+  template: src=guacamole/guacamole.properties.j2 dest=/var/lib/tomcat/webapps/guacamole/WEB-INF/classes/guacamole.properties owner=root group=root mode=0644
+
+- name: Restore SELinux contexts
+  command: /sbin/restorecon -FR /var/lib/tomcat/webapps/guacamole/WEB-INF/lib
+
+- name: Ensure that Guacamole is running
+  service: name={{ item }} enabled=yes state=started
+  with_items:
+    - guacd
+    - tomcat

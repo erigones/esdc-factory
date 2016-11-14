@@ -1,0 +1,14 @@
+---
+- meta: flush_handlers
+
+- name: Inspect the VM before final image preparation begins
+  pause:
+  when: image_debug is defined and image_debug
+
+- name: Prepare virtual machine for snapshotting (CentOS)
+  shell: prepare-image
+  when: ansible_distribution == "CentOS"
+
+- name: Prepare virtual machine for snapshotting (SmartOS)
+  shell: sm-prepare-image -y
+  when: ansible_distribution == "SmartOS"

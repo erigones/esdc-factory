@@ -1,0 +1,15 @@
+{
+  "v": 2,
+  "uuid": "{{ lookup('pipe', '{{ builder_uuid_generator }}') }}",
+  "name": "{{ pkg_base_name | mandatory }}",
+  "version": "{{ pkg_version | default(software_version) | mandatory }}",
+  "type": "other",
+  "os": "other",
+  "description": "{{ pkg_desc | default('') }}",
+  "state": "active",
+  "disabled": false,
+  "published_at": "{{ lookup('pipe', 'date -u +\"%Y-%m-%dT%H:%M:%SZ\"') }}",
+  "files": [ 
+      {{ pkg_file|to_nice_json }}
+  ]
+}

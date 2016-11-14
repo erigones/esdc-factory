@@ -1,0 +1,43 @@
+---
+- name: Set base image facts for download and import operations (CentOS)
+  when: zone_brand == "kvm"
+  set_fact:
+    base_image_uuid: "{{ base_image_uuid | default(zone_disks[0].image_uuid) }}"
+    base_image:
+      manifest:
+        url: "{{ base_image_manifest_url | default(builder_base_centos_imgmanifest_url) }}"
+        file: "/tmp/{{ base_image_manifest_file | default(builder_base_centos_imgmanifest) }}"
+      file:
+        url: "{{ base_image_file_url | default(builder_base_centos_imgfile_url) }}"
+        file: "/tmp/{{ base_image_file_file | default(builder_base_centos_imgfile) }}"
+
+- name: Set base image facts for download and import operations (base64)
+  when: zone_brand != "kvm"
+  set_fact:
+    base_image_uuid: "{{ base_image_uuid | default(zone_image_uuid) }}"
+    base_image:
+      manifest:
+        url: "{{ base_image_manifest_url | default(builder_base_zone_imgmanifest_url) }}"
+        file: "/tmp/{{ base_image_manifest_file | default(builder_base_zone_imgmanifest) }}"
+      file:
+        url: "{{ base_image_file_url | default(builder_base_zone_imgfile_url) }}"
+        file: "/tmp/{{ base_image_file_file | default(builder_base_zone_imgfile) }}"
+
+- name: Check if the latest base image is imported ({{ base_image_uuid }})
+  shell: imgadm list -H -o uuid,zpool | grep zones | grep -q "{{ base_image_uuid }}"
+  ignore_errors: true
+  register: image_imported
+
+- name: Download latest base image
+  get_url: url="{{ item.value.url }}" dest="{{ item.value.file }}" validate_certs=no timeout=30
+  with_dict: "{{ base_image }}"
+  when: image_imported|failed
+
+- name: Install latest base image
+  shell: imgadm install -f "{{ base_image.file.file }}" -m "{{ base_image.manifest.file }}"
+  when: image_imported|failed
+
+- name: Remove downloaded base image
+  file: path="{{ item.value.file }}" state=absent
+  with_dict: "{{ base_image }}"
+  when: image_imported|failed

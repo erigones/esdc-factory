@@ -1,0 +1,3 @@
+BROKER_URL = 'amqp://{{ rabbitmq.user }}:{{ rabbitmq.password }}@{{ rabbitmq.host }}:{{ rabbitmq.port }}/{{ rabbitmq.vhost }}'
+CELERY_RESULT_BACKEND = 'redis://:{{ redis.password }}@{{ redis.host }}:{{ redis.port }}/0'
+ERIGONES_MGMT_DAEMON_ENABLED = True

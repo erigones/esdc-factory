@@ -1,0 +1,55 @@
+{
+  "autoboot": true,
+  "brand": "kvm",
+  "vcpus": 1,
+  "cpu_cap": 150,
+  "vnc_port": 20001,
+  "disks": [
+    {
+      "image_uuid": "{{ IMAGE_UUID }}",
+      "image_size": 10240,
+      "boot": true,
+      "model": "virtio",
+      "media": "disk",
+      "compression": "lz4"
+    }
+  ],
+  "nics": [
+    {
+      "nic_tag": "admin",
+      "gateway": "@ADMIN_GATEWAY@",
+      "ip": "@MON_IP@",
+      "netmask": "@ADMIN_NETMASK@",
+      "network_uuid": "d42bc4c3-ba17-43ee-a02a-74e667bd41fa",
+      "model": "virtio",
+      "primary": true
+    }
+  ],
+  "ram": 1024,
+  "hostname": "mon01.local",
+  "alias": "mon01.local",
+  "uuid": "a28faa4d-d0ee-4593-938a-f0d062022b02",
+  "resolvers": [
+    "127.0.0.1",
+    "@DNS_IP@"
+  ],
+ "customer_metadata": {
+    "org.erigones:zabbix_ip": "127.0.0.1",
+    "org.erigones:zabbix_esdc_password": "@ZABBIX_ESDC_PASSWORD@",
+    "org.erigones:zabbix_admin_password": "@ZABBIX_ADMIN_PASSWORD@",
+    "org.erigones:zabbix_admin_email": "@ZABBIX_ADMIN_EMAIL@",
+    "org.erigones:zabbix_smtp_email": "@ZABBIX_SMTP_EMAIL@",
+    "root_authorized_keys": "@ROOT_AUTHORIZED_KEYS@"
+  },
+  "internal_metadata": {
+    "author": "Erigones",
+    "installed": true,
+    "alias": "mon01",
+    "ostype": 1,
+    "mon_ip": "127.0.0.1",
+    "mon_templates": "t_role-mon"
+  },
+  "owner_uuid": "1",
+  "qemu_extra_opts": "-chardev socket,path=/tmp/vm.qga,server,nowait,id=qga0 -device virtio-serial -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0",
+  "indestructible_zoneroot": true
+}

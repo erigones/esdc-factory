@@ -1,0 +1,14 @@
+---
+- name: Load {{ usb_archive_esdc.name }} manifest
+  set_fact:
+    img_manifest: "{{ lookup('file', '{{ builder.archive.dir }}/{{ usb_archive_esdc.name }}-{{ release_version }}.imgmanifest') | from_json }}"
+
+- name: Hardlink {{ usb_archive_esdc.name }} package in archives/
+  file: src="{{ builder.archive.dir }}/{{ usb_archive_esdc.name }}-{{ img_manifest.version }}{{ builder.archive.ext }}"
+        dest="{{ usb_tmp_stage }}/archives/{{ usb_archive_esdc.name }}{{ builder.archive.ext }}"
+        state=hard
+
+- name: Hardlink {{ usb_archive_esdc.name }} manifest in archives/
+  file: src="{{ builder.archive.dir }}/{{ usb_archive_esdc.name }}-{{ img_manifest.version }}.imgmanifest"
+        dest="{{ usb_tmp_stage }}/archives/{{ usb_archive_esdc.name }}.imgmanifest"
+        state=hard

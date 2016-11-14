@@ -1,0 +1,29 @@
+---
+- meta: flush_handlers
+
+# Do not use at this time.
+#- name: Set up GRUB password protection
+#  lineinfile: state=present
+#              dest=/boot/grub/grub.conf
+#              insertafter="^hiddenmenu"
+#              line="password --encrypted {{ grub_pw }}"
+#  when: grub_pw is defined and grub_pw
+
+- name: Generate random password for the root account
+  shell: openssl rand -base64 30 | tr -dc _A-Z-a-z-0-9
+  register: _root_pw
+  when: root_pw is defined and root_pw == ""
+
+- name: Generate random password hash for the root account
+  set_fact:
+    root_pw: "{{ _root_pw.stdout | password_hash('sha512') }}"
+  when: root_pw is defined and root_pw == ""
+
+- debug: msg="Setting root password to {{ _root_pw.stdout }}"
+  when: root_pw is defined and root_pw
+
+- name: Change root account password
+  user: name=root password={{ root_pw }}
+  when: root_pw is defined and root_pw
+
+# NOTE: After changing the root password ansible may not be able to access the machine

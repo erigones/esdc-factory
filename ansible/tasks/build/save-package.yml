@@ -1,0 +1,31 @@
+# Expects:
+#   - save_dir
+#   - pkg_url (optional)
+#   - pkg_name
+#   - pkg_ext
+#   - pkg_link (optional)
+#   - pkg_link_exts (optional)
+#   - pkg_base_name
+#   - pkg_version
+#   - pkg_desc (optional)
+---
+- name: Download package from {{ pkg_url }}
+  get_url: url="{{ pkg_url }}" dest="{{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}" mode=0644 force="{{ force_download|default(false) }}"
+  when: pkg_url is defined and pkg_url
+
+- name: Get package file information
+  stat: path="{{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}" checksum_algorithm="sha1" get_checksum=True
+  register: pkg_stat
+
+- name: Create image manifest for package
+  template: src=templates/imgmanifest.j2 dest="{{ save_dir }}/{{ pkg_name }}.imgmanifest"
+  vars:
+    pkg_file:
+      size: "{{ pkg_stat.stat.size }}"
+      compression: "gzip"
+      sha1: "{{ pkg_stat.stat.checksum }}"
+
+- name: Create symlink to the latest package version
+  shell: chdir="{{ save_dir }}" rm -f "{{ pkg_link }}{{ item }}"; test -f "{{ pkg_name }}{{ item }}" && ln -s "{{ pkg_name }}{{ item }}" "{{ pkg_link }}{{ item }}"
+  with_items: "{{ pkg_link_exts | default([pkg_ext]) }} + ['.imgmanifest']"
+  when: pkg_link is defined and pkg_link

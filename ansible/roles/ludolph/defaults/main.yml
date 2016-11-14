@@ -1,0 +1,32 @@
+---
+ludolph_service_enabled: False
+
+ludolph_webserver_host: "127.0.0.1"
+ludolph_webserver_port: 8222
+
+ludolph_cron_enabled: True
+
+ludolph_nick: Ludolph
+
+ludolph_xmpp_username: ludolph@example.com
+ludolph_xmpp_password: SecretPassw0rd
+
+ludolph_xmpp_host:
+ludolph_xmpp_port:
+
+ludolph_xmpp_use_tls: True
+ludolph_xmpp_use_ssl: False
+ludolph_xmpp_use_sslv3: False
+
+ludolph_xmpp_users: []
+ludolph_xmpp_admins: []
+
+ludolph_plugin_zabbix_enabled: False
+ludolph_plugin_zabbix_server_url: https://zabbix.example.com
+ludolph_plugin_zabbix_username: zabbix
+ludolph_plugin_zabbix_password: zabbix
+
+ludolph_plugin_zabbix_http_authentication: False
+
+ludolph_plugin_zabbix_http_username: zabbix
+ludolph_plugin_zabbix_http_password: zabbix

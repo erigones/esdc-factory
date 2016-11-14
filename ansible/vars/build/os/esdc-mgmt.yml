@@ -1,0 +1,116 @@
+root_pw: ""  # auto-generate password
+grub_pw: null
+hostname: "{{ esdc_mgmt.hostname | default('mgmt01.local') }}"
+
+rc_scripts_after:
+  - redis.service
+  - rabbitmq-server.service
+  - tomcat.service
+  - guacd.service
+  - postgresql-9.5.service
+  - pgbouncer.service
+  - zabbix-agent.service
+  - nginx.service
+  - haproxy.service
+
+postgresql_databases:
+  - name: "{{ esdc_mgmt.pgsql_esdc.name | mandatory }}"
+    owner: "{{ esdc_mgmt.pgsql_esdc.user | mandatory }}"
+  - name: "{{ esdc_mgmt.pgsql_pdns.name | mandatory }}"
+    owner: "{{ esdc_mgmt.pgsql_esdc.user | mandatory }}"
+postgresql_users:
+  esdc:
+    name: "{{ esdc_mgmt.pgsql_esdc.user | mandatory }}"
+    password: "{{ esdc_mgmt.pgsql_esdc.password | mandatory }}"
+  pdns:
+    name: "{{ esdc_mgmt.pgsql_pdns.user | mandatory }}"
+    password: "{{ esdc_mgmt.pgsql_pdns.password | mandatory }}"
+  monitoring:
+    name: "{{ esdc_mgmt.pgsql_monitoring.user | mandatory }}"
+    password: "{{ esdc_mgmt.pgsql_monitoring.password | mandatory }}"
+postgresql_user_privileges:
+  - name: "{{ esdc_mgmt.pgsql_esdc.user | mandatory }}"
+    db: "{{ esdc_mgmt.pgsql_esdc.name | mandatory }}"
+    priv: ALL
+  - name: "{{ esdc_mgmt.pgsql_esdc.user | mandatory }}"
+    db: "{{ esdc_mgmt.pgsql_pdns.name | mandatory }}"
+    priv: ALL
+postgresql_backup_enabled: true
+
+pgbouncer_users: "{{ postgresql_users }}"
+
+pgbouncer_admin_users:
+  - "{{ postgresql_users.esdc.name | mandatory }}"
+pgbouncer_stats_users:
+  - "{{ postgresql_users.esdc.name | mandatory }}"
+  - "{{ postgresql_users.monitoring.name | mandatory }}"
+
+rabbitmq: "{{ esdc_mgmt.rabbitmq }}"
+
+redis: "{{ esdc_mgmt.redis }}"
+
+pgsql_pdns: "{{ esdc_mgmt.pgsql_pdns }}"
+pgsql_esdc: "{{ esdc_mgmt.pgsql_esdc }}"
+pgsql_monitoring: "{{ esdc_mgmt.pgsql_monitoring }}"
+
+zabbix_api: "{{ esdc_mgmt.zabbix_api }}"
+
+esdc_source:
+  repo: "https://github.com/erigones/esdc-{{ release_edition }}.git"
+  version: "{{ software_branch }}"
+
+firewall_allowed_tcp_ports:
+  - port: 80
+  - port: 443
+  - port: 22
+    iface: eth0
+  - port: 5672
+    iface: eth0
+  - port: 6379
+    iface: eth0
+  - port: 6432
+    iface: eth0
+  - port: 10050
+    iface: eth0
+
+sudo_users:
+  - user: erigones
+    runas: root
+    command: /usr/bin/systemctl
+  - user: erigones
+    runas: root
+    command: /opt/erigones/bin/esdc-git-update
+  - user: erigones
+    runas: root
+    command: /opt/erigones/bin/esdc-sslcert-update
+  - user: zabbix
+    runas: rabbitmq
+    command: "/usr/sbin/rabbitmqctl list_queues -p esdc"
+
+zbx_agent_UserParameter:
+  - "queue.ping[*],/opt/erigones/bin/erigonesd mgmt inspect ping -q -C -t 1 -d $1@$2 > /dev/null 2> /dev/null; echo $?"
+  - "queue.tasks[*],/opt/erigones/bin/erigonesd mgmt inspect active -q -C -t 1 -d $1 2> /dev/null | grep -c args"
+  - "queue.tasks.all,sudo -u rabbitmq /usr/sbin/rabbitmqctl list_queues -p esdc | grep -vE 'Listing queues |^default|done\\.|celery\\.pidbox|^celeryev' | awk 'BEGIN{sum=0};{ sum += $2};END{print sum}'"
+  - "queue.tasks.count[*],sudo -u rabbitmq /usr/sbin/rabbitmqctl list_queues -p esdc | awk '/^$1\\.$2/ { print $$2 }'"
+  - "sio.ping,curl -m 3 -s http://127.0.0.1:8000/api/ping/ | grep -c pong"
+  - "gui.ping,curl -m 3 -s http://127.0.0.1:8001/api/ping/ | grep -c pong"
+  - "api.ping,curl -m 3 -s http://127.0.0.1:8002/api/ping/ | grep -c pong"
+  - "haproxy.ping,/usr/bin/curl -m 3 -I -s http://127.0.0.1/zbx_ping | grep -c \"200 OK\""
+  - "redis.ping,/usr/bin/redis-cli -a @REDIS_PASSWORD@ ping | grep -c PONG"
+  - "redis.stat[*],/usr/bin/redis-cli -a @REDIS_PASSWORD@ info | grep \"$1\" | cut -d: -f2"
+  - "{% raw %}vfs.dev.discovery,echo -n '{\"data\":['; for disk in $(awk '$3 !~ /[0-9]+/ {print $3}' /proc/diskstats); do echo -n \"{\\\"{#DEVICE}\\\":\\\"${disk}\\\",\\\"{#DEVICENAME}\\\":\\\"\\/dev\\/${disk}\\\"},\"; done |sed -e 's:,$::'; echo ']}'{% endraw %}"
+  - "custom.vfs.dev.read.ms[*],egrep $1 /proc/diskstats | head -1 | awk '{print $$7}'"
+  - "custom.vfs.dev.write.ms[*],egrep $1 /proc/diskstats | head -1 | awk '{print $$11}'"
+  - "proc.rss[*],/bin/ps -eo rss,args | /usr/bin/awk 'BEGIN{sum = 0}($$0 ~ /$1/ && $$0 !~ /awk/) {sum += $$1} END{print sum*1024}'"
+  - "proc.cpu[*],/bin/ps -eo pcpu,args | /usr/bin/awk 'BEGIN{sum = 0}($$0 ~ /$1/ && $$0 !~ /awk/) {sum += $$1} END{print sum}'"
+  - "pgsql.ping,/usr/bin/psql -h 127.0.0.1 -p 5432 -U {{ postgresql_users.monitoring.name }} -d postgres -Atc 'select 1' >/dev/null 2>&1; echo $?"
+  - "pgsql.db.size[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U {{ postgresql_users.monitoring.name }} -d postgres -At -c \"select pg_database_size('$1')\""
+  - "pgsql.db.connections[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U {{ postgresql_users.monitoring.name }} -d postgres -At -c \"select numbackends from pg_stat_database where datname = '$1'\""
+  - "pgsql.cachehit_ratio[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U {{ postgresql_users.monitoring.name }} -d postgres -At -c \"SELECT round(blks_hit*100/(blks_hit+blks_read), 2) AS cache_hit_ratio FROM pg_stat_database WHERE datname = '$1' and blks_read > 0 union all select 0.00 AS cache_hit_ratio order by cache_hit_ratio desc limit 1\""
+  - "pgsql.table.size[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U {{ postgresql_users.monitoring.name }} -d zabbix -At -c \"SELECT pg_total_relation_size('$1')\""
+  - "pgbouncer.ping,/usr/bin/psql -h 127.0.0.1 -p 6432 -U {{ postgresql_users.monitoring.name }} -d pgbouncer -Atc 'show help' >/dev/null 2>&1; echo $?"
+  - "pgbouncer.avg.qps[*],/usr/bin/psql -h 127.0.0.1 -p 6432 -U {{ postgresql_users.monitoring.name }} -d pgbouncer -tc 'show stats' | awk '$$1 ~ /$1/ {print $$11}'"
+  - "pgbouncer.avg.qdur[*],/usr/bin/psql -h 127.0.0.1 -p 6432 -U {{ postgresql_users.monitoring.name }} -d pgbouncer -tc 'show stats' | awk '$$1 ~ /$1/ {print $$17}'"
+  - "pgbouncer.pool.cl_active[*],/usr/bin/psql -h 127.0.0.1 -p 6432 -U {{ postgresql_users.monitoring.name }} -d pgbouncer -tc 'show pools' | awk '$$1 ~ /$1/ {print $$5}' | awk '{s+=$$1} END {print s}'"
+
+selinux_permissive_domains: [ zabbix_agent_t ]

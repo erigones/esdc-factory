@@ -1,0 +1,18 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine and image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/base-centos-6.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/centos/kickstart.yml
+        ks_template=templates/centos-6/ks.cfg.j2
+    - include: tasks/build/centos/create-image.yml

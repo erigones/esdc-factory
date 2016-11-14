@@ -1,0 +1,40 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/base-64-es.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/zone/register-host.yml
+        hostname=base-64-es
+
+- name: Install and configure appliance
+  hosts: base-64-es
+  gather_facts: true
+  vars_files:
+    - vars/build/os/base-64-es.yml
+  roles:
+    - os-common
+    - pkgin
+    - zabbix-agent
+  tasks:
+    - include: tasks/build/zone/kickstart.yml
+  post_tasks:
+    - name: Prepare virtual machine for snapshotting
+      shell: sm-prepare-image -y
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/base-64-es.yml
+  tasks:
+    - include: tasks/build/zone/create-image.yml

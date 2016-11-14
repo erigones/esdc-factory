@@ -1,0 +1,48 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/esdc-node.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/zone/register-host.yml
+        hostname=esdc-node
+
+- name: Build and save esDC compute node software archive
+  hosts: esdc-node
+  gather_facts: true
+  vars_files:
+    - vars/build/os/esdc-node.yml
+  roles:
+    - esdc-node
+
+- name: Software package post-build tasks
+  hosts: builder
+  vars_files:
+    - vars/build/os/esdc-node.yml
+  vars:
+    save_dir: "{{ esdc_node_build.save_dir }}"
+    pkg_name: "{{ esdc_node_build.pkg_name }}"
+    pkg_ext: ".tar.gz"
+    pkg_link: "{{ esdc_node_build.pkg_link }}"
+    pkg_link_exts:
+        - ".tar.gz"
+        - "-VERSION"
+  tasks:
+    - include: tasks/build/save-package.yml
+
+- name: Cleanup virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/esdc-node.yml
+  tasks:
+    - include: tasks/build/cleanup.yml

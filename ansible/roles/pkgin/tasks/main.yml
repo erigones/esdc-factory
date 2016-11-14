@@ -1,0 +1,12 @@
+---
+- name: Configure PKG_PATH in /opt/local/etc/pkg_install.conf
+  lineinfile: dest=/opt/local/etc/pkg_install.conf
+              regexp=^PKG_PATH
+              line="PKG_PATH={{ pkgin_mirror }}/packages/SmartOS/{{ pkgin_release }}/{{ pkgin_arch }}/All"
+
+- name: Configure pkgin mirror
+  template: src=repositories.conf.j2
+            dest=/opt/local/etc/pkgin/repositories.conf
+            owner=root
+            group=root
+            mode=0644

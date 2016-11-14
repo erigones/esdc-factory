@@ -1,0 +1,542 @@
+#!/usr/bin/bash
+
+#
+# Copyright (c) 2015-2016, Erigones, s. r. o.
+#
+
+unset LD_LIBRARY_PATH
+PATH=/usr/bin:/usr/sbin:/smartdc/bin
+export PATH
+export HEADNODE_SETUP_START=$(date +%s)
+
+set -o errexit
+set -o pipefail
+set -o xtrace
+
+export PS4='{% raw %}[\D{%FT%TZ}] ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }{% endraw %}'
+export BASH_XTRACEFD=2
+
+export CONSOLE_FD=4
+exec 2>>/var/log/headnode-install.log
+exec 4>>/dev/console
+
+# Time to wait for each VM to setup (in seconds)
+VM_DEPLOY_TIMEOUT=600
+
+# Helper functions
+function printf_log() {
+	printf "$@" >&${CONSOLE_FD}
+}
+
+function fatal() {
+	printf_log "%-80s\r" " "
+	printf_log "headnode configuration: fatal error: $*\n"
+	echo "headnode configuration: fatal error: $*"
+	exit 1
+}
+
+function errexit() {
+	[[ $1 -ne 0 ]] || exit 0
+	fatal "error exit status $1"
+}
+
+function cr_once() {
+	if [[ -z "${did_cr_once}" ]]; then
+		# This is to move us to the beginning of the line with the login: prompt
+		printf "\r" >&${CONSOLE_FD}
+		did_cr_once=1
+	fi
+}
+
+function create_setup_file() {
+	[[ -f /var/lib/setup.json ]] && rm -f /var/lib/setup.json
+	echo "{" \
+		"\"setup_time\": $(date +%s)," \
+		"\"complete\": true" \
+		"}" \
+		> /var/lib/setup.json
+	chmod 400 /var/lib/setup.json
+}
+
+# Main part
+USB_COPY=$(svcprop -p "joyentfs/usb_copy_path" svc:/system/filesystem/smartdc:default)
+SYS_ZPOOL=$(svcprop -p "config/zpool" svc:/system/smartdc/init:default)
+
+. /lib/sdc/config.sh
+
+load_sdc_sysinfo
+load_sdc_config
+
+trap 'errexit $?' EXIT
+
+if [[ "${CONFIG_stop_before_setup}" == "true" ]]; then
+	# This option is for development purposes and it allows the installer to
+	# be stopped before any agents and headnode zones are installed.
+	exit 0
+fi
+
+if [[ -f /var/lib/setup.json ]]; then
+	exit 0
+fi
+
+function configure_imgadm() {
+	if [[ ! -f /var/imgadm/imgadm.conf ]]; then
+		mkdir -p /var/imgadm
+		echo '{}' > /var/imgadm/imgadm.conf
+	fi
+
+	if [[ -z "$(json -f /var/imgadm/imgadm.conf sources)" ]]; then
+		# re-load config
+		load_sdc_config
+
+		imgadm sources -f -d https://images.joyent.com
+		imgadm sources -f -a "http://${IMG_IP}"
+	fi
+}
+
+function configure_erigonesd() {
+	echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
+	echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
+	echo "ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)" >> /opt/erigones/core/celery/local_config.py
+	chown root:root /opt/erigones/core/celery/local_config.py
+	chmod 0600 /opt/erigones/core/celery/local_config.py
+}
+
+function configure_zabbix() {
+	sed -i -e "s|@MON_IPADDR@|${MON_IP}|" /opt/zabbix/etc/zabbix_agentd.conf
+	sed -i -e "s|@NODE_HOSTNAME@|${SYSINFO_UUID}|" /opt/zabbix/etc/zabbix_agentd.conf
+}
+
+function install_isos() {
+	zfs list zones/iso &>/dev/null
+	if [[ $? -eq 0 && -d "${USB_COPY}/isos" ]]; then
+		for iso in "${USB_COPY}"/isos/*.iso; do
+			printf_log "%-56s Copying $(basename "${iso}") "
+			cp "${iso}" /iso/
+			printf_log "%4s\n" "done"
+		done
+	fi
+}
+
+# If we have some images, we should copy them to the local image server
+function _install_image() {
+	image=$1
+	img_repo_path=$2
+
+	if [[ -d "${USB_COPY}/images/${image}" ]]; then
+		img_name=$(cat "${USB_COPY}/images/${image}/dataset")
+		[[ -z "${img_name}" ]] && fatal "No dataset specified in ${USB_COPY}/images/${image}/dataset"
+
+		img_manifest="${USB_COPY}/datasets/${img_name}"
+		[[ ! -f "${img_manifest}" ]] && fatal "No image manifest found at ${img_manifest}"
+
+		img_basename="${img_name%.imgmanifest}"
+		img_filename="${USB_COPY}/datasets/${img_basename}.zfs.gz"
+		[[ ! -f "${img_filename}" ]] && fatal "No filename found for ${img_filename}"
+
+		img_uuid=$(json uuid < "${img_manifest}")
+
+		cr_once
+		printf_log "%-56s" "Copying image ${img_basename} "
+
+		img_dest="${img_repo_path}/${img_uuid}"
+
+		mkdir -p "${img_dest}"
+		cp "${img_filename}" "${img_dest}/file"
+		cp "${img_manifest}" "${img_dest}/manifest"
+		chown -R 10000:10000 "${img_dest}"  # shipment_uid and shipment_gid
+		printf_log "%4s\n" "done"
+	fi
+
+	return 0
+}
+
+# Get imgsrv /datasets path and explicitly specify, which images should be installed
+function install_images() {
+	img_uuid=$(json uuid < "${USB_COPY}/zones/{{ image_server.name }}/vmmanifest.tmpl")
+	img_path="/zones/${img_uuid}/root/datasets"
+
+	for img in "${USB_COPY}/images"/*; do
+		_install_image "$(basename "${img}")" "${img_path}"
+	done
+}
+
+function _build_vmmanifest() {
+	vm="${1}"
+	template="${2}"
+	manifest="${3}"
+
+	case "${vm}" in
+		esdc-cfgdb)
+			sed -e "s|@DNS_IP@|${DNS_IP}|" \
+				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
+				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@CFGDB_IP@|${CFGDB_IP}|" \
+				-e "s|@MON_IP@|${MON_IP}|" \
+				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
+				-e "s|@ESDC_INSTALL_PASSWORD@|${ESDC_INSTALL_PASSWORD}|" \
+				"${template}" > "${manifest}"
+		;;
+
+		esdc-dns)
+			sed -e "s|@DNS_IP@|${DNS_IP}|" \
+				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
+				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@MGMT_IP@|${MGMT_IP}|" \
+				-e "s|@MON_IP@|${MON_IP}|" \
+				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
+				-e "s|@PGSQL_PDNS_PASSWORD@|${PGSQL_PDNS_PASSWORD}|" \
+				"${template}" > "${manifest}"
+		;;
+
+		esdc-img)
+			sed -e "s|@IMG_IP@|${IMG_IP}|" \
+				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
+				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@DNS_IP@|${DNS_IP}|" \
+				-e "s|@MON_IP@|${MON_IP}|" \
+				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
+				"${template}" > "${manifest}"
+		;;
+
+		esdc-mgmt)
+			sed -e "s|@MGMT_IP@|${MGMT_IP}|" \
+				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
+				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@MON_IP@|${MON_IP}|" \
+				-e "s|@DNS_IP@|${DNS_IP}|" \
+				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
+				-e "s|@ZABBIX_ADMIN_PASSWORD@|${ZABBIX_ADMIN_PASSWORD}|" \
+				-e "s|@ZABBIX_ESDC_PASSWORD@|${ZABBIX_ESDC_PASSWORD}|" \
+				-e "s|@RABBITMQ_PASSWORD@|${RABBITMQ_PASSWORD}|" \
+				-e "s|@REDIS_PASSWORD@|${REDIS_PASSWORD}|" \
+				-e "s|@PGSQL_ESDC_PASSWORD@|${PGSQL_ESDC_PASSWORD}|" \
+				-e "s|@PGSQL_PDNS_PASSWORD@|${PGSQL_PDNS_PASSWORD}|" \
+				-e "s|@ESDC_ADMIN_EMAIL@|${ZABBIX_ADMIN_EMAIL}|" \
+				"${template}" > "${manifest}"
+		;;
+
+		esdc-mon)
+			sed -e "s|@MON_IP@|${MON_IP}|" \
+				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
+				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@DNS_IP@|${DNS_IP}|" \
+				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
+				-e "s|@ZABBIX_ESDC_PASSWORD@|${ZABBIX_ESDC_PASSWORD}|" \
+				-e "s|@ZABBIX_ADMIN_PASSWORD@|${ZABBIX_ADMIN_PASSWORD}|" \
+				-e "s|@ZABBIX_ADMIN_EMAIL@|${ZABBIX_ADMIN_EMAIL}|" \
+				-e "s|@ZABBIX_SMTP_EMAIL@|${ZABBIX_SMTP_EMAIL}|" \
+				"${template}" > "${manifest}"
+		;;
+	esac
+
+	json --validate -q -f "${manifest}" &> /dev/null || fatal "VM manifest validation failed for ${vm}"
+}
+
+# Create a VM and try to be brand-agnostic.
+# KVM images should set the esdc_vm_installed customer_metadata upon successful deploy.
+# OS images should have /var/svc/provision_success upon successful provision.
+# If they don't have that file, we should try to figure out what to do.
+function create_vm() {
+	vm=$1
+	ds_file="${USB_COPY}/zones/${vm}/dataset"
+
+	cr_once
+
+	if [[ -f "${ds_file}" ]]; then
+		ds_name=$(cat "${ds_file}")
+		[[ -z ${ds_name} ]] && fatal "No dataset specified in ${ds_file}"
+
+		ds_manifest="${USB_COPY}/datasets/${ds_name}"
+		[[ ! -f ${ds_manifest} ]] && fatal "No manifest found at ${ds_manifest}"
+
+		ds_basename="${ds_name%.imgmanifest}"
+		ds_filename="${USB_COPY}/datasets/${ds_basename}.zfs.gz"
+		[[ ! -f ${ds_filename} ]] && fatal "No filename found for ${ds_name}"
+
+		ds_uuid=$(json uuid < "${ds_manifest}")
+
+		if [[ ! -d "${SYS_ZPOOL}/${ds_uuid}" ]]; then
+			printf_log "%-58s" "Importing core image: ${ds_basename} "
+			imgadm install -m "${ds_manifest}" -f "${ds_filename}"
+			printf_log "%4s\n" "done"
+		fi
+	fi
+
+	template="${USB_COPY}/zones/${vm}/vmmanifest.tmpl"
+	if [[ -f "${template}" ]]; then
+		vm_manifest="${USB_COPY}/zones/${vm}/vmmanifest"
+		_build_vmmanifest "${vm}" "${template}" "${vm_manifest}"
+		vm_brand=$(json brand < "${vm_manifest}")
+		vm_uuid=$(json uuid < "${vm_manifest}")
+
+		if vmadm list | grep "${vm_uuid}" > /dev/null; then
+			printf_log "%-58s" "VM ${vm} already exists"
+			printf_log "%7s\n" "skipped"
+			return
+		fi
+	fi
+
+	printf_log "%-58s" "Creating VM ${vm} "
+
+	vmadm create -f "${vm_manifest}"
+
+	zonepath=$(vmadm get "${vm_uuid}" | json zonepath)
+	[[ -z "${zonepath}" ]] && fatal "Unable to find zonepath for ${vm_uuid}"
+
+	local start_t=$(date +%s)
+	local seconds=0
+	local failure=""
+	local timeout=""
+	local maintenance=""
+
+	while true; do
+		case "${vm_brand}" in
+			"joyent")
+				if [[ -f "${zonepath}/root/var/svc/provision_success" ]]; then
+					# OS zone was provisioned successfully, but we will make sure
+					# that there aren't any services in maintenance state.
+					maintenance=$(svcs -xvz "${vm_uuid}")
+					[[ -z "${maintenance}" ]] && break
+				elif [[ -f "${zonepath}/root/var/svc/provision_failure" ]]; then
+					failure="true"
+					break
+				fi
+			;;
+			"kvm")
+				if [[ -n "$(json "customer_metadata.esdc_vm_installed" < "${zonepath}/config/metadata.json")" ]]; then
+					echo '{"remove_customer_metadata": ["esdc_vm_installed"]}' | vmadm update "${vm_uuid}" > /dev/null 2> /dev/null
+					break
+				fi
+			;;
+			*)
+				break  # Unknown brand
+			;;
+		esac
+
+		if [[ ${seconds} -gt ${VM_DEPLOY_TIMEOUT} ]]; then
+			timeout="true"
+			break
+		else
+			sleep 3
+			seconds=$((seconds + 3))
+		fi
+	done
+
+	local delta_t=$(($(date +%s) - start_t))
+
+	if [[ -n "${timeout}" ]]; then
+		printf_log "%7s\n" "timeout"
+		fatal "Failed to create VM ${vm}: setup timed out after ${delta_t} seconds."
+	elif [[ -n "${failure}" ]]; then
+		printf_log "%6s\n" "failed"
+		fatal "Failed to create VM ${vm}: setup failed after ${delta_t} seconds."
+	elif [[ -n "${maintenance}" ]]; then
+		printf_log "%15s\n" "service fail"
+		fatal "Failed to create VM ${vm}: 'svcs -xv' not clear after ${delta_t} seconds."
+	else
+		printf_log "%4s\n" "done"
+	fi
+
+	return 0
+}
+
+function import_smf_manifests() {
+	printf_log "%-56s" "Importing SMF manifests "
+
+	for manifest in /opt/custom/smf/*; do
+		svccfg validate "${manifest}" || fatal "Failed to validate SMF manifest at ${manifest}"
+		svccfg import "${manifest}"
+	done
+
+	printf_log "%4s\n" "done"
+}
+
+function install_archives() {
+	{% for arch in usb_archives %}
+	if [[ ! -d "{{ arch.target }}" ]]; then
+		archive="{{ arch.name }}{{ builder.archive.ext }}"
+		printf_log "%-56s" "Preparing {{ arch.target }} by extracting ${archive} ..."
+		gtar xf "${USB_COPY}/archives/${archive}" -C / &> /dev/null
+		printf_log "%4s\n" "done"
+	fi
+	{% endfor %}
+
+	if [[ ! -d "{{ usb_archive_esdc.target }}" ]]; then
+		archive="{{ usb_archive_esdc.name }}{{ builder.archive.ext }}"
+		printf_log "%-56s" "Preparing {{ usb_archive_esdc.target }} by extracting ${archive} ..."
+		gtar xf "${USB_COPY}/archives/${archive}" -C /opt &> /dev/null
+		printf_log "%4s\n" "done"
+	fi
+}
+
+function _zk() {
+	zkcli="${USB_COPY}/scripts/zookeepercli"
+	cmd="${@}"
+
+	if ! "${zkcli}" -servers "${CFGDB_IP}:2181" -auth_usr "esdc" -auth_pwd "${ESDC_INSTALL_PASSWORD}" -c ${cmd} &> /dev/null; then
+		fatal "Error: cfgdb command \"${cmd}\" failed"
+	fi
+}
+
+function configure_cfgdb() {
+	printf_log "%-56s Saving configuration information into cfgdb ..."
+
+	_zk creater /esdc/settings/rabbitmq/username "{{ esdc_mgmt.rabbitmq.user }}"
+	_zk creater /esdc/settings/rabbitmq/password "${RABBITMQ_PASSWORD}"
+	_zk creater /esdc/settings/rabbitmq/host "${MGMT_IP}"
+	_zk creater /esdc/settings/rabbitmq/port "{{ esdc_mgmt.rabbitmq.port }}"
+	_zk creater /esdc/settings/rabbitmq/vhost "{{ esdc_mgmt.rabbitmq.vhost }}"
+
+	_zk creater /esdc/settings/redis/host "${MGMT_IP}"
+	_zk creater /esdc/settings/redis/port "{{ esdc_mgmt.redis.port }}"
+	_zk creater /esdc/settings/redis/password "${REDIS_PASSWORD}"
+
+	_zk creater /esdc/settings/pgsql_esdc/host "${MGMT_IP}"
+	_zk creater /esdc/settings/pgsql_esdc/port "{{ esdc_mgmt.pgsql_esdc.port }}"
+	_zk creater /esdc/settings/pgsql_esdc/username "{{ esdc_mgmt.pgsql_esdc.user }}"
+	_zk creater /esdc/settings/pgsql_esdc/password "${PGSQL_ESDC_PASSWORD}"
+
+	_zk creater /esdc/settings/pgsql_pdns/host "${MGMT_IP}"
+	_zk creater /esdc/settings/pgsql_pdns/port "{{ esdc_mgmt.pgsql_pdns.port }}"
+	_zk creater /esdc/settings/pgsql_pdns/username "{{ esdc_mgmt.pgsql_pdns.user }}"
+	_zk creater /esdc/settings/pgsql_pdns/password "${PGSQL_PDNS_PASSWORD}"
+
+	_zk creater /esdc/settings/zabbix/host "${MON_IP}"
+	_zk creater /esdc/settings/zabbix/admin_username "${ZABBIX_ADMIN_USERNAME}"
+	_zk creater /esdc/settings/zabbix/admin_password "${ZABBIX_ADMIN_PASSWORD}"
+	_zk creater /esdc/settings/zabbix/admin_email "${ZABBIX_ADMIN_EMAIL}"
+	_zk creater /esdc/settings/zabbix/smtp_email "${ZABBIX_SMTP_EMAIL}"
+	_zk creater /esdc/settings/zabbix/esdc_username "${ZABBIX_ESDC_USERNAME}"
+	_zk creater /esdc/settings/zabbix/esdc_password "${ZABBIX_ESDC_PASSWORD}"
+
+	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
+	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "true"
+	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/hostname" "${SYSINFO_Hostname}"
+	_zk creater "/esdc/nodes/headnodes" "${SYSINFO_UUID}"
+
+	for vm in {{ usb_vms|map(attribute='name')|list|join(' ') }}; do
+		_zk creater "/esdc/vms/${vm}/master" "1"
+
+		vm_manifest="${USB_COPY}/zones/${vm}/vmmanifest"
+		[[ ! -f "${vm_manifest}" ]] && continue
+
+		vm_uuid="$(json uuid < "${vm_manifest}")"
+		vm_json="$(vmadm get "${vm_uuid}")"
+
+		_zk creater "/esdc/vms/${vm}/hosts/1/uuid" "$(echo ${vm_json} | json uuid)"
+		_zk creater "/esdc/vms/${vm}/hosts/1/hostname" "$(echo ${vm_json} | json hostname)"
+		_zk creater "/esdc/vms/${vm}/hosts/1/ip" "$(echo ${vm_json} | json nics.0.ip)"
+		_zk creater "/esdc/vms/${vm}/hosts/1/node" "${SYSINFO_UUID}"
+	done
+
+	printf_log "%4s\n" "done"
+}
+
+function inform_user() {
+	headnode_setup_duration=$(($(date +%s) - HEADNODE_SETUP_START))
+
+	printf_log "%-56s Waiting for Danube Cloud to initialize ..."
+	sleep 60
+	printf_log "%4s\n" "done"
+
+	printf_log "==> Setup complete (in %s seconds).\n" "${headnode_setup_duration}"
+	printf_log "==> IMPORTANT: Please save the following information\n".
+	printf_log "==>   Danube Cloud URL: https://${MGMT_IP}\n"
+	printf_log "==>   Danube Cloud username: admin\n"
+	printf_log "==>   Danube Cloud password: changeme\n"
+	printf_log "==>   Monitoring URL: https://${MON_IP}\n"
+	printf_log "==>   Monitoring username: ${ZABBIX_ADMIN_USERNAME}\n"
+	printf_log "==>   Monitoring password: ${ZABBIX_ADMIN_PASSWORD}\n"
+    printf_log "==>   Configuration DB IP address: ${CFGDB_IP}\n"
+	printf_log "==> Press [enter] to get login prompt or visit https://${MGMT_IP}.\n"
+}
+
+function generate_ssh_keys() {
+	# We need to setup SSH key pair, so backups and data replication just work
+	if [[ ! -f "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}" ]] && [[ ! -f "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}" ]]; then
+		printf_log "%-56s" "Generating SSH key pair... "
+		ssh-keygen -q -C "${CONFIG_hostname}" -t rsa -b 2048 -f "${CONFIG_config_inc_dir}/id_rsa" -q -N ''
+		chmod 400 "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}"
+		chmod 600 "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}"
+		mkdir -p /root/.ssh
+		cp "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}" "/root/.ssh/${CONFIG_ssh_private_key_file}"
+		cp "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}" "/root/.ssh/${CONFIG_ssh_public_key_file}"
+		printf_log "%4s\n" "done"
+	fi
+}
+
+function _validate_config_var() {
+	var="${1}"
+	value="${2}"
+
+	[[ -z "${value}" ]] && fatal "Missing \"${var}\" option in configuration file"
+
+	return 0
+}
+
+function validate_config() {
+	_validate_config_var "admin_netmask" "${CONFIG_admin_netmask}"
+	_validate_config_var "headnode_default_gateway" "${CONFIG_headnode_default_gateway}"
+	_validate_config_var "mgmt_admin_ip" "${CONFIG_mgmt_admin_ip}"
+	_validate_config_var "mon_admin_ip" "${CONFIG_mon_admin_ip}"
+	_validate_config_var "dns_admin_ip" "${CONFIG_dns_admin_ip}"
+	_validate_config_var "img_admin_ip" "${CONFIG_img_admin_ip}"
+	_validate_config_var "cfgdb_admin_ip" "${CONFIG_cfgdb_admin_ip}"
+	_validate_config_var "esdc_install_password" "${CONFIG_esdc_install_password}"
+}
+
+function random_string() {
+	local length="${1:-24}"
+	openssl rand -base64 "${length}" | tr -dc _A-Z-a-z-0-9
+}
+
+#
+# Here we go
+#
+
+cr_once
+printf_log "%-56s\n" "==> Setup starting..."
+validate_config
+install_archives
+generate_ssh_keys
+
+# Metatada for VMs
+ROOT_AUTHORIZED_KEYS="$(cat "/root/.ssh/${CONFIG_ssh_public_key_file}")"
+ADMIN_NETMASK="${CONFIG_admin_netmask}"
+ADMIN_GATEWAY="${CONFIG_headnode_default_gateway}"
+MGMT_IP="${CONFIG_mgmt_admin_ip}"
+MON_IP="${CONFIG_mon_admin_ip}"
+DNS_IP="${CONFIG_dns_admin_ip}"
+IMG_IP="${CONFIG_img_admin_ip}"
+CFGDB_IP="${CONFIG_cfgdb_admin_ip}"
+ESDC_INSTALL_PASSWORD="${CONFIG_esdc_install_password}"
+RABBITMQ_PASSWORD="$(random_string)"
+REDIS_PASSWORD="$(random_string)"
+PGSQL_ESDC_PASSWORD="$(random_string)"
+PGSQL_PDNS_PASSWORD="$(random_string)"
+ZABBIX_ESDC_USERNAME="{{ esdc_mgmt.zabbix_api.username }}"
+ZABBIX_ESDC_PASSWORD="$(random_string)"
+ZABBIX_ADMIN_USERNAME="Admin"
+ZABBIX_ADMIN_PASSWORD="$(random_string 9)"
+ZABBIX_ADMIN_EMAIL="${CONFIG_admin_email:-""}"
+domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
+[[ -z "${domainname}" ]] && domainname="example.com"
+ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"monitoring@${domainname}"}"
+
+configure_erigonesd
+configure_zabbix
+
+{% for vm in usb_vms %}
+create_vm {{ vm.name }}
+{% endfor %}
+
+install_isos
+configure_imgadm
+configure_cfgdb
+install_images
+import_smf_manifests
+create_setup_file
+inform_user
+
+exit 0

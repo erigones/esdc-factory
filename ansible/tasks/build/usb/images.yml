@@ -1,0 +1,20 @@
+---
+- name: Load image manifest
+  set_fact:
+    img_manifest: "{{ lookup('file', '{{ builder.appliance.dir }}/{{ img.name }}/{{ img.name }}-{{ img.version | default(version) }}.imgmanifest') | from_json }}"
+
+- name: Hardlink appliance image in datasets/
+  file: src="{{ builder.appliance.dir }}/{{ img.name }}/{{ img.name }}-{{ img_manifest.version }}{{ builder.appliance.ext }}"
+        dest="{{ usb_tmp_stage }}/datasets/{{ img.name }}-{{ img_manifest.version }}{{ builder.appliance.ext }}"
+        state=hard
+
+- name: Hardlink appliance manifest in datasets/
+  file: src="{{ builder.appliance.dir }}/{{ img.name }}/{{ img.name }}-{{ img_manifest.version }}.imgmanifest"
+        dest="{{ usb_tmp_stage }}/datasets/{{ img.name }}-{{ img_manifest.version }}.imgmanifest"
+        state=hard
+
+- name: Create image folders in images/
+  file: path="{{ usb_tmp_stage }}/images/{{ img.name }}" state=directory mode=0755
+
+- name: Create appliance dataset file in zones/
+  copy: content="{{ img.name }}-{{ img_manifest.version }}.imgmanifest" dest="{{ usb_tmp_stage }}/images/{{ img.name }}/dataset" mode=0444

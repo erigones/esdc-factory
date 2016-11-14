@@ -1,0 +1,7 @@
+---
+- name: Copy cfgd server initilization script
+  copy: src=40-cfgdb.sh
+        dest=/var/zoneinit/includes/40-cfgdb.sh
+        owner=root
+        group=root
+        mode=0755

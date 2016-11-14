@@ -1,0 +1,36 @@
+---
+# defaults file for pgbouncer
+pgbouncer_users: {}
+
+pgbouncer_pools:
+    - name: "*"
+      conninfo: ""
+
+pgbouncer_logfile: "/var/log/pgbouncer/pgbouncer.log"
+pgbouncer_pidfile: "/var/tmp/pgbouncer.pid"
+
+pgbouncer_listen_addr: "*"
+pgbouncer_listen_port: "6432"
+
+pgbouncer_auth_type: "md5"
+pgbouncer_auth_file: "/opt/local/etc/pgbouncer.userlist"
+pgbouncer_auth_file_user: "root"
+
+pgbouncer_admin_users:
+    - postgres
+
+pgbouncer_stats_users:
+    - stats
+    - postgres
+
+pgbouncer_pool_mode: "transaction"
+
+pgbouncer_max_client_conn: 100
+pgbouncer_default_pool_size: 20
+pgbouncer_reserve_pool_size: 5
+pgbouncer_server_lifetime: 1200
+pgbouncer_server_idle_timeout: 30
+
+pgbouncer_log_disconnections: 0
+pgbouncer_log_connections: 0
+pgbouncer_log_pooler_errors: 1

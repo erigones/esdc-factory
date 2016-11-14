@@ -1,0 +1,14 @@
+---
+- name: Load archive manifest
+  set_fact:
+    img_manifest: "{{ lookup('file', '{{ builder.archive.dir }}/{{ arch.name }}-{{ arch.version | default(version) }}.imgmanifest') | from_json }}"
+
+- name: Hardlink archive in archives/
+  file: src="{{ builder.archive.dir }}/{{ arch.name }}-{{ img_manifest.version }}{{ builder.archive.ext }}"
+        dest="{{ usb_tmp_stage }}/archives/{{ arch.name }}{{ builder.archive.ext }}"
+        state=hard
+
+- name: Hardlink archive manifest in archives/
+  file: src="{{ builder.archive.dir }}/{{ arch.name }}-{{ img_manifest.version }}.imgmanifest"
+        dest="{{ usb_tmp_stage }}/archives/{{ arch.name }}.imgmanifest"
+        state=hard

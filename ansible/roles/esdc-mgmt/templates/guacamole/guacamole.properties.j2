@@ -1,0 +1,11 @@
+# Hostname and port of guacamole proxy
+guacd-hostname: localhost
+guacd-port:     4822
+
+# Erigones redis authentication class
+auth-provider: org.erigones.guacamole.net.auth.RedisAuthenticationProvider
+redis-host: localhost
+redis-port: 6379
+redis-parent: esdc:guacamole:
+redis-password: {{ redis.password }}
+redis-timeout: 3

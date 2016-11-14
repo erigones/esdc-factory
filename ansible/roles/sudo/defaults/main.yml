@@ -1,0 +1,4 @@
+---
+sudo_requiretty: false
+
+sudo_users: []

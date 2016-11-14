@@ -1,0 +1,39 @@
+build_base_url: 'http://192.168.23.100'
+build_base_dir: '/data'
+#build_uuid_generator: 'uuidgen'
+build_ssh_key: 'ssh-rsa blabla user@host'
+build_image_password: 'nbusr123'
+build_disk_compression: lz4
+
+build_resolvers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+build_nic_tag: admin
+build_gateway: 192.168.23.1
+build_netmask: 255.255.255.0
+
+build_ips:
+  base_centos6: 192.168.23.81
+  base_centos7: 192.168.23.82
+  base64: 192.168.23.83
+  centos6: 192.168.23.84
+  centos7: 192.168.23.85
+  esdc_cfgdb: 192.168.23.86
+  esdc_dns: 192.168.23.87
+  esdc_img: 192.168.23.88
+  esdc_mgmt: 192.168.23.89
+  esdc_mon: 192.168.23.91
+  esdc_node: 192.168.23.93
+# Or specify only one, which will be used by all VMs (=> no parallel builds)
+#build_ip: 192.168.23.42
+
+build_vnc_ports:
+  base_centos6: 65081
+  base_centos7: 65082
+  centos6: 65084
+  centos7: 65085
+  esdc_mgmt: 65089
+  esdc_mon: 65091
+# Or specify only one, which will be used by all VMs (=> no parallel builds)
+#build_vnc_port: 40000

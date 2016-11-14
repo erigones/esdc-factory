@@ -1,0 +1,5 @@
+zbx_agent_Server: "@SERVER@"
+zbx_agent_UserParameter:
+  - "zookeeper.ping,echo ruok | nc -w 2 127.0.0.1 2181 | grep -c imok"
+  - "smf.maintenance,/usr/bin/svcs -x | grep -c svc:/"
+  - "smf.status[*],/usr/bin/svcs -Ho state $1 2>/dev/null || echo ZBX_NOTSUPPORTED"

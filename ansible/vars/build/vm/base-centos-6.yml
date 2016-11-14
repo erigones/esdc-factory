@@ -1,0 +1,25 @@
+# Dependencies: base.yml, zone.yml
+image_name: base-centos-6
+image_size: 10240
+remove_base_image: false
+builder_dir: "{{ builder.appliance.dir }}/base-centos-6"
+builder_download_dir: "{{ builder_dir }}/_build"
+builder_download_url: "{{ builder.appliance.url }}/base-centos-6/_build"
+centos_mirror: "{{ builder_centos_mirror }}/6/os/x86_64/images/pxeboot"
+centos_files:
+  - file: vmlinuz
+    sha256sum: e314b285a325227a9c21506b48be2096665c0a17c2d07d65919c864e02ba35b2
+  - file: initrd.img
+    sha256sum: 093c036f384b9bc379f34da0ea0250348c2434b5289b48a07481fc907ef6d6d6
+zone_brand: kvm
+zone_vnc_port: "{{ build_vnc_ports.base_centos6 | default(build_vnc_port) | mandatory }}"
+zone_uuid: baa875bc-0d4c-482d-9646-a042dfb735ab
+zone_qemu_extra_opts: "-kernel /vmlinuz -initrd /initrd.img -append \\\"ks={{ builder_download_url }}/ks.cfg sshd=1\\\""
+zone_hostname: "{{ image_name }}"
+zone_nic_0_ip: "{{ build_ips.base_centos6 | default(build_ip) }}"
+zone_disks:
+  - boot: true
+    compression: "{{ build_disk_compression | default('lz4') }}"
+    refreservation: "{{ image_size }}"
+    size: "{{ image_size }}"
+zone_memory: 2048

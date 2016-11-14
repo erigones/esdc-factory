@@ -1,0 +1,425 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:46:22Z",
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_zfs_l2arc",
+                "macros": [],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "30",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "arc.stat[l2_read_bytes]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "L2 ARC read bytes",
+                        "applications": [
+                            {
+                                "name": "ZFS L2ARC"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "30",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "arc.stat[l2_write_bytes]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "L2 ARC write bytes",
+                        "applications": [
+                            {
+                                "name": "ZFS L2ARC"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "arc.stat[l2_hits_perc]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "L2ARC hit percentage",
+                        "applications": [
+                            {
+                                "name": "ZFS L2ARC"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "0",
+                        "key": "arc.stat[l2_hits]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "L2ARC hits",
+                        "applications": [
+                            {
+                                "name": "ZFS L2ARC"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "0",
+                        "key": "arc.stat[l2_misses]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "L2ARC misses",
+                        "applications": [
+                            {
+                                "name": "ZFS L2ARC"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "arc.stat[l2_misses_perc]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "L2ARC miss percentage",
+                        "applications": [
+                            {
+                                "name": "ZFS L2ARC"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    }
+                ],
+                "screens": [],
+                "applications": [
+                    {
+                        "name": "ZFS L2ARC"
+                    }
+                ],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_zfs_l2arc"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "graphs": [
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "C80000",
+                        "item": {
+                            "host": "t_zfs_l2arc",
+                            "key": "arc.stat[l2_hits_perc]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "009900",
+                        "item": {
+                            "host": "t_zfs_l2arc",
+                            "key": "arc.stat[l2_misses_perc]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "L2ARC cache efficiency",
+                "percent_left": "0.0000",
+                "type": "2",
+                "ymax_type_1": "0",
+                "height": "400",
+                "yaxismax": "0.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "0",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "0",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "00C800",
+                        "item": {
+                            "host": "t_zfs_l2arc",
+                            "key": "arc.stat[l2_misses]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "C80000",
+                        "item": {
+                            "host": "t_zfs_l2arc",
+                            "key": "arc.stat[l2_hits]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "L2ARC stats",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "C80000",
+                        "item": {
+                            "host": "t_zfs_l2arc",
+                            "key": "arc.stat[l2_read_bytes]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "5",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "00C800",
+                        "item": {
+                            "host": "t_zfs_l2arc",
+                            "key": "arc.stat[l2_write_bytes]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "5",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "L2ARC throughput",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            }
+        ]
+    }
+}

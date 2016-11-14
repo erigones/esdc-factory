@@ -1,0 +1,106 @@
+---
+- name: Include OS-specific variables
+  include_vars: ../defaults/{{ ansible_distribution }}.yml
+
+- name: Set up PostgreSQL repositories (CentOS 6)
+  yum: name={{ pg_repo_el6 }} state=present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+- name: Set up PostgreSQL repositories (CentOS 7)
+  yum: name={{ pg_repo_el7_erigones }} state=present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: Install PostgreSQL (CentOS)
+  yum: name={{ item }} state=latest
+  with_items: "{{ pg_packages }}"
+  when: ansible_distribution == "CentOS"
+
+- name: Install PostgreSQL (SmartOS)
+  command: pkgin -y install {{ item }}
+  register: res
+  changed_when: "'nothing to do.' not in res.stdout"
+  with_items: "{{ pg_packages }}"
+  when: ansible_distribution == "SmartOS"
+
+- name: Fix PostgreSQL stop method (SmartOS)
+  lineinfile: dest=/opt/local/lib/svc/method/postgresql backrefs=yes regexp='(^.*pg_ctl.*stop$)' line='\1 -m fast'
+  when: ansible_distribution == "SmartOS"
+
+- name: Initiate database (CentOS 6)
+  shell: PGSETUP_INITDB_OPTIONS="--encoding={{ pg_encoding }} --locale={{ pg_locale }}" /etc/init.d/postgresql-{{ pg_version }} initdb en_US.UTF-8 creates={{ pg_datadir }}/postgresql.conf
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+- name: Initiate database (CentOS 7)
+  command: env GSETUP_INITDB_OPTIONS="--encoding={{ pg_encoding }} --locale={{ pg_locale }}" /usr/pgsql-{{ pg_version }}/bin/postgresql{{ pg_version_nodot }}-setup initdb creates={{ pg_datadir }}/postgresql.conf
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: Initiate database (SmartOS)
+  command: su - postgres -c "/opt/local/bin/initdb --pgdata={{ pg_datadir }} --encoding={{ pg_encoding }} --locale={{ pg_locale }} --auth=ident"
+           creates={{ pg_datadir }}/postgresql.conf
+  when: ansible_distribution == "SmartOS"
+
+- name: Create conf.d directory
+  file: path={{ pg_datadir }}/conf.d state=directory owner=postgres group=postgres mode=0700
+
+- name: Uncomment conf.d include in postgresql.conf
+  lineinfile: line="include_dir 'conf.d'" dest={{ pg_datadir }}/postgresql.conf
+  notify: restart postgresql
+
+- name: Configure conf.d/ansible.conf
+  template: src=postgresql.conf.j2 dest={{ pg_datadir }}/conf.d/ansible.conf owner=postgres group=postgres mode=0600
+  notify: restart postgresq
+
+- name: Deploy default pg_hba.conf
+  template: src=pg_hba.conf.j2 dest={{ pg_datadir }}/pg_hba.conf owner=postgres group=postgres mode=0600
+  notify: restart postgresql
+
+- name: Deploy default pg_ident.conf
+  template: src=pg_ident.conf.j2 dest={{ pg_datadir }}/pg_ident.conf owner=postgres group=postgres mode=0600
+  notify: restart postgresql
+
+- name: Start PostgreSQL and enable at boot
+  service: name={{ pg_service }} enabled=yes state=started
+
+- name: Make sure the PostgreSQL users are present
+  postgresql_user:
+    name: "{{ item.value.name }}"
+    password: "{{ item.value.password }}"
+    encrypted: "{{ item.value.encrypted | default('yes') }}"
+    state: "{{ item.value.state | default('present') }}"
+  with_dict: "{{ postgresql_users }}"
+  when: postgresql_users
+
+- name: Make sure the PostgreSQL databases are present
+  postgresql_db:
+    name: "{{ item.name }}"
+    owner: "{{ item.owner | default(pg_admin_user) }}"
+    encoding: "{{ item.encoding | default(pg_encoding) }}"
+    lc_collate: "{{ item.lc_collate | default(pg_locale) }}"
+    lc_ctype: "{{ item.lc_ctype | default(pg_locale) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ postgresql_databases }}"
+  when: postgresql_databases
+
+- name: Add hstore to the databases with the requirement
+  become: yes
+  become_user: "{{ pg_admin_user }}"
+  shell: "psql {{ item.name }} -c 'CREATE EXTENSION IF NOT EXISTS hstore;'"
+  with_items: "{{ postgresql_databases }}"
+  when: "item.hstore is defined and item.hstore == 'yes'"
+
+- name: Update the user privileges
+  postgresql_user:
+    name: "{{ item.name }}"
+    db: "{{ item.db }}"
+    priv: "{{ item.priv | default('ALL') }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ postgresql_user_privileges }}"
+  when: postgresql_user_privileges
+
+- name: Install PostgreSQL backup script
+  template: src=backup_pgsql.sh.j2 dest=/usr/local/sbin/backup_pgsql.sh mode=0700 owner=root group=root
+
+- name: Create daily crontab entry for PostgreSQL backup script
+  cron: name="daily PostgreSQL backup" minute=30 hour=4 job="/usr/local/sbin/backup_pgsql.sh > /dev/null 2> /dev/null"
+  when: postgresql_backup_enabled
+

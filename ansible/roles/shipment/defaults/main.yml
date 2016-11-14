@@ -1,0 +1,26 @@
+---
+shipment_source: {}
+
+shipment_user: shipment
+shipment_group: shipment
+
+shipment_uid: 10000
+shipment_gid: 10000
+
+shipment_home: /opt/shipment
+
+shipment_shell: /usr/bin/false
+
+shipment_workers: 2
+shipment_worker_class: sync
+shipment_worker_connections: 100
+shipment_loglevel: info
+shipment_accesslog: /var/log/shipment/shipment-access.log
+shipment_errorlog: /var/log/shipment/shipment-error.log
+
+shipment_graceful_timeout: 10
+
+shipment_nginx: true
+
+shipment_dependencies:
+    - py27-virtualenv

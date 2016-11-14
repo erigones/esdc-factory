@@ -1,0 +1,209 @@
+---
+#
+# Danube Cloud OS dependencies
+#
+
+- name: Ensure Danube Cloud dependencies are installed
+  yum: name={{ item }} state=latest
+  with_items:
+    - python
+    - python-virtualenv
+    - python-pip
+    - GeoIP
+    - python-requests
+    - python-httplib2
+    - libxml2
+    - libxslt
+    - rsync
+    - lsof
+    - git
+    - libjpeg
+
+- name: Ensure Danube Cloud development dependencies are installed
+  yum: name={{ item }} state=latest
+  with_items:
+    - git
+    - gcc
+    - make
+    - postgresql{{ pg_version_nodot }}-devel
+    - python-devel
+    - libffi-devel
+    - zlib-devel
+    - libevent-devel
+    - libxslt-devel
+    - libxml2-devel
+    - openssl-devel
+    - libjpeg-devel
+    - patch
+
+- name: Download GeoIP database
+  get_url: url="http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
+           dest="/tmp/GeoIP.dat.gz"
+
+- name: Extract GeoIP database
+  shell: gzip -cd /tmp/GeoIP.dat.gz > /usr/share/GeoIP/GeoIP.dat
+
+- name: Remove downloaded GeoIP database
+  shell: rm -f /tmp/GeoIP.dat.gz
+
+- name: Create erigones group
+  group: name=erigones state=present system=yes
+
+- name: Create erigones user
+  user: name=erigones group=erigones system=yes home=/opt/erigones shell=/sbin/nologin createhome=no
+
+
+#
+# Danube Cloud - The application
+#
+
+# Prepare ERIGONES_HOME
+- name: Clone Danube Cloud source code repository
+  git: repo={{ esdc_source.repo }}
+       version={{ esdc_source.version }}
+       dest=/opt/erigones
+       accept_hostkey=yes
+
+- name: Initialize Danube Cloud virtualenvs
+  shell: /opt/erigones/bin/ctl.sh init_envs  # Switch to init_envs_copy after https://github.com/pypa/virtualenv/issues/565
+
+# (Intermezzo) We need settings before proceeding
+- name: Generate SECRET_KEY
+  command: openssl rand -base64 42
+  register: secret_key
+
+- name: Configure Danube Cloud local_settings.py
+  template: src=esdc/local_settings.py.j2
+            dest=/opt/erigones/core/local_settings.py
+            owner=erigones
+            group=erigones
+            mode=0640
+
+- name: Configure Danube Cloud local_config.py
+  template: src=esdc/local_config.py.j2
+            dest=/opt/erigones/core/celery/local_config.py
+            owner=erigones
+            group=erigones
+            mode=0640
+
+- name: Update bashrc for Danube Cloud environment
+  lineinfile: dest="/root/.bashrc" line="{{ item }}" insertafter=EOF
+  with_items:
+    - 'export ERIGONES_HOME="/opt/erigones"'
+    - 'export PYTHONPATH="$ERIGONES_HOME:$PYTHONPATH"'
+    - 'export VIRTUAL_ENV="$ERIGONES_HOME/envs"'
+    - 'export PATH="$ERIGONES_HOME/bin:$VIRTUAL_ENV/bin:/usr/pgsql-{{ pg_version }}/bin:$PATH"'
+    - 'unset PYTHON_HOME'
+    - 'export DJANGO_SETTINGS_MODULE="core.settings"'
+
+# Back to installation from source
+- name: Deploy Danube Cloud
+  shell: /opt/erigones/bin/ctl.sh deploy
+  environment:
+    PATH: "/usr/pgsql-{{ pg_version }}/bin:{{ ansible_env.PATH }}"
+
+- name: Remove unnecessary Danube Cloud dependencies
+  shell: /opt/erigones/bin/ctl.sh pip_uninstall
+
+# Fix permissions
+- name: Modify /opt/erigones directory permissions
+  file: path=/opt/erigones owner=root group=erigones mode=0755
+
+- name: Modify /opt/erigones/var subdirectory permissions (before mount)
+  file: path={{ item }} owner=root group=erigones mode=0775
+  with_items:
+    - /opt/erigones/var/log
+    - /opt/erigones/var/run
+    - /opt/erigones/var/tmp
+    - /opt/erigones/var/lib
+
+- name: Ensure /opt/erigones/var/run is a tmpfs mount
+  mount: src=tmpfs
+         name=/opt/erigones/var/run
+         fstype=tmpfs state=present
+         opts="uid=root,gid=erigones,mode=0775,size=10M"
+
+- name: Ensure /opt/erigones/var/tmp is a tmpfs mount
+  mount: src=tmpfs
+         name=/opt/erigones/var/tmp
+         fstype=tmpfs state=present
+         opts="uid=root,gid=erigones,mode=0775,size=128M"
+
+- name: Modify /opt/erigones/var subdirectory permissions (after mount)
+  file: path={{ item }} owner=root group=erigones mode=0775
+  with_items:
+    - /opt/erigones/var/log
+    - /opt/erigones/var/run
+    - /opt/erigones/var/tmp
+    - /opt/erigones/var/lib
+
+- name: Modify /opt/erigones/api/static/api/bin/es file permissions
+  file: path=/opt/erigones/api/static/api/bin/es owner=erigones
+
+- name: Modify /opt/erigones/var/www/static/api/bin/es file permissions
+  file: path=/opt/erigones/var/www/static/api/bin/es owner=erigones
+
+- name: Configure SELinux context on /opt/erigones/var/log
+  file: path=/opt/erigones/var/log setype=var_log_t
+
+- name: Configure SELinux contexts
+  command: semanage fcontext -a -t var_log_t "/opt/erigones/var/log(/.*)?"
+
+- name: Fix bug with wrong ownership with Danube Cloud log files
+  file: path=/opt/erigones/var/log
+        state=directory
+        owner=erigones
+        group=erigones
+        recurse=yes
+
+- name: Restore SELinux contexts
+  command: /sbin/restorecon -FR /opt/erigones
+
+#
+# Configure other services related to Danube Cloud
+#
+
+- name: Deploy esDC init scripts
+  command: creates={{ item.dest }} /bin/cp -p {{ item.src }} {{ item.dest }}
+  with_items:
+    - { src: "/opt/erigones/etc/init.d/erigonesd.service", dest: "/etc/systemd/system/erigonesd.service" }
+    - { src: "/opt/erigones/etc/init.d/erigonesd-beat.service", dest: "/etc/systemd/system/erigonesd-beat.service" }
+    - { src: "/opt/erigones/etc/init.d/esdc@.service", dest: "/etc/systemd/system/esdc@.service" }
+
+- name: Copy application stack service configurations
+  copy: src="{{ item }}" dest="/etc/{{ item }}" mode=0644
+  with_items:
+    - "haproxy/haproxy.cfg"
+    - "nginx/nginx.conf"
+    - "nginx/vhost.d/esdc.conf"
+    - "logrotate.d/esdc"
+
+- name: Restart application web stack services
+  service: name={{ item }} state=restarted
+  with_items:
+    - nginx
+    - haproxy
+
+- meta: flush_handlers
+
+- name: Install /usr/sbin/es-post-deploy.sh into /var/lib/rc-scripts/50-es-post-deploy.sh
+  template: src=esdc/es-post-deploy.sh.j2
+            dest=/var/lib/rc-scripts/50-es-post-deploy.sh
+            mode=0750
+            owner=root
+            group=root
+
+- name: Stop services
+  service: name={{ item }} state=stopped
+  with_items:
+    - erigonesd
+    - erigonesd-beat
+    - esdc@gunicorn-api
+    - esdc@gunicorn-gui
+    - esdc@gunicorn-sio
+    - guacd
+    - tomcat
+    - zabbix-agent
+
+- name: Remove Danube Cloud log files
+  shell: rm -f /opt/erigones/var/log/*log

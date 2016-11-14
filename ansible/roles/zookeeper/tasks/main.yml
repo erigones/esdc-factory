@@ -1,0 +1,11 @@
+---
+- name: Install Apache ZooKeeper packages
+  command: pkgin -y install zookeeper
+  register: res
+  changed_when: "'nothing to do.' not in res.stdout"
+
+- name: Install zkPasswd.sh
+  copy: src=zkPasswd.sh dest=/opt/local/bin mode=0755 owner=root group=root
+
+- name: Enable and start ZooKeeper
+  shell: svcadm enable zookeeper

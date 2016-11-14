@@ -1,0 +1,5 @@
+---
+hostname: "mon01.local"
+zabbix_url: 'https://localhost'
+login_user: 'Admin'
+login_password: 'zabbix'

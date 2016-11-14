@@ -1,0 +1,17 @@
+# Zabbix Server database
+zabbix_db_host: 'localhost'
+zabbix_db_port: 5432
+zabbix_db_name: 'zabbix'
+zabbix_db_user: 'zabbix'
+zabbix_db_password: 'zabbix'
+
+# General Zabbix Server Parameters
+############ GENERAL PARAMETERS #################
+
+zbx_server_DBHost: "{{ zabbix_db_host }}"                        # If set to localhost, socket is used for MySQL, if set empty socket is used for PostgreSQL
+zbx_server_DBName: "{{ zabbix_db_name }}"                        # DBName For SQLite3 path to database file must be provided. DBUser and DBPassword are ignored
+zbx_server_DBSchema:                                             # Schema name. Used only for IBM DB2
+zbx_server_DBUser: "{{ zabbix_db_user }}"                        # Database Username. Ignored for SQLite.
+zbx_server_DBPassword: "{{ zabbix_db_password }}"                # Database password. Ignored for SQLite.
+zbx_server_DBSocket:                                             # Path to MySQL Socket
+zbx_server_DBPort: "{{ zabbix_db_port }}"                        # Database port when not using local socket. Ignored for SQLite

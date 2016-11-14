@@ -1,0 +1,4 @@
+# MAPNAME       SYSTEM-USERNAME         PG-USERNAME
+{% for user in pg_cfg_pg_ident_default %}
+{{ user.mapname }}  {{ user.system_username }}  {{ user.pg_username }}
+{% endfor %}

@@ -1,0 +1,58 @@
+---
+# Instead of configuring pkgsrc/pkgin, we need to install the same /opt/local archive
+# that is used on a compute node
+- name: Replace /opt/local with compute node archive
+  include: pkgsrc.yml
+
+- name: Ensure esDC dependencies are installed
+  shell: pkgin -y install {{ item }}
+  register: res
+  changed_when: "'nothing to do.' not in res.stdout"
+  with_items:
+    - python27
+    - py27-virtualenv
+    - git-base
+    - gcc49
+    - gmake
+    - autoconf
+
+- name: Create /opt/download
+  file: path=/opt/download mode=0755 state=directory
+
+- name: Create /opt/custom/smf
+  file: path=/opt/custom/smf mode=0755 state=directory
+
+- name: Clone esDC source code repository
+  git: repo={{ esdc_node_source.repo }}
+       version={{ esdc_node_source.version }}
+       dest=/opt/erigones
+       accept_hostkey=yes
+
+- name: Initialize esDC virtualenvs
+  shell: /opt/erigones/bin/ctl.sh init_envs_copy
+
+- name: Copy erigonesd SMF manifest into /opt/custom/smf
+  shell: cp /opt/erigones/etc/init.d/erigonesd.xml /opt/custom/smf/
+
+- name: Build esDC compute node software (que)
+  shell: /opt/erigones/bin/ctl.sh build --node
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/opt/local/gcc49/bin"
+
+- name: Remove unnecessary esDC dependencies
+  shell: /opt/erigones/bin/ctl.sh pip_uninstall
+
+- name: Cleanup esDC virtualenvs
+  shell: /opt/erigones/bin/ctl.sh clean_envs
+
+- name: Create esDC VERSION file
+  shell: /opt/erigones/bin/ctl.sh git_version > /opt/download/{{ esdc_node_build.pkg_name }}-VERSION
+
+- name: Create esDC application tarball
+  shell: chdir=/opt gtar -czvf /opt/download/{{ esdc_node_build.pkg_name }}.tar.gz erigones custom
+
+- name: Save esDC application tarball
+  fetch: src=/opt/download/{{ item }} dest={{ esdc_node_build.save_dir }}/ flat=yes fail_on_missing=yes validate_checksum=yes
+  with_items:
+    - "{{ esdc_node_build.pkg_name }}.tar.gz"
+    - "{{ esdc_node_build.pkg_name }}-VERSION"

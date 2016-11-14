@@ -1,0 +1,13 @@
+---
+- name: Install redis
+  yum: name={{ item }} state=latest
+  with_items:
+    - redis
+
+- name: Install and configure redis
+  template: src=redis/redis.conf.j2 dest=/etc/redis.conf owner=root group=root mode=0644
+  notify:
+    - restart redis
+
+- name: Start redis and enable at boot
+  service: name=redis enabled=yes state=started

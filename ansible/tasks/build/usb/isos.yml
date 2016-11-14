@@ -1,0 +1,14 @@
+---
+- name: Load iso manifest
+  set_fact:
+    img_manifest: "{{ lookup('file', '{{ builder.iso.dir }}/{{ iso.name }}-{{ iso.version | default(version) }}.imgmanifest') | from_json }}"
+
+- name: Hardlink iso in isos/
+  file: src="{{ builder.iso.dir }}/{{ iso.name }}-{{ img_manifest.version }}{{ builder.iso.ext }}"
+        dest="{{ usb_tmp_stage }}/isos/{{ iso.name }}{{ builder.iso.ext }}"
+        state=hard
+
+- name: Hardlink iso manifest in isos/
+  file: src="{{ builder.iso.dir }}/{{ iso.name }}-{{ img_manifest.version }}.imgmanifest"
+        dest="{{ usb_tmp_stage }}/isos/{{ iso.name }}.imgmanifest"
+        state=hard

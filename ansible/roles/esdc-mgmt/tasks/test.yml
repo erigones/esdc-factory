@@ -1,0 +1,125 @@
+---
+- name: Start Danube Cloud services
+  service: name={{ item }} state=started
+  with_items:
+    - erigonesd
+    - esdc@gunicorn-sio
+    - esdc@gunicorn-api
+    - esdc@gunicorn-gui
+    - erigonesd-beat
+
+- name: Wait for services to start
+  pause: seconds=10
+
+- name: Test Danube Cloud API service
+  uri: url="https://localhost/api/ping"
+       validate_certs=no
+       return_content=yes
+       timeout=10
+       status_code=200
+  register: api_ping
+
+- name: Check response from Danube Cloud API service
+  fail: msg="Invalid response from Danube Cloud API service"
+  when: api_ping.content.find('pong') == -1
+
+- name: Test Erigones SIO unauthenticated access
+  uri: url="https://localhost/socket.io"
+       validate_certs=no
+       return_content=yes
+       timeout=10
+       status_code=403
+  register: sio_view
+
+- name: Test Danube Cloud index page redirect to GUI login
+  uri: url="https://localhost"
+       validate_certs=no
+       return_content=yes
+       timeout=10
+       status_code=200
+  register: gui_login
+
+- name: Check response from Danube Cloud GUI login
+  fail: msg="Invalid response from Danube Cloud GUI login"
+  when: gui_login.content.find('csrfmiddlewaretoken') == -1
+
+- name: Check log files of Danube Cloud services
+  shell: cat /opt/erigones/var/log/"{{ item }}"
+  with_items:
+    - main.log
+    - auth.log
+    - task.log
+    - mgmt.log
+    - erigonesd-beat.log
+    - gunicorn-api.error_log
+    - gunicorn-gui.error_log
+    - gunicorn-sio.error_log
+  register: logfile
+
+- name: Fail if CRITICAL in Danube Cloud log file
+  fail: msg="CRITICAL in Danube Cloud log file {{ item.item }}"
+  when: item.stdout.find('CRITICAL') != -1
+  with_items: "{{ logfile.results }}"
+
+- name: Fail if ERROR in Danube Cloud log file
+  fail: msg="ERROR in Danube Cloud log file {{ item.item }}"
+  when: item.stdout.find('ERROR') != -1
+  with_items: "{{ logfile.results }}"
+
+- name: Fail if Traceback in Danube Cloud log file 
+  fail: msg="Traceback in Danube Cloud log file {{ item.item }}"
+  when: item.stdout.find('Traceback') != -1
+  with_items: "{{ logfile.results }}"
+
+- name: Stop Danube Cloud services
+  service: name={{ item }} state=stopped
+  with_items:
+    - erigonesd-beat
+    - erigonesd
+    - esdc@gunicorn-sio
+    - esdc@gunicorn-api
+    - esdc@gunicorn-gui
+
+- name: Disable Danube Cloud services
+  service: name={{ item }} state=stopped enabled=no
+  with_items:
+    - erigonesd-beat
+    - erigonesd
+    - esdc@gunicorn-sio
+    - esdc@gunicorn-api
+    - esdc@gunicorn-gui
+
+- name: Remove Danube Cloud service log files
+  file: path={{ item }}
+        state=absent
+  with_items:
+    - /opt/erigones/var/log/main.log
+    - /opt/erigones/var/log/auth.log
+    - /opt/erigones/var/log/task.log
+    - /opt/erigones/var/log/mgmt.log
+    - /opt/erigones/var/log/erigonesd-beat.log
+    - /opt/erigones/var/log/gunicorn-api.access_log
+    - /opt/erigones/var/log/gunicorn-api.error_log
+    - /opt/erigones/var/log/gunicorn-gui.access_log
+    - /opt/erigones/var/log/gunicorn-gui.error_log
+    - /opt/erigones/var/log/gunicorn-sio.access_log
+    - /opt/erigones/var/log/gunicorn-sio.error_log
+
+- name: Create empty Danube Cloud service log files
+  file: path={{ item }}
+        owner=erigones
+        group=erigones
+        mode=0644
+        state=touch
+  with_items:
+    - /opt/erigones/var/log/main.log
+    - /opt/erigones/var/log/auth.log
+    - /opt/erigones/var/log/task.log
+    - /opt/erigones/var/log/mgmt.log
+    - /opt/erigones/var/log/erigonesd-beat.log
+    - /opt/erigones/var/log/gunicorn-api.access_log
+    - /opt/erigones/var/log/gunicorn-api.error_log
+    - /opt/erigones/var/log/gunicorn-gui.access_log
+    - /opt/erigones/var/log/gunicorn-gui.error_log
+    - /opt/erigones/var/log/gunicorn-sio.access_log
+    - /opt/erigones/var/log/gunicorn-sio.error_log

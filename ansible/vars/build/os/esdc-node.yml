@@ -1,0 +1,10 @@
+pkg_base_name: "esdc-node-{{ release_edition }}"
+pkg_desc: "Danube Cloud compute node software archive"
+
+esdc_node_source:
+  repo: "https://github.com/erigones/esdc-{{ release_edition }}.git"
+  version: "{{ software_branch }}"
+esdc_node_build:
+  pkg_name: "{{ pkg_base_name }}-{{ software_version }}"
+  pkg_link: "{{ pkg_base_name }}-latest"
+  save_dir: "{{ builder.archive.dir }}"

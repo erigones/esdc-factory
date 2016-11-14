@@ -1,0 +1,19 @@
+- name: Delete a build virtual machine and its base image
+  hosts: buildnode
+  vars:
+    vm: "{{ vm | mandatory }}"
+  tasks:
+    - name: Load virtual machine variables for VM {{ vm }}
+      include_vars: "vars/build/vm/{{ vm }}.yml"
+      when: vm != 'tmp'
+
+    - name: Cleanup build stuff for VM {{ vm }} 
+      include: tasks/build/cleanup.yml
+      when: vm != 'tmp'
+
+- name: Cleanup local temporary files
+  hosts: builder
+  tasks:
+    - name: Delete content of temp folder {{ factory_basedir }}/tmp
+      shell: rm -rf {{ factory_basedir }}/tmp/*
+      when: vm is not defined or vm == 'tmp'

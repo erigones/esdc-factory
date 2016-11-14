@@ -1,0 +1,29 @@
+---
+pgsql_esdc:
+  name: "{{ esdc_mgmt.pgsql_esdc.name }}"
+  host: "{{ esdc_mgmt.pgsql_esdc.host }}"
+  port: "{{ esdc_mgmt.pgsql_esdc.port }}"
+  user: "{{ esdc_mgmt.pgsql_esdc.user }}"
+  password: '@PGSQL_ESDC_PASSWORD@'
+pgsql_pdns:
+  name: "{{ esdc_mgmt.pgsql_pdns.name }}"
+  host: "{{ esdc_mgmt.pgsql_pdns.host }}"
+  port: "{{ esdc_mgmt.pgsql_pdns.port }}"
+  user: "{{ esdc_mgmt.pgsql_esdc.user }}"
+  password: '@PGSQL_ESDC_PASSWORD'
+pgsql_monitoring:
+  name: "{{ esdc_mgmt.pgsql_monitoring.user }}"
+  password: "{{ esdc_mgmt.pgsql_monitoring.password }}"
+zabbix_api:
+  username: ""  # Don't include into settings -> will be appended during post-deploy
+  password: ""  # Don't include into settings -> will be appended during post-deploy
+redis:
+  host: "{{ esdc_mgmt.redis.host | mandatory }}"
+  port: "{{ esdc_mgmt.redis.port | mandatory }}"
+  password: "@REDIS_PASSWORD@"
+rabbitmq:
+  user: "{{ esdc_mgmt.rabbitmq.user | mandatory }}"
+  host: "{{ esdc_mgmt.rabbitmq.host | mandatory }}"
+  port: "{{ esdc_mgmt.rabbitmq.port | mandatory }}"
+  password: "@RABBITMQ_PASSWORD@"
+  vhost: "{{ esdc_mgmt.rabbitmq.vhost | mandatory }}"

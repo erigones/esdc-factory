@@ -1,0 +1,1542 @@
+{
+    "zabbix_export": {
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_zabbix-proxy",
+                "macros": [],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "0",
+                        "key": "zabbix[wcache,values]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Values processed by Zabbix proxy",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[wcache,history,pfree]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $2 write cache, % free",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[wcache,index,pfree]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $2 write cache, % free",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,self-monitoring,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,configuration syncer,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,snmp trapper,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,unreachable poller,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,java poller,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,trapper,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,poller,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "localhost",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,ipmi poller,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,data sender,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,heartbeat sender,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,discoverer,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "localhost",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,history syncer,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,icmp pinger,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,http poller,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[process,housekeeper,avg,busy]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix $4 $2 processes, in %",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "zabbix[rcache,buffer,pfree]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix configuration cache, % free",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "zabbix[queue]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix queue",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "5",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "zabbix[queue,10m]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Zabbix queue over $2",
+                        "applications": [
+                            {
+                                "name": "Zabbix proxy"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    }
+                ],
+                "screens": [
+                    {
+                        "vsize": "2",
+                        "name": "Zabbix proxy health",
+                        "hsize": "2",
+                        "screen_items": [
+                            {
+                                "application": "",
+                                "style": "0",
+                                "rowspan": "1",
+                                "resource": {
+                                    "host": "t_zabbix-proxy",
+                                    "name": "Zabbix proxy performance"
+                                },
+                                "sort_triggers": "0",
+                                "halign": "0",
+                                "resourcetype": "0",
+                                "colspan": "1",
+                                "dynamic": "0",
+                                "height": "212",
+                                "width": "500",
+                                "elements": "0",
+                                "url": "",
+                                "valign": "1",
+                                "y": "0",
+                                "x": "0"
+                            },
+                            {
+                                "application": "",
+                                "style": "0",
+                                "rowspan": "1",
+                                "resource": {
+                                    "host": "t_zabbix-proxy",
+                                    "name": "Zabbix data gathering process busy %"
+                                },
+                                "sort_triggers": "0",
+                                "halign": "0",
+                                "resourcetype": "0",
+                                "colspan": "1",
+                                "dynamic": "0",
+                                "height": "100",
+                                "width": "500",
+                                "elements": "0",
+                                "url": "",
+                                "valign": "1",
+                                "y": "0",
+                                "x": "1"
+                            },
+                            {
+                                "application": "",
+                                "style": "0",
+                                "rowspan": "1",
+                                "resource": {
+                                    "host": "t_zabbix-proxy",
+                                    "name": "Zabbix internal process busy %"
+                                },
+                                "sort_triggers": "0",
+                                "halign": "0",
+                                "resourcetype": "0",
+                                "colspan": "1",
+                                "dynamic": "0",
+                                "height": "100",
+                                "width": "500",
+                                "elements": "0",
+                                "url": "",
+                                "valign": "1",
+                                "y": "1",
+                                "x": "0"
+                            },
+                            {
+                                "application": "",
+                                "style": "0",
+                                "rowspan": "1",
+                                "resource": {
+                                    "host": "t_zabbix-proxy",
+                                    "name": "Zabbix cache usage, % free"
+                                },
+                                "sort_triggers": "0",
+                                "halign": "0",
+                                "resourcetype": "0",
+                                "colspan": "1",
+                                "dynamic": "0",
+                                "height": "128",
+                                "width": "500",
+                                "elements": "0",
+                                "url": "",
+                                "valign": "1",
+                                "y": "1",
+                                "x": "1"
+                            }
+                        ]
+                    }
+                ],
+                "applications": [
+                    {
+                        "name": "Zabbix proxy"
+                    }
+                ],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_zabbix-proxy"
+            }
+        ],
+        "triggers": [
+            {
+                "status": "0",
+                "description": "Consider increasing CacheSize in the zabbix_server.conf configuration file",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "{t_zabbix-proxy:zabbix[rcache,buffer,pfree].min(10m)}<25",
+                "name": "Less than 25% free in the configuration cache"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "{t_zabbix-proxy:zabbix[wcache,history,pfree].min(10m)}<25",
+                "name": "Less than 25% free in the history cache"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "{t_zabbix-proxy:zabbix[wcache,index,pfree].min(10m)}<25",
+                "name": "Less than 25% free in the text history cache"
+            },
+            {
+                "status": "0",
+                "description": "zabbix[queue,10m] item is collecting data about how many items are missing data for more than 10 minutes (next parameter)",
+                "url": "",
+                "type": "0",
+                "priority": "2",
+                "dependencies": [],
+                "expression": "{t_zabbix-proxy:zabbix[queue,10m].min(10m)}>100",
+                "name": "More than 100 items having missing data for more than 10 minutes"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,configuration syncer,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,configuration syncer,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix configuration syncer processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,data sender,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,data sender,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix data sender processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,discoverer,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,discoverer,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix discoverer processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,heartbeat sender,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,heartbeat sender,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix heartbeat sender processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,history syncer,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,history syncer,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix history syncer processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,housekeeper,avg,busy].avg(30m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,housekeeper,avg,busy].avg(30m)}>65)",
+                "name": "Zabbix housekeeper processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,http poller,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,http poller,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix http poller processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,icmp pinger,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,icmp pinger,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix icmp pinger processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,ipmi poller,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,ipmi poller,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix ipmi poller processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,java poller,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,java poller,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix java poller processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,poller,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,poller,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix poller processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,self-monitoring,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,self-monitoring,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix self-monitoring processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,snmp trapper,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,snmp trapper,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix snmp trapper processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,trapper,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,trapper,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix trapper processes more than 75% busy"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [],
+                "expression": "({TRIGGER.VALUE}=0&{t_zabbix-proxy:zabbix[process,unreachable poller,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{t_zabbix-proxy:zabbix[process,unreachable poller,avg,busy].avg(10m)}>65)",
+                "name": "Zabbix unreachable poller processes more than 75% busy"
+            }
+        ],
+        "graphs": [
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "DD0000",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[rcache,buffer,pfree]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "00DDDD",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[wcache,index,pfree]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "3333FF",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[wcache,history,pfree]"
+                        },
+                        "sortorder": "2",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "1",
+                "name": "Zabbix cache usage, % free",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "1",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "003300",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,http poller,avg,busy]"
+                        },
+                        "sortorder": "5",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "FF33FF",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,discoverer,avg,busy]"
+                        },
+                        "sortorder": "3",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "0000EE",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,ipmi poller,avg,busy]"
+                        },
+                        "sortorder": "2",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "7",
+                        "color": "000099",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,snmp trapper,avg,busy]"
+                        },
+                        "sortorder": "8",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "990099",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,trapper,avg,busy]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "990000",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,poller,avg,busy]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "DD0000",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,java poller,avg,busy]"
+                        },
+                        "sortorder": "7",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "00EE00",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,icmp pinger,avg,busy]"
+                        },
+                        "sortorder": "4",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "33FFFF",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,unreachable poller,avg,busy]"
+                        },
+                        "sortorder": "6",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "1",
+                "name": "Zabbix data gathering process busy %",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "1",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "009600",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,data sender,avg,busy]"
+                        },
+                        "sortorder": "5",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "FFAA00",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,housekeeper,avg,busy]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "EE0000",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,history syncer,avg,busy]"
+                        },
+                        "sortorder": "2",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "960000",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,heartbeat sender,avg,busy]"
+                        },
+                        "sortorder": "4",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "FF66FF",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,self-monitoring,avg,busy]"
+                        },
+                        "sortorder": "3",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "990099",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[process,configuration syncer,avg,busy]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "1",
+                "name": "Zabbix internal process busy %",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "1",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "00C800",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[wcache,values]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "5",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "C80000",
+                        "item": {
+                            "host": "t_zabbix-proxy",
+                            "key": "zabbix[queue]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "5",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "Zabbix proxy performance",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "date": "2015-12-03T21:46:15Z"
+    }
+}

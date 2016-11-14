@@ -1,0 +1,20 @@
+---
+- name: Install rabbitmq-server
+  yum: name={{ item }} state=latest
+  with_items:
+    - rabbitmq-server
+
+- name: Create environment file for rabbitmq
+  lineinfile: line="NODENAME=rabbit@{{ hostname.split('.').0 }}"
+              dest=/etc/rabbitmq/rabbitmq-env.conf
+              state=present
+              create=yes
+
+- name: Start rabbitmq-server and enable at boot
+  service: name=rabbitmq-server enabled=yes state=started
+
+- name: Ensure vhost erigones is present
+  rabbitmq_vhost: name={{ rabbitmq.vhost }} state=present
+
+- name: Add rabbitmq users
+  rabbitmq_user: user={{ rabbitmq.user }} password={{ rabbitmq.password }} vhost={{ rabbitmq.vhost }} configure_priv=.* write_priv=.* read_priv=.* state=present

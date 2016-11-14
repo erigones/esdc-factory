@@ -1,0 +1,20 @@
+# Python
+*.pyc
+
+# PyCharm
+.idea
+
+# Eclipse
+.project
+.pydevproject
+.settings
+
+# OS files
+.DS_Store
+*.swp
+*.test
+
+# Configuration files
+etc/config.yml
+etc/hosts.cfg
+etc/files

@@ -1,0 +1,10 @@
+---
+pg_packages:
+  - "postgresql{{ pg_version_nodot }}-client"
+  - "postgresql{{ pg_version_nodot }}-server"
+  - "postgresql{{ pg_version_nodot }}-datatypes"
+  - "py27-psycopg2"
+
+pg_datadir: "/var/pgsql/data"
+pg_backupdir: "/var/pgsql/backups"
+pg_service: "pkgsrc/postgresql"

@@ -1,0 +1,19 @@
+# Dependencies: base.yml, zone.yml
+image_name: "esdc-mgmt-{{ release_edition }}"
+image_desc: "Danube Cloud central management portal"
+image_homepage: "{{ image_base_homepage }}#esdc-mgmt"
+remove_base_image: true
+builder_dir: "{{ builder.appliance.dir }}/esdc-mgmt"
+base_centos_imgmanifest: "{{ lookup('pipe', 'curl -s {{ builder_base_centos_imgmanifest_url }}') | from_json }}"
+zone_brand: kvm
+zone_vnc_port: "{{ build_vnc_ports.esdc_mgmt | default(build_vnc_port) | mandatory }}"
+zone_uuid: 8effb202-35c8-11e5-8200-03a455b02a31
+zone_hostname: "{{ image_name }}"
+zone_disks:
+  - boot: true
+    compression: "{{ build_disk_compression | default('lz4') }}"
+    image_size: "{{ base_centos_imgmanifest.image_size }}"
+    image_uuid: "{{ base_centos_imgmanifest.uuid }}"
+    refreservation: "{{ base_centos_imgmanifest.image_size }}"
+zone_nic_0_ip: "{{ build_ips.esdc_mgmt | default(build_ip) }}"
+

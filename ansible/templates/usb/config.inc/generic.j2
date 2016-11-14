@@ -1,0 +1,9 @@
+{% if usb_type == "hn" %}
+initial_script=scripts/headnode.sh
+{% else %}
+initial_script=scripts/computenode.sh
+{% endif %}
+
+ssh_private_key_file=id_rsa
+ssh_public_key_file=id_rsa.pub
+root_authorized_keys_file=authorized_keys

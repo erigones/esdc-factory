@@ -1,0 +1,23 @@
+digraph "Erigones" {
+    "gunicorn-sio" -> redis;
+    "gunicorn-sio" -> rabbitmq;
+
+    "gunicorn-api" -> redis;
+    "gunicorn-api" -> rabbitmq;
+
+    "gunicorn-gui" -> redis;
+    "gunicorn-gui" -> rabbitmq;
+
+    "erigonesd" -> rabbitmq;
+    "erigonesd-beat" -> erigonesd;
+    "erigonesd" -> redis;
+
+    redis;
+    rabbitmq;
+    guacd;
+    tomcat;
+    nginx;
+    haproxy;
+
+    "pdns-recursor" -> pdns;
+}

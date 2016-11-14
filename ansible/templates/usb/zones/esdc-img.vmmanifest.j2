@@ -1,0 +1,47 @@
+{
+  "brand": "joyent",
+  "uuid": "2b504f53-1c0b-4ceb-bfda-352f549a70e1",
+  "image_uuid": "{{ IMAGE_UUID }}",
+  "max_physical_memory": 256,
+  "max_swap": 512,
+  "hostname": "img01.local",
+  "alias": "img01.local",
+  "zfs_io_priority": 100,
+  "cpu_cap": 200,
+  "cpu_shares": 100,
+  "resolvers": [
+    "@DNS_IP@"
+  ],
+  "nics": [
+    {
+      "primary": true,
+      "nic_tag": "admin",
+      "gateway": "@ADMIN_GATEWAY@",
+      "ip": "@IMG_IP@",
+      "netmask": "@ADMIN_NETMASK@",
+      "network_uuid": "d42bc4c3-ba17-43ee-a02a-74e667bd41fa"
+    }
+  ],
+ "customer_metadata": {
+    "org.erigones:zabbix_ip": "@MON_IP@",
+    "root_authorized_keys": "@ROOT_AUTHORIZED_KEYS@"
+  },
+  "internal_metadata": {
+    "author": "Erigones",
+    "installed": true,
+    "alias": "img01",
+    "mon_ip": "@IMG_IP@",
+    "ostype": 5,
+    "mon_templates": "t_role-img"
+  },
+  "zpool": "zones",
+  "quota": 50,
+  "delegate_dataset": true,
+  "zfs_data_recsize": 131072,
+  "zfs_data_compression": "lz4",
+  "zfs_root_recsize": 131072,
+  "zfs_root_compression": "lz4",
+  "owner_uuid": "1",
+  "indestructible_zoneroot": true,
+  "indestructible_delegated": true
+}

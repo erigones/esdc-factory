@@ -1,0 +1,50 @@
+{
+  "brand": "joyent",
+  "uuid": "6546040c-ca68-4c5b-8a19-a42e487267c9",
+  "image_uuid": "{{ IMAGE_UUID }}",
+  "max_physical_memory": 256,
+  "max_swap": 512,
+  "hostname": "dns01.local",
+  "alias": "dns01.local",
+  "dns_domain": "local",
+  "zfs_io_priority": 100,
+  "cpu_cap": 200,
+  "cpu_shares": 100,
+  "resolvers": [
+    "127.0.0.1",
+    "8.8.8.8"
+  ],
+  "nics": [
+    {
+      "primary": true,
+      "nic_tag": "admin",
+      "gateway": "@ADMIN_GATEWAY@",
+      "ip": "@DNS_IP@",
+      "netmask": "@ADMIN_NETMASK@",
+      "network_uuid": "d42bc4c3-ba17-43ee-a02a-74e667bd41fa"
+    }
+  ],
+  "customer_metadata": {
+    "org.erigones:pgsql_host": "@MGMT_IP@",
+    "org.erigones:pgsql_port": "{{ esdc_mgmt.pgsql_pdns.port }}",
+    "org.erigones:pgsql_user": "{{ esdc_mgmt.pgsql_pdns.user }}",
+    "org.erigones:pgsql_password": "@PGSQL_PDNS_PASSWORD@",
+    "org.erigones:pgsql_dbname": "{{ esdc_mgmt.pgsql_pdns.name }}",
+    "org.erigones:zabbix_ip": "@MON_IP@",
+    "root_authorized_keys": "@ROOT_AUTHORIZED_KEYS@"
+  },
+  "internal_metadata": {
+    "author": "Erigones",
+    "installed": true,
+    "alias": "dns01",
+    "mon_ip": "@DNS_IP@",
+    "ostype": 5,
+    "mon_templates": "t_role-dns"
+  },
+  "zpool": "zones",
+  "quota": 10,
+  "zfs_root_recsize": 131072,
+  "zfs_root_compression": "lz4",
+  "owner_uuid": "1",
+  "indestructible_zoneroot": true
+}

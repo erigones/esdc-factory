@@ -1,0 +1,12 @@
+---
+- name: Install common packages
+  yum: name={{ item }} state=latest
+  with_items:
+    - libselinux-python
+    - tcpdump
+    - screen
+    - bind-utils
+    - openssh-clients
+    - strace
+    - vim-enhanced
+  when: ansible_distribution == "CentOS"

@@ -1,0 +1,6 @@
+- name: Examine the esDC VM Factory
+  hosts: builder
+  vars:
+    builder_http_full_check: true
+  tasks:
+    - include: tasks/build/check.yml

@@ -1,0 +1,43 @@
+---
+pdns_allow_axfr_ips: 127.0.0.1/8
+
+pdns_setuid: pdns
+pdns_setgid: pdns
+
+pdns_allow_recursion: "127.0.0.1/8,::1/128"
+pdns_cache_ttl: 20
+
+pdns_disable_axfr: "yes"
+pdns_disable_tcp: "no"
+pdns_distributor_threads: 3
+
+pdns_local_address: "0.0.0.0"
+pdns_local_port: 53
+
+pdns_loglevel: 4
+
+pdns_max_cache_entries: 1000000
+pdns_max_queue_length: 5000
+pdns_max_tcp_connections: 10
+pdns_negquery_cache_ttl: 60
+pdns_query_cache_ttl: 20
+pdns_queue_limit: 1500
+pdns_receiver_threads: 1
+pdns_recursive_cache_ttl: 10
+
+pdns_recursor_ip: 127.0.0.1
+pdns_recursor_port: 5353
+
+pdns_retrieval_threads: 2
+
+pdns_webserver: "yes"
+pdns_webserver_address: 127.0.0.1
+pdns_webserver_port: 8081
+pdns_webserver_password:
+
+pdns_backend: 'pgsql'
+pdns_db_host: 127.0.0.1
+pdns_db_port: 5432
+pdns_db_user: pdns
+pdns_db_password: pdns
+pdns_db_name: pdns

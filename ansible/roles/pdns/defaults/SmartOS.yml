@@ -1,0 +1,6 @@
+pdns_config_dir: /opt/local/etc
+pdns_service: pdns
+
+pdns_packages:
+    - powerdns
+    - powerdns-pgsql

@@ -1,0 +1,62 @@
+usb_tmp_dir: "{{ builder_tmp_dir | mandatory }}"
+usb_tmp_stage: "{{ usb_tmp_dir }}/esdc-usb-stage"
+usb_tmp_mountpoint: "{{ usb_tmp_dir }}/esdc-usb-image"
+usb_tmp_image: "{{ usb_tmp_dir }}/esdc-usb.img"
+usb_type: "hn"  # "hn" or "cn"
+usb_root_pw: "$5$9NwhzBL/$b8T1ooxt3zTNf743KJlbHWqPJC/nQnC7SksX6/yVm54"  # esdc
+
+platform_version: "20161111T125226Z"
+platform_os_archive: "{{ builder.platform.dir }}/platform-{{ platform_version }}.tgz"
+platform_boot_archive: "{{ builder.platform.dir }}/boot-{{ platform_version }}.tgz"
+
+usb_vms:
+  - name: esdc-cfgdb
+    version: "{{ release_version }}"
+    edition: ""
+  - name: esdc-dns
+    version: "{{ release_version }}"
+    edition: ""
+  - name: esdc-img
+    version: "{{ release_version }}"
+    edition: ""
+  - name: esdc-mon
+    version: "{{ release_version }}"
+    edition: ""
+  - name: esdc-mgmt
+    version: "{{ release_version }}"
+    edition: "-{{ release_edition }}"
+
+image_server:
+  name: esdc-img
+
+usb_images:
+  - name: base-64-es
+    version: latest
+  # No space left for more images
+  #- name: centos-7
+  #  version: latest
+
+usb_archives:
+  - name: monitoring
+    version: latest
+    target: /opt/zabbix
+  - name: local
+    version: latest
+    target: /opt/local
+
+usb_archive_esdc:
+  name: "esdc-node-{{ release_edition }}"
+  target: /opt/erigones
+
+usb_isos:
+  - name: rescuecd
+    version: latest
+
+legal_url: "https://github.com/erigones/esdc-docs/raw/master/legal/usb"
+usb_legal_files:
+  - src: "eula-{{ release_edition }}.pdf"
+    dst: EULA.pdf
+  - src: "eula-{{ release_edition }}.txt"
+    dst: EULA.txt
+  - src: LICENSES.txt
+    dst: LICENSES.txt

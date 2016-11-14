@@ -1,0 +1,21 @@
+---
+- name: Ensure {{ ssl_key }} does not exist
+  stat: path={{ ssl_key }}
+  register: st_key
+
+- name: Ensure {{ ssl_cert }} does not exist
+  stat: path={{ ssl_cert }}
+  register: st_cert
+
+- name: Generate SSL certificate
+  command: 'openssl req -new -nodes -x509 -subj "/C=SK/ST=Slovakia/L=Bratislava/O=IT/CN=*.*" -days 3650
+                        -keyout {{ ssl_key }} -out {{ ssl_cert }} -extensions v3_ca'
+           creates={{ ssl_cert }}
+  when: st_key.stat.exists == False and st_cert.stat.exists == False
+
+- name: Change file permissions
+  file: path={{ item.name }} mode={{ item.mode }}
+  with_items:
+    - { name: "{{ ssl_key }}", mode: "0600" }
+    - { name: "{{ ssl_cert }}", mode: "0644" }
+  when: st_key.stat.exists == False and st_cert.stat.exists == False

@@ -1,0 +1,24 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Download esDC platform
+  hosts: builder
+  vars:
+    save_dir: "{{ builder.platform.dir }}"
+  tasks:
+    - include: tasks/build/save-package.yml
+      with_items: "{{ builder_platform }}"
+      loop_control:
+        loop_var: pkg
+      vars:
+        force_download: true
+        pkg_base_name: "{{ pkg.name | mandatory }}"
+        pkg_name: "{{ pkg.name + '-' + pkg.version | mandatory }}"
+        pkg_version: "{{ pkg.version | mandatory }}"
+        pkg_ext: "{{ pkg.ext | default(builder.platform.ext) }}"
+        pkg_url: "{{ pkg.url | default(builder_platform_url + '/' + pkg_name + pkg_ext) }}"
+        pkg_link: "{{ pkg.link | default('') }}"
+        pkg_desc: "{{ pkg.desc | default('') }}"

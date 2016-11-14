@@ -1,0 +1,7 @@
+---
+- name: Copy image server initilization script
+  copy: src=40-imageserver.sh
+        dest=/var/zoneinit/includes/40-imageserver.sh
+        owner=root
+        group=root
+        mode=0755

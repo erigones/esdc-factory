@@ -1,0 +1,16 @@
+---
+- name: Find all imgmanifest files in {{ source_dir }}
+  find: paths="{{ source_dir }}"
+        recurse=yes
+        file_type=file
+        patterns="*.imgmanifest"
+  register: image_manifests
+
+- name: Create IMGAPI tree from {{ source_dir }}
+  include: tasks/build/imgapi/item.yml
+    images_dir="{{ target_dir }}"
+    image_file_ext="{{ file_ext }}"
+    image_manifest="{{ manifest_file.path }}"
+  with_items: "{{ image_manifests.files }}"
+  loop_control:
+    loop_var: manifest_file

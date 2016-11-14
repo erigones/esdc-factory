@@ -1,0 +1,41 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:45:15Z",
+        "templates": [
+            {
+                "templates": [
+                    {
+                        "name": "t_erigones-zone"
+                    },
+                    {
+                        "name": "t_icmp"
+                    },
+                    {
+                        "name": "t_svc-cfgdb"
+                    },
+                    {
+                        "name": "t_zabbix-agent"
+                    }
+                ],
+                "name": "t_role-cfgdb",
+                "macros": [],
+                "items": [],
+                "screens": [],
+                "applications": [],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_role-cfgdb"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ]
+    }
+}

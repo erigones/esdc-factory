@@ -1,0 +1,144 @@
+{
+{% if zone_autoboot is defined and zone_autoboot == false %}
+  "autoboot": false,
+{% endif %}
+  "brand": "{{ zone_brand }}",
+{% if zone_limit_priv is defined and zone_limit_priv %}
+  "limit_priv": "{{ zone_limit_priv }}",
+{% endif %}
+{% if zone_boot is defined and zone_boot %}
+  "boot": "{{ zone_boot }}",
+{% endif %}
+  "uuid": "{{ zone_uuid | mandatory }}",
+{% if zone_image_uuid is defined and zone_image_uuid %}
+  "image_uuid": "{{ zone_image_uuid }}",
+{% endif %}
+  "ram": {{ zone_memory | mandatory }},
+  "hostname": "{{ zone_hostname | mandatory }}",
+  "alias": "{{ zone_hostname | mandatory}}",
+  "vcpus": "{{ zone_vcpus | default(1) }}",
+{% if zone_vga is defined and zone_vga %}
+  "vga": "{{ zone_vga }}",
+{% endif %}
+{% if zone_virtio_txburst is defined and zone_virtio_txburst %}
+  "virtio_txburst": "{{ zone_virtio_txburst }}",
+{% endif %}
+{% if zone_virtio_timer is defined and zone_virtio_timer %}
+  "virtio_timer": "{{ zone_virtio_timer }}",
+{% endif %}
+{% if zone_vnc_port is defined and zone_vnc_port %}
+  "vnc_port": {{ zone_vnc_port }},
+{% endif %}
+{% if zone_zfs_io_priority is defined and zone_zfs_io_priority %}
+  "zfs_io_priority": {{ zone_zfs_io_priority }},
+{% endif %}
+{% if zone_cpu_shares is defined and zone_cpu_shares %}
+  "cpu_shares": {{ zone_cpu_shares }},
+{% endif %}
+{% if zone_cpu_cap is defined and zone_cpu_cap %}
+  "cpu_cap": {{ zone_cpu_cap }},
+{% endif %}
+{% if zone_cpu_type is defined and zone_cpu_type %}
+  "cpu_type": "{{ zone_cpu_type }}"
+{% endif %}
+{% if zone_resolvers %}
+  "resolvers": [
+{% for item in zone_resolvers %}
+{% if not loop.last %}
+    "{{ item }}",
+{% else %}
+    "{{ item }}"
+{% endif %}
+{% endfor %}
+  ],
+{% endif %}
+{% if zone_disks %}
+  "disks": [
+{% for item in zone_disks %}
+    {
+{% if item.boot is defined and item.boot == true %}
+      "boot": true,
+{% endif %}
+{% if item.nocreate is defined and item.nocreate == true %}
+      "nocreate": true,
+{% endif %}
+{% if item.compression is defined and item.compression %}
+      "compression": "{{ item.compression }}",
+{% endif %}
+{% if item.refreservation is defined and item.refreservation %}
+      "refreservation": {{ item.refreservation }},
+{% endif %}
+{% if item.size is defined %}
+      "size": {{ item.size }},
+      "block_size": {{ item.block_size | default(4096) }},
+{% else %}
+      "image_uuid": "{{ item.image_uuid }}",
+      "image_size": {{ item.image_size }},
+{% endif %}
+      "zpool": "{{ item.zpool | default("zones") }}",
+      "media": "{{ item.media | default("disk") }}",
+      "model": "{{ item.model | default("virtio") }}"
+{% if not loop.last %}
+    },
+{% else %}
+    }
+{% endif %}
+{% endfor %}
+  ],
+{% endif %}
+{% if zone_nics %}
+  "nics": [
+{% for item in zone_nics %}
+    {
+{% if item.primary is defined and item.primary == true %}
+      "primary": true,
+{% endif %}
+      "mac": "{{ item.mac | default("52:2f:" + '%02x:' | format(256 | random) + '%02x:' | format(256 | random) + '%02x:' | format(256 | random) + '%02x' | format(256 | random)) }}",
+{% if item.vlan_id is defined %}
+      "vlan_id": {{ item.vlan_id }},
+{% endif %}
+      "nic_tag": "{{ item.nic_tag }}",
+      "gateway": "{{ item.gateway }}",
+      "ip": "{{ item.ip }}",
+      "netmask": "{{ item.netmask }}",
+      "model": "{{ item.model | default("virtio") }}"
+{% if not loop.last %}
+    },
+{% else %}
+    }
+{% endif %}
+{% endfor %}
+  ],
+{% endif %}
+{% if zone_customer_metadata is defined and zone_customer_metadata %}
+  "customer_metadata": {
+{% for item in zone_customer_metadata %}
+    "{{ item.key }}": "{{ item.value }}"{{"," if not loop.last else ''}}
+{% endfor %}
+  },
+{% endif %}
+{% if zone_internal_metadata is defined and zone_internal_metadata %}
+  "internal_metadata": {
+{% for item in zone_internal_metadata %}
+    "{{ item.key }}": "{{ item.value }}"{{"," if not loop.last else ''}}
+{% endfor %}
+  },
+{% endif %}
+{% if zone_tags is defined and zone_tags %}
+  "tags": {
+{% for item in tags %}
+    "{{ item.key }}": "{{ item.value }}"{{"," if not loop.last else ''}}
+{% endfor %}
+  },
+{% endif %}
+{% if zone_qemu_extra_opts is defined and zone_qemu_extra_opts %}
+  "qemu_extra_opts": "{{ zone_qemu_extra_opts }}",
+{% endif %}
+{% if zone_indestructible_delegated is defined and zone_indestructible_delegated == true %}
+  "indestructible_delegated": true,
+{% endif %}
+{% if zone_indestructible_zoneroot is defined and zone_indestructible_zoneroot == true %}
+  "indestructible_zoneroot": true,
+{% endif %}
+  "zpool": "{{ zone_zpool | default("zones") }}"
+}

@@ -1,0 +1,4 @@
+---
+- name: Disable inetd (SmartOS)
+  command: svcadm disable inetd
+  when: ansible_distribution == "SmartOS"

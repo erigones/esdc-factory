@@ -1,0 +1,206 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:45:09Z",
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_icmp",
+                "macros": [],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "3",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": {
+                            "name": "Service state"
+                        },
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "icmpping",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "ICMP ping",
+                        "applications": [
+                            {
+                                "name": "ICMP"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "3",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "s",
+                        "value_type": "0",
+                        "key": "icmppingsec[,5]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Network latency",
+                        "applications": [
+                            {
+                                "name": "ICMP"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "3",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "icmppingloss[,5]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Packet loss",
+                        "applications": [
+                            {
+                                "name": "ICMP"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    }
+                ],
+                "screens": [],
+                "applications": [
+                    {
+                        "name": "ICMP"
+                    }
+                ],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_icmp"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "triggers": [
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [
+                    {
+                        "expression": "{t_icmp:icmpping.max(3m)}=0",
+                        "name": "Server is unreachable (ICMP)"
+                    }
+                ],
+                "expression": "{t_icmp:icmppingsec[,5].avg(5m)}>{$ICMP_RESPONSE}",
+                "name": "Network latency is over {$ICMP_RESPONSE}s"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [
+                    {
+                        "expression": "{t_icmp:icmpping.max(3m)}=0",
+                        "name": "Server is unreachable (ICMP)"
+                    }
+                ],
+                "expression": "{t_icmp:icmppingloss[,5].min(5m)}>{$ICMP_LOSS}",
+                "name": "Packet loss is higher than {$ICMP_LOSS}%"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [],
+                "expression": "{t_icmp:icmpping.max(3m)}=0",
+                "name": "Server is unreachable (ICMP)"
+            }
+        ]
+    }
+}

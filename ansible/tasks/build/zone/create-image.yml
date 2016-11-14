@@ -1,0 +1,102 @@
+---
+# sm-prepare-image -y shuts the machine down
+- name: Wait for a few seconds (SmartOS)
+  pause: seconds=30
+
+- name: Stop virtual machine
+  vmadm: uuid="{{ zone_uuid }}" state=stopped
+
+- name: Create directory /opt/{{ zone_uuid }}
+  file: path="/opt/{{ zone_uuid }}" state=directory
+
+- name: Update sysinfo
+  shell: sysinfo -u
+
+- name: Create image from virtual machine
+  command: chdir="/opt/{{ zone_uuid }}" imgadm create -c gzip "{{ zone_uuid }}"
+           name='{{ image_name }}'
+           version='{{ image_version }}'
+           tags='{{ image_tags | to_json }}'
+           published_at="{{ lookup('pipe', 'date -u +\"%Y-%m-%dT%H:%M:%SZ\"') }}"
+           state="active"
+           disabled="false"
+           description='"{{ image_desc | default("") }}"'
+           homepage='"{{ image_homepage | default("") }}"'
+
+- name: Download image artefacts
+  fetch: src="{{ item }}"
+         dest="{{ builder_dir }}/"
+         flat=yes
+         fail_on_missing=yes
+         validate_checksum=yes
+  with_items:
+    - "/opt/{{ zone_uuid }}/{{ image_name }}-{{ image_version }}.zfs.gz"
+    - "/opt/{{ zone_uuid }}/{{ image_name }}-{{ image_version }}.imgmanifest"
+    - "/tmp/{{ zone_uuid }}.json"
+
+- name: Remove file leftovers
+  file: path="{{ item }}" state=absent
+  with_items:
+    - "/opt/{{ zone_uuid }}"
+    - "/tmp/{{ zone_uuid }}.json"
+
+- name: Get virtual machine configuration
+  shell: vmadm get "{{ zone_uuid }}"
+  register: vm_manifest
+  when: remove_base_image
+
+- name: Get used base-64 image uuid
+  set_fact: image_uuid="{{ (vm_manifest.stdout | from_json)['image_uuid'] }}"
+  when: remove_base_image
+
+- name: Remove virtual machine
+  vmadm: name="{{ zone_uuid }}" state=absent
+
+- name: Remove used base-64 image
+  shell: imgadm delete -P zones "{{ image_uuid }}"
+  when: remove_base_image
+  ignore_errors: true
+
+- name: Create symlink to the latest version
+  file: src="{{ builder_dir }}/{{ item.src }}"
+        dest="{{ builder_dir }}/{{ item.dest }}"
+        state=link
+  with_items:
+    - src: "{{ image_name }}-{{ image_version }}.zfs.gz"
+      dest: "{{ image_name }}-latest.zfs.gz"
+    - src: "{{ image_name }}-{{ image_version }}.imgmanifest"
+      dest: "{{ image_name }}-latest.imgmanifest"
+  delegate_to: builder
+
+- name: Delete latest appliance pkgsrc version
+  file: dest="{{ builder_dir }}/{{ image_name }}-{{ pkgsrc_version }}.zfs.gz"
+        state=absent
+  delegate_to: builder
+
+- name: Hardlink latest build to pkgsrc version
+  file: src="{{ builder_dir }}/{{ image_name }}-{{ image_version }}.zfs.gz"
+        dest="{{ builder_dir }}/{{ image_name }}-{{ pkgsrc_version }}.zfs.gz"
+        state=hard
+  delegate_to: builder
+
+- name: Modify latest manifest to fit pkgsrc version
+  copy: content="{{ ((lookup('file', '{{ imgmanifest }}') | from_json) | combine(up)) | to_nice_json }}"
+        dest="{{ builder_dir }}/{{ image_name }}-{{ pkgsrc_version }}.imgmanifest"
+        mode=0644
+  vars:
+    imgmanifest: '{{ builder_dir }}/{{ image_name }}-{{ image_version }}.imgmanifest'
+    up:
+      version: '{{ pkgsrc_version }}'
+  delegate_to: builder
+
+- name: Create IMGAPI item
+  include: tasks/build/imgapi/item.yml
+      images_dir="{{ builder.image.dir }}"
+      image_file_ext='.zfs.gz'
+      image_manifest="{{ builder_dir }}/{{ image_name }}-{{ image_version }}.imgmanifest"
+  delegate_to: builder
+
+- name: Re-create IMGAPI root manifest in {{ builder.image.dir }}/manifest
+  include: tasks/build/imgapi/root.yml
+      imgapi_dir="{{ builder.image.dir }}"
+  delegate_to: builder

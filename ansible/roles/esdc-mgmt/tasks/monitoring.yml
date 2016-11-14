@@ -1,0 +1,10 @@
+---
+- name: Ensure /var/lib/zabbix exists
+  file: path=/var/lib/zabbix state=directory mode=0750 owner=zabbix group=zabbix
+
+- name: Set monitoring user database password
+  copy: content="*:*:*:{{ pgsql_monitoring.user }}:{{ pgsql_monitoring.password }}\n"
+        owner=zabbix
+        group=zabbix
+        mode=0600
+        dest=/var/lib/zabbix/.pgpass

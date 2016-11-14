@@ -1,0 +1,7 @@
+---
+- name: Created /etc/httpd/conf.d/ssl_redirect.conf
+  copy: src=ssl_redirect.conf dest=/etc/httpd/conf.d/ssl_redirect.conf
+        mode=0644 owner=root group=root
+
+- name: Restart httpd
+  service: name=httpd state=restarted

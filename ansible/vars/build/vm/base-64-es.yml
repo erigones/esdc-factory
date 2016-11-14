@@ -1,0 +1,27 @@
+#Dependencies: base.yml, zone.yml
+image_name: base-64-es
+image_desc: "Danube Cloud base zone image"
+image_homepage: "{{ image_base_homepage }}#base-64-es"
+remove_base_image: false
+builder_dir: "{{ builder.appliance.dir }}/base-64-es"
+zone_brand: joyent
+zone_dns_domain: local
+zone_uuid: b442c858-f254-4a1f-a4f5-8fce46913ca6
+zone_image_uuid: 088b97b0-e1a1-11e5-b895-9baa2086eb33  # base-64-lts 15.4.1
+zone_hostname: "{{ image_name }}"
+zone_nic_0_ip: "{{ build_ips.base64 | default(build_ip) }}"
+zone_delegate_dataset: false
+zone_zfs_root_recsize: 131072
+zone_zfs_data_recsize: 16384
+zone_zfs_root_compression: "{{ build_disk_compression | default('lz4') }}"
+zone_zfs_data_compression: "{{ build_disk_compression | default('lz4') }}"
+zone_customer_metadata:
+  - key: user-script
+    value: "/usr/sbin/mdata-get root_authorized_keys > /root/.ssh/authorized_keys ;"
+  - key: root_authorized_keys
+    value: "{{ builder_ssh_key }}"
+
+base_image_manifest_url: "{{ builder_imgapi_mirror }}/images/{{ zone_image_uuid }}"
+base_image_manifest_file: "base-64-lts-{{ pkgsrc_version }}.imgmanifest"
+base_image_file_url: "{{ base_image_manifest_url }}/file"
+base_image_file_file: "base-64-lts-{{ pkgsrc_version }}.zfs.gz"

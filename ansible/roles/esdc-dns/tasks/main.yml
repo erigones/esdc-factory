@@ -1,0 +1,7 @@
+---
+- name: Copy dns server initilization script
+  copy: src=41-dns.sh
+        dest=/var/zoneinit/includes/41-dns.sh
+        owner=root
+        group=root
+        mode=0755

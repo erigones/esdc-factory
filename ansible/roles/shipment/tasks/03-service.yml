@@ -1,0 +1,19 @@
+---
+- name: Copy SMF manifest
+  command: cp -p {{ shipment_home }}/doc/gunicorn.xml /opt/local/lib/svc/manifest/gunicorn.xml
+           creates=/opt/local/lib/svc/manifest/gunicorn.xml
+  when: ansible_distribution == "SmartOS"
+
+- name: Check if SMF manifests are imported
+  shell: /usr/bin/svcs -Ho state gunicorn 2>/dev/null
+  ignore_errors: true
+  register: smf_state
+  changed_when: smf_state.rc != 0
+  when: ansible_distribution == "SmartOS"
+
+- name: Import shipment SMF manifest
+  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/gunicorn.xml
+  when: ansible_distribution == "SmartOS" and smf_state|failed
+
+- name: Ensure shipment is enabled and running
+  service: name=gunicorn enabled=yes state=started

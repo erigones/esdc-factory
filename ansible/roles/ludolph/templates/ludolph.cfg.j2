@@ -1,0 +1,163 @@
+[global]
+# Run in background as daemon
+daemon = false
+
+# PID file location
+#pidfile = /var/run/ludolph/ludolph.pid
+
+# Log file (required)
+# Empty value means logging to stdout
+logfile =
+
+# Log level (required)
+loglevel = INFO
+
+# DB file used for storing operational user data (optional)
+# Currently only used to achieve persistence of scheduled "at" commands across reboots.
+#dbfile = /var/lib/ludolph/ludolph.shelf
+
+[webserver]
+# Start web server listening on host:port. Needed for webhooks functionality.
+# Setting host or port to empty value will completely disable the web server.
+host = {{ ludolph_webserver_host }}
+port = {{ ludolph_webserver_port }}
+
+[cron]
+# Enable cron scheduler process. Needed for cronjob functionality and the at and remind command.
+enabled = {{ ludolph_cron_enabled | bool }}
+
+[xmpp]
+# Jabberbot nick name
+nick = {{ ludolph_nick }}
+
+# Username used for jabberbot to login (required)
+username = {{ ludolph_xmpp_username }}
+
+# Password used for jabberbot to login (required)
+password = {{ ludolph_xmpp_password }}
+
+# Jabber server address (default: using SRV DNS lookup to determine the host)
+{% if ludolph_xmpp_host is defined and ludolph_xmpp_host %}
+host = {{ ludolph_xmpp_host }}
+{% else %}
+#host = xmpp.example.com
+{% endif %}
+
+# Jabber server port (default: 5222)
+{% if ludolph_xmpp_port is defined and ludolph_xmpp_port %}
+port = {{ ludolph_xmpp_port }}
+{% else %}
+#port = 5222
+{% endif %}
+
+# Use TLS (default: true)
+{% if ludolph_xmpp_use_tls %}
+tls = {{ ludolph_xmpp_use_tls }}
+{% else %}
+#tls = true
+{% endif %}
+
+# Use SSL (default: false)
+{% if ludolph_xmpp_use_ssl %}
+ssl = {{ ludolph_xmpp_use_ssl }}
+{% else %}
+#ssl = false
+{% endif %}
+
+# Using OpenFire server with SSL (disabled by default)
+{% if ludolph_xmpp_use_sslv3 %}
+sslv3 = {{ ludolph_xmpp_use_sslv3 }}
+{% else %}
+#sslv3 = False
+{% endif %}
+
+# Comma-separated list of user jabber IDs.
+# Users are authorized to run regular Ludolph commands.
+# Leaving this option empty means that everybody is allowed to run Ludolph commands.
+users = {{ ludolph_xmpp_users | join(',') }}
+
+# Comma-separated list of admin jabber IDs.
+# Only admin is authorized to remove other users from Ludolph's roster.
+# Leave this option empty to grant roster operations to everybody.
+# You can use @users keyword here.
+admins = {{ ludolph_xmpp_admins | join(',') }}
+
+# Name of the Multi-User Chat room.
+# Leaving this option empty will disable MUC.
+#room =
+
+# Comma-separated list of room user jabber IDs.
+# Room users are authorized to access the MUC room.
+# Leaving this option empty means that everybody is allowed to access the room.
+# You can use @users or @admins keywords here.
+#room_users =
+
+# Comma-separated list of room admin jabber IDs.
+# Room admins get privileges associated with the "admin" affiliation.
+# You can use @users, @admins or @room_users keywords here.
+#room_admins =
+
+# Default MUC room affiliations set for Ludolph, room_users and room_admins.
+# Affiliations won't be set if left empty.
+#room_bot_affiliation = owner
+#room_user_affiliation = member
+#room_admin_affiliation = admin
+
+# Default MUC room roles set for Ludolph, room_users and room_admins.
+# Roles won't be set if left empty (default).
+#room_bot_role =
+#room_user_role =
+#room_admin_role =
+
+# Whether to send invites to new users to join the MUC room.
+# room_invites = True
+
+# Comma-separated list of user jabber IDs.
+# Users will not receive message that will be broadcasted to Ludolph's roster.
+# You can use @admins keyword here.
+broadcast_blacklist = 
+
+
+###############################################################################
+# Ludolph Plugins. You can enable plugins by uncommenting a configuration section.
+###############################################################################
+
+# Ludolph base commands
+[base]
+# Absolute path to directory with avatars
+#avatar_dir =
+
+# Multi-User chat room commands (only useful when room option is enabled)
+#[muc]
+#salutations = true
+#motd =
+
+# Ludolph commands plugin
+[commands]
+# <name> = <command>, [flags], [comment]
+#
+# name      - name of the Ludolph's command
+# command   - command or script to be executed in OS
+# flags     - comma-separated flags: user_not_required, admin_required, room_user_required, room_admin_required
+#                                    stream_output, ignore_output
+# comment   - help message displayed in Ludolph
+#
+os-uptime = uptime, Display system uptime
+
+
+{% if ludolph_plugin_zabbix_enabled %}
+# Zabbix plugin
+#[zabbix]
+# Zabbix server URI
+server = {{ ludolph_plugin_zabbix_server_url }}
+
+# Zabbix credentials
+username = {{ ludolph_plugin_zabbix_username }}
+password = {{ ludolph_plugin_zabbix_password }}
+
+{% if ludolph_plugin_zabbix_http_authentication %}
+# HTTP authentication
+httpuser = {{ ludolph_plugin_zabbix_http_username }}
+httppasswd = {{ ludolph_plugin_zabbix_http_password }}
+{% endif %}
+{% endif %}

@@ -1,0 +1,10 @@
+{% if pgbouncer_auth_type == "md5" %}
+{% for item in pgbouncer_hashed_passwords.results %}
+"{{ item.item.value.name }}" "{{ item.stdout }}"
+{% endfor %}
+{% endif %}
+{% if pgbouncer_auth_type == "trust" %}
+{% for key,val in pgbouncer_users.items() %}
+"{{ val.name }}" ""
+{% endfor %}
+{% endif %}

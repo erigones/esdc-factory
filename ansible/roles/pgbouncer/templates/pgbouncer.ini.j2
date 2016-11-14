@@ -1,0 +1,211 @@
+;; database name = connect string
+;;
+;; connect string params:
+;;   dbname= host= port= user= password=
+;;   client_encoding= datestyle= timezone=
+;;   pool_size= connect_query=
+[databases]
+{% for pool in pgbouncer_pools %}
+{{ pool.name }} = {{ pool.conninfo }}
+{% endfor %}
+
+;; Configuration section
+[pgbouncer]
+
+;;;
+;;; Administrative settings
+;;;
+
+logfile = {{ pgbouncer_logfile }}
+pidfile = {{ pgbouncer_pidfile }}
+
+;;;
+;;; Where to wait for clients
+;;;
+
+; ip address or * which means all ip-s
+listen_addr = {{ pgbouncer_listen_addr }}
+listen_port = {{ pgbouncer_listen_port }}
+
+; unix socket is also used for -R.
+; On debian it should be /var/run/postgresql
+;unix_socket_dir = /tmp
+;unix_socket_mode = 0777
+;unix_socket_group =
+
+;;;
+;;; Authentication settings
+;;;
+
+; any, trust, plain, crypt, md5
+auth_type = {{ pgbouncer_auth_type }}
+auth_file = {{ pgbouncer_auth_file }}
+
+;;;
+;;; Users allowed into database 'pgbouncer'
+;;;
+
+; comma-separated list of users, who are allowed to change settings
+{% if pgbouncer_admin_users is defined and pgbouncer_admin_users %}
+admin_users = {{ pgbouncer_admin_users | join(',') }}
+{% endif %}
+
+; comma-separated list of users who are just allowed to use SHOW command
+{% if pgbouncer_stats_users is defined and pgbouncer_stats_users %}
+stats_users = {{ pgbouncer_stats_users | join(',') }}
+{% endif %}
+
+;;;
+;;; Pooler personality questions
+;;;
+
+; When server connection is released back to pool:
+;   session      - after client disconnects
+;   transaction  - after transaction finishes
+;   statement    - after statement finishes
+pool_mode = {{ pgbouncer_pool_mode }}
+
+;
+; Query for cleaning connection immediately after releasing from client.
+; No need to put ROLLBACK here, pgbouncer does not reuse connections
+; where transaction is left open.
+;
+; Query for 8.3+:
+;   DISCARD ALL;
+;
+; Older versions:
+;   RESET ALL; SET SESSION AUTHORIZATION DEFAULT
+;
+; Empty if transaction pooling is in use.
+;
+server_reset_query = {{ 'DISCARD ALL' if pgbouncer_pool_mode == 'session' else '' }}
+
+;
+; Comma-separated list of parameters to ignore when given
+; in startup packet.  Newer JDBC versions require the
+; extra_float_digits here.
+;
+;ignore_startup_parameters = extra_float_digits
+
+;
+; When taking idle server into use, this query is ran first.
+;   SELECT 1
+;
+;server_check_query = select 1
+
+; If server was used more recently that this many seconds ago,
+; skip the check query.  Value 0 may or may not run in immediately.
+;server_check_delay = 30
+
+;;;
+;;; Connection limits
+;;;
+
+; total number of clients that can connect
+max_client_conn = {{ pgbouncer_max_client_conn }}
+
+; default pool size.  20 is good number when transaction pooling
+; is in use, in session pooling it needs to be the number of
+; max clients you want to handle at any moment
+default_pool_size = {{ pgbouncer_default_pool_size }}
+
+; how many additional connection to allow in case of trouble
+reserve_pool_size = {{ pgbouncer_reserve_pool_size }}
+
+; if a clients needs to wait more than this many seconds, use reserve pool
+;reserve_pool_timeout = 3
+
+; log if client connects or server connection is made
+log_connections = {{ pgbouncer_log_connections }}
+
+; log if and why connection was closed
+log_disconnections = {{ pgbouncer_log_disconnections }}
+
+; log error messages pooler sends to clients
+log_pooler_errors = {{ pgbouncer_log_pooler_errors }}
+
+
+; If off, then server connections are reused in LIFO manner
+;server_round_robin = 0
+
+;;;
+;;; Timeouts
+;;;
+
+;; Close server connection if its been connected longer.
+server_lifetime = {{ pgbouncer_server_lifetime }}
+
+;; Close server connection if its not been used in this time.
+;; Allows to clean unnecessary connections from pool after peak.
+server_idle_timeout = {{ pgbouncer_server_idle_timeout }}
+
+;; Cancel connection attempt if server does not answer takes longer.
+server_connect_timeout = 10
+
+;; If server login failed (server_connect_timeout or auth failure)
+;; then wait this many second.
+server_login_retry = 10
+
+;; Dangerous.  Server connection is closed if query does not return
+;; in this time.  Should be used to survive network problems,
+;; _not_ as statement_timeout. (default: 0)
+;query_timeout = 0
+
+;; Dangerous.  Client connection is closed if the query is not assigned
+;; to a server in this time.  Should be used to limit the number of queued
+;; queries in case of a database or network failure. (default: 0)
+;query_wait_timeout = 0
+
+;; Dangerous.  Client connection is closed if no activity in this time.
+;; Should be used to survive network problems. (default: 0)
+;client_idle_timeout = 0
+
+;; Disconnect clients who have not managed to log in after connecting
+;; in this many seconds.
+;client_login_timeout = 60
+
+;; Clean automatically created database entries (via "*") if they
+;; stay unused in this many seconds.
+; autodb_idle_timeout = 3600
+
+;;;
+;;; Low-level tuning options
+;;;
+
+;; buffer for streaming packets
+;pkt_buf = 2048
+
+;; man 2 listen
+;listen_backlog = 128
+
+;; networking options, for info: man 7 tcp
+
+;; Linux: notify program about new connection only if there
+;; is also data received.  (Seconds to wait.)
+;; On Linux the default is 45, on other OS'es 0.
+;tcp_defer_accept = 0
+
+;; In-kernel buffer size (Linux default: 4096)
+;tcp_socket_buffer = 0
+
+;; whether tcp keepalive should be turned on (0/1)
+;tcp_keepalive = 1
+
+;; following options are Linux-specific.
+;; they also require tcp_keepalive=1
+
+;; count of keepaliva packets
+;tcp_keepcnt = 0
+
+;; how long the connection can be idle,
+;; before sending keepalive packets
+;tcp_keepidle = 0
+
+;; The time between individual keepalive probes.
+;tcp_keepintvl = 0
+
+;; DNS lookup caching time
+;dns_max_ttl = 15
+
+;; DNS zone SOA lookup period
+;dns_zone_check_period = 0

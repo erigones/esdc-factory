@@ -1,0 +1,14 @@
+- name: restart rabbitmq
+  service: name=rabbitmq-server state=restarted
+
+- name: restart postgresql
+  service: name=postgresql-{{ pg_version }} state=restarted
+
+- name: restart pgbouncer
+  service: name=pgbouncer state=restarted
+
+- name: restart nginx
+  service: name=nginx state=restarted
+
+- name: restart redis
+  service: name=redis state=restarted

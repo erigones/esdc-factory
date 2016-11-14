@@ -1,0 +1,18 @@
+---
+- name: Check if json command is available
+  shell: which json
+  register: which_json
+  ignore_errors: true
+
+- name: Create IMGAPI root manifest in {{ imgapi_dir }} (json)
+  shell: find "{{ imgapi_dir }}" -type l -name manifest -exec json -f '{}' \; | json -g > "{{ imgapi_dir }}/manifest"
+  when: which_json|success
+
+- name: Create IMGAPI root manifest in {{ imgapi_dir }} (join - step 1)
+  shell: find /data/images -type l -name manifest -exec cat '{}' \; -exec echo ',' \; | sed '$d'
+  register: manifests
+  when: which_json|failed
+
+- name: Create IMGAPI root manifest in {{ imgapi_dir }} (join - step 2)
+  shell: echo "[\n{{ manifests.stdout }}\n]" > "{{ imgapi_dir }}/manifest"
+  when: which_json|failed

@@ -1,0 +1,11 @@
+---
+- name: Install additional packages
+  yum: name={{ item }} state=present
+  with_items:
+    - python-requests
+    - python-pip
+
+- name: Install zabbix-api-erigones (zabbix_template module)
+  shell: pip install -U zabbix-api-erigones
+  register: pip_result
+  changed_when: "'Successfully installed zabbix-api-erigones' in pip_result.stdout"

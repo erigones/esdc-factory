@@ -1,0 +1,49 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/esdc-mon.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/centos/register-host.yml
+        hostname=monitoring
+
+- name: Install and configure appliance
+  hosts: monitoring
+  gather_facts: true
+  vars_files:
+    - vars/build/os/esdc-mon.yml
+  roles:
+    - esdc-common
+    - selinux
+    - postgresql
+    - pgbouncer
+    - zabbix-server
+    - zabbix-agent
+    - cloud-init
+    - rc-scripts
+    - esdc-mon
+    - iptables
+    - mdata-client
+    - qemu-guest-agent
+    - ludolph
+    - passwords
+    - vm-image
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/esdc-mon.yml
+  vars:
+    image_tags: {internal: false, resize: true, deploy: false}
+  tasks:
+    - include: tasks/build/centos/create-image.yml

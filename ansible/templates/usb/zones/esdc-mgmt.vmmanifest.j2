@@ -1,0 +1,60 @@
+{
+  "autoboot": true,
+  "brand": "kvm",
+  "vcpus": 1,
+  "cpu_cap": 150,
+  "cpu_shares": 100,
+  "vnc_port": 20000,
+  "disks": [
+    {
+      "image_uuid": "{{ IMAGE_UUID }}",
+      "image_size": 10240,
+      "boot": true,
+      "model": "virtio",
+      "media": "disk",
+      "compression": "lz4"
+    }
+  ],
+  "nics": [
+    {
+      "nic_tag": "admin",
+      "gateway": "@ADMIN_GATEWAY@",
+      "ip": "@MGMT_IP@",
+      "netmask": "@ADMIN_NETMASK@",
+      "network_uuid": "d42bc4c3-ba17-43ee-a02a-74e667bd41fa",
+      "model": "virtio",
+      "primary": true
+    }
+  ],
+  "ram": 1024,
+  "hostname": "{{ esdc_mgmt.hostname | default('mgmt01.local') }}",
+  "alias": "{{ esdc_mgmt.hostname | default('mgmt01.local') }}",
+  "uuid": "f7860689-c435-4964-9f7d-2d2d70cfe389",
+  "resolvers": [
+    "@DNS_IP@"
+  ],
+  "customer_metadata": {
+    "org.erigones:zabbix_ip": "@MON_IP@",
+    "org.erigones:zabbix_server": "@MON_IP@",
+    "org.erigones:zabbix_admin_password": "@ZABBIX_ADMIN_PASSWORD@",
+    "org.erigones:zabbix_esdc_username": "{{ esdc_mgmt.zabbix_api.username }}",
+    "org.erigones:zabbix_esdc_password": "@ZABBIX_ESDC_PASSWORD@",
+    "org.erigones:rabbitmq_password": "@RABBITMQ_PASSWORD@",
+    "org.erigones:redis_password": "@REDIS_PASSWORD@",
+    "org.erigones:pgsql_esdc_password": "@PGSQL_ESDC_PASSWORD@",
+    "org.erigones:pgsql_pdns_password": "@PGSQL_PDNS_PASSWORD@",
+	"org.erigones:esdc_admin_email": "@ESDC_ADMIN_EMAIL@",
+    "root_authorized_keys": "@ROOT_AUTHORIZED_KEYS@"
+  },
+  "internal_metadata": {
+    "author": "Erigones",
+    "installed": true,
+    "alias": "mgmt01",
+    "ostype": 1,
+    "mon_ip": "@MGMT_IP@",
+    "mon_templates": "t_role-mgmt"
+  },
+  "owner_uuid": "1",
+  "qemu_extra_opts": "-chardev socket,path=/tmp/vm.qga,server,nowait,id=qga0 -device virtio-serial -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0",
+  "indestructible_zoneroot": true
+}

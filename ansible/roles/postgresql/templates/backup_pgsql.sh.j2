@@ -1,0 +1,42 @@
+#!/bin/bash 
+
+PATH="/usr/pgsql-{{ pg_version }}/bin:/usr/local/sbin:/usr/local/bin:/opt/local/sbin:/opt/local/bin:/usr/sbin:/usr/bin:/sbin"
+DATESTAMP=$(date +%Y%m%d)
+BKPSTORE="{{ pg_backupdir }}"
+BKPDIR="${BKPSTORE}/${DATESTAMP}"
+E=0
+
+if [ "$(psql -U postgres -Aqtc "SELECT pg_is_in_recovery()")" != "f" ]; then
+    echo "PostgreSQL in recovery mode. Exiting."
+    exit 9
+fi
+
+[[ -d "${BKPSTORE}" ]] || mkdir -p "${BKPSTORE}"
+
+# 1. vacuumdb -vaz
+vacuumdb -U postgres -avz > /tmp/backup_pgsql_vacuumdb.log 2>&1
+E=$((E+$?))
+
+# 3. pgdump per database
+mkdir -p "${BKPDIR}"
+# globals first
+pg_dumpall -U postgres -g 2> "${BKPDIR}/_globals.err" | gzip -9 > "${BKPDIR}/_globals.sql.gz"
+
+DATABASES=$(psql -A -U postgres -t -c "SELECT datname FROM pg_database WHERE datname<>'template0' AND datname<>'template1'")
+echo "${DATABASES}" | while read DB; do
+    TIMESTAMP="${DATESTAMP}$(date +%H%M%S)"
+    # DB data + DB schema dump
+    pg_dump -U postgres -s "${DB}" 2> "${BKPDIR}/${DB}-${TIMESTAMP}-schema.err" | gzip -9 > "${BKPDIR}/${DB}-${TIMESTAMP}-schema.sql.gz"
+    E=$((E+$?))
+    pg_dump -U postgres -a "${DB}" 2> "${BKPDIR}/${DB}-${TIMESTAMP}-data.err" | gzip -9 > "${BKPDIR}/${DB}-${TIMESTAMP}-data.sql.gz"
+    E=$((E+$?))
+done
+
+# 4. delete old backups
+find "${BKPSTORE}" -maxdepth 1 -type d -mtime +5 -exec rm -rf {} \;
+
+if [[ ${E} -eq 0 ]]; then
+    date > /tmp/backup_pgsql_dump.lastgood
+fi
+
+exit ${E}

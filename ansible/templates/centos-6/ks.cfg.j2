@@ -1,0 +1,199 @@
+#platform=x86, AMD64, or Intel EM64T
+#version=DEVEL
+# SSH account for anaconda
+sshpw --username=root {{ image_pass }} --plaintext
+# Firewall configuration
+firewall --enabled --ssh
+# Install OS instead of upgrade
+install
+# Use CDROM installation media
+cdrom
+# Root password
+rootpw {{ image_pass }}
+# System authorization information
+auth  --useshadow  --passalgo=sha512
+# Use text mode install
+text
+# System keyboard
+keyboard us
+# System language
+lang en_US
+# SELinux configuration
+selinux --enforcing
+# Do not configure the X Window System
+skipx
+# Installation logging level
+logging --level=info
+
+# System timezone
+timezone Etc/UTC
+# Network information
+network  --bootproto=dhcp --device=eth0 --onboot=on --hostname="localhost.localdomain"
+# System bootloader configuration
+bootloader --append="tsc=reliable divider=10" --location=mbr
+# Clear the Master Boot Record
+zerombr
+# Partition clearing information
+clearpart --all --initlabel
+# Disk partitioning information
+part / --asprimary --fstype="ext4" --size=1024 --grow
+#part swap --asprimary --fstype="swap" --size=2048
+
+unsupported_hardware
+
+firstboot --disabled
+poweroff
+
+url --url {{ builder_centos_mirror }}/6/os/x86_64
+repo --name=epel --baseurl={{ builder_epel_mirror }}/6/x86_64/
+repo --name=updates --baseurl={{ builder_centos_mirror }}/6/updates/x86_64/
+
+%packages --nobase
+#@core
+bzip2
+-bfa-firmware
+-iwl1000-firmware
+-ipw2100-firmware
+-ipw2200-firmware
+-iwl3945-firmware
+-iwl4965-firmware
+-iwl5000-firmware
+-iwl5150-firmware
+-iwl6000-firmware
+-iwl6050-firmware
+-iwl100-firmware
+-iwl6000g2a-firmware
+-ql2100-firmware
+-ql2200-firmware
+-ql23xx-firmware
+-ql2400-firmware
+-ql2500-firmware
+-rt61pci-firmware
+-rt73usb-firmware
+-zd1211-firmware
+-libertas-usb8388-firmware
+-ivtv-firmware
+-aic94xx-firmware
+-atmel-firmware
+-xorg-x11-drv-ati-firmware
+-b43-openfwwf
+-kexec-tools
+yum-utils
+acpid
+ntp
+openssh-clients
+man
+cloud-utils-growpart
+parted
+epel-release
+iputils
+%end
+
+%post
+exec < /dev/tty3 > /dev/tty3
+chvt 3
+
+# Populate /etc/resolv.conf with our nameservers
+{% if zone_resolvers %}{% for ip in zone_resolvers %}
+echo "nameserver {{ ip }}" >> /etc/resolv.conf
+{% endfor %}{% endif %}
+
+if ! ping -q -c 2 google.com > /dev/null; then
+    echo "Network is down!"
+fi 
+
+# Linux likes a bit of swap, so we create one
+fallocate -l 512M /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+# and add it to fstab
+cat << EOF >> /etc/fstab
+/swapfile   swap    swap    defaults    0   0
+
+EOF
+
+# The following tuning causes dirty data to begin to be background flushed at
+# 100 Mbytes, so that it writes earlier and more often to avoid a large build
+# up and improving overall throughput.
+echo "Setting vm.dirty_background_bytes"
+echo "vm.dirty_background_bytes=100000000" >> /etc/sysctl.conf
+
+# We want to configure newly added network interfaces, which
+# might be added to the virtual instance at some point in the future.
+# This modification will run on every boot and ensure the configuration
+# files are in place.
+
+# Quotes around RCLOCAL will make bash disable param substitution.
+cat << 'RCLOCAL' > /etc/rc.d/rc.local
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+interfaces="$(ifconfig -a | grep ^eth | awk '{print $1}')"
+
+for iface in ${interfaces[@]}; do
+    config="/etc/sysconfig/network-scripts/ifcfg-${iface}"
+
+    if [[ -f "${config}" ]]; then
+        if grep -q "dhcp" "${config}"; then
+            continue
+        fi
+    fi
+
+    ifdown ${iface}
+
+    echo "DEVICE=\"${iface}\"" > ${config}
+    echo "ONBOOT=\"yes\"" >> ${config}
+    echo "BOOTPROTO=\"dhcp\"" >> ${config}
+
+    ifup ${iface}
+
+    ipaddr="$(ifconfig ${iface} | grep 'inet addr:' | cut -d: -f2 | cut -d ' ' -f1)"
+
+    /sbin/arping -q -c 2 -A -I ${iface} ${ipaddr}
+done
+
+touch /var/lock/subsys/local
+RCLOCAL
+
+# Update yum.conf
+echo "Updating yum.conf"
+echo "installonly_limit=2" >> /etc/yum.conf
+echo "clean_requirements_on_remove=yes" >> /etc/yum.conf
+
+# Disable nozeroconf
+echo NOZEROCONF=yes >> /etc/sysconfig/network
+
+# Enable services to run on boot
+/sbin/chkconfig acpid on
+/sbin/chkconfig ntpd on
+
+# Make sure we have updates applied
+echo "Updating packages via yum"
+yum update -y
+
+# If we do not reinstall selinux-policy-targeted, then the ansible selinux role
+# will fail because of missing file. This is a stupid workaround until the
+# upstream fixes the problem.
+yum reinstall -y selinux-policy-targeted
+
+echo "Rebuild initramfs with rootfs-resize capability"
+cd /tmp
+curl -Lko /tmp/linux-rootfs-resize.tar.gz {{ builder_download_url }}/linux-rootfs-resize.tar.gz
+tar xvvf /tmp/linux-rootfs-resize.tar.gz
+cd /tmp/linux-rootfs-resize-master
+./install
+
+echo "Include prepare-image"
+curl -o /usr/sbin/prepare-image {{ builder_download_url }}/prepare-image
+chown root:root /usr/sbin/prepare-image
+chmod +x /usr/sbin/prepare-image
+restorecon -RF /usr/sbin/prepare-image
+
+# Cleanup
+/usr/sbin/prepare-image
+
+chvt 7
+%end

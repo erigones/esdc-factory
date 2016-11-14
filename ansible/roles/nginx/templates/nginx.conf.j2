@@ -1,0 +1,64 @@
+user  {{ nginx_user }} {{ nginx_group }};
+worker_processes  {{ nginx_worker_processes }};
+
+error_log  /var/log/nginx/error.log warn;
+
+events {
+    worker_connections {{ nginx_worker_connections }};
+}
+
+http {
+    include {{ nginx_config_dir }}/mime.types;
+    default_type {{ nginx_default_type }};
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile {{ nginx_sendfile }};
+    tcp_nopush {{ nginx_tcp_nopush }};
+    tcp_nodelay {{ nginx_tcp_nodelay }};
+
+{% if nginx_keepalive == 'on' %}
+    keepalive_timeout  {{ nginx_keepalive_timeout }};
+    client_body_timeout  {{ nginx_client_body_timeout }};
+    client_header_timeout  {{ nginx_client_header_timeout }};
+    send_timeout  {{ nginx_send_timeout }};
+    keepalive_requests {{ nginx_keepalive_requests }};
+{% endif %}
+
+    gzip {{ nginx_gzip }};
+{% if nginx_gzip == 'on' %}
+    gzip_http_version {{ nginx_gzip_http_version }};
+    gzip_comp_level {{ nginx_gzip_comp_level }};
+    gzip_proxied {{ nginx_gzip_proxied }};
+    gzip_vary {{ nginx_gzip_vary }};
+{% if nginx_gzip_buffers %}
+    gzip_buffers {{ nginx_gzip_buffers }};
+{% endif %}
+    gzip_types {{ nginx_gzip_types|join(' ') }};
+    gzip_min_length {{ nginx_gzip_min_length }};
+    gzip_disable "{{ nginx_gzip_disable }}";
+{% endif %}
+
+    connection_pool_size {{ nginx_connection_pool_size }};
+    client_body_buffer_size {{ nginx_client_body_buffer_size }};
+    client_header_buffer_size {{ nginx_client_header_buffer_size }};
+    client_max_body_size {{ nginx_client_max_body_size }};
+    large_client_header_buffers {{ nginx_large_client_header_buffers }};
+    request_pool_size {{ nginx_request_pool_size }};
+
+    server_names_hash_bucket_size {{ nginx_server_names_hash_bucket_size }};
+    server_names_hash_max_size {{ nginx_server_names_hash_max_size }};
+    types_hash_max_size {{ nginx_types_hash_max_size }};
+    types_hash_bucket_size {{ nginx_types_hash_bucket_size }};
+
+    server_tokens {{ nginx_server_tokens }};
+    server_name_in_redirect {{ nginx_server_name_in_redirect }};
+
+    ignore_invalid_headers {{ nginx_ignore_invalid_headers }};
+
+    include {{ nginx_config_dir}}/vhosts.d/*.conf;
+}

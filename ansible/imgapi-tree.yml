@@ -1,0 +1,60 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Build IMGAPI compatible file structure from image-like artefacts
+  hosts: builder
+  vars:
+    replace_imgapi_tree: true
+  tasks:
+    - name: Create temporary directory
+      shell: mktemp -d
+      register: mktemp
+
+    - name: Set some variables
+      set_fact:
+        tmpdir: "{{ mktemp.stdout }}"
+
+    - name: Fix permissions on temporary directory
+      file: path="{{ tmpdir }}"
+            mode=0775
+
+    - name: Create IMGAPI tree in {{ tmpdir }}
+      include: tasks/build/imgapi/tree.yml
+        target_dir="{{ tmpdir }}"
+        source_dir="{{ data.dir }}"
+        file_ext="{{ data.ext }}"
+      with_items:
+        - "{{ builder.appliance }}"
+      loop_control:
+        loop_var: data
+
+    - name: Create IMGAPI root manifest in {{ tmpdir }}
+      include: tasks/build/imgapi/root.yml
+        imgapi_dir="{{ tmpdir }}"
+
+    - name: Find appliance folders in {{ builder.appliance.dir }}
+      find: paths="{{ builder.appliance.dir }}"
+            recurse=no
+            file_type=directory
+            follow=yes
+      register: appliance_dirs
+
+    - name: Create symlinks for appliances
+      file: src="{{ item.path }}"
+            dest="{{ tmpdir }}/{{ item.path | basename }}"
+            state=link
+      with_items:
+        - "{{ appliance_dirs.files }}"
+
+    - name: Replace current IMGAPI tree in {{ builder.image.dir }}
+      synchronize: src="{{ tmpdir }}/"
+                   dest="{{ builder.image.dir }}/"
+                   delete=yes
+      when: replace_imgapi_tree
+
+    - name: Delete IMGAPI tree in {{ tmpdir }}
+      file: path="{{ tmpdir }}" state=absent
+      when: replace_imgapi_tree

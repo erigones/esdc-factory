@@ -1,0 +1,22 @@
+zone_autoboot: false
+zone_memory: 1024
+zone_cpu_cap: 100
+zone_cpu_shares: 100
+zone_zfs_io_priority: 100
+zone_quota: 10
+zone_resolvers: "{{ build_resolvers | mandatory }}"
+zone_indestructible_zoneroot: false
+zone_indestructible_delegated: false
+zone_delegate_dataset: false
+zone_nics:
+  - primary: true
+    nic_tag: "{{ build_nic_tag | mandatory }}"
+    gateway: "{{ build_gateway | mandatory }}"
+    ip: "{{ zone_nic_0_ip | mandatory }}"
+    netmask: "{{ build_netmask | mandatory }}"
+    vlan_id: "{{ build_vlan_id | default(0) }}"
+zone_tags: []
+zone_internal_metadata: []
+zone_customer_metadata:
+  - key: root_authorized_keys
+    value: "{{ builder_ssh_key }}"

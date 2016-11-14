@@ -1,0 +1,38 @@
+---
+- name: Remove unnecessary packages
+  shell: pkgin -y remove "{{ item }}"
+  with_items:
+    - nodejs
+    - gcc47-libs
+
+- name: Marking python27 as non auto-removable
+  shell: pkgin keep python27
+
+- name: Update package cache
+  shell: pkgin -y update
+
+- name: Run package update
+  shell: pkgin -y full-upgrade
+
+- name: Clear package cache
+  shell: pkgin -y clean
+
+- name: Modify branding files
+  file: path="{{ item.path }}" state="{{ item.state }}"
+  with_items:
+    - { path: /etc/motd, state: absent }
+    - { path: /etc/product, state: absent }
+    - { path: /etc/motd, state: touch }
+    - { path: /root/.bash_history, state: absent }
+
+- name: Place default zoneinit scripts
+  copy: src="{{ item.src }}"
+        dest="{{ item.dest }}"
+        mode=0755
+        owner=root
+        group=root
+  with_items:
+    - src: files/base64/93-authorized-keys.sh
+      dest: /var/zoneinit/includes/93-authorized-keys.sh
+    - src: files/base64/94-root-login.sh
+      dest: /var/zoneinit/includes/94-root-login.sh

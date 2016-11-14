@@ -1,0 +1,38 @@
+---
+zbx_server: "127.0.0.1"
+hostname: "{{ ansible_fqdn }}"
+
+# General Zabbix Agent Parameters
+############ GENERAL PARAMETERS #################
+
+zbx_agent_PidFile: "/var/run/zabbix/zabbix_agentd.pid"              #   Name of PID file.
+zbx_agent_LogFile: "/var/log/zabbix/zabbix_agentd.log"              #   Name of log file.
+zbx_agent_LogFileSize: 0                                            #   Maximum size of log file in MB.
+zbx_agent_DebugLevel: 3                                             #   Specifies debug level
+zbx_agent_SourceIP:                                                 #   Source IP address for outgoing connections.
+zbx_agent_EnableRemoteCommands: 0                                   #   Whether remote commands from Zabbix server are allowed.
+zbx_agent_LogRemoteCommands: 0                                      #   Enable logging of executed shell commands as warnings.
+zbx_agent_Server: "{{ zbx_server }}"                                #   List of comma delimited IP addresses (or hostnames) of Zabbix servers.
+zbx_agent_ServerActive: "{{ zbx_server }}"                          #   List of comma delimited IP:port (or hostname:port) pairs of Zabbix servers for active checks.
+zbx_agent_ListenPort: 10050                                         #   Agent will listen on this port for connections from the server.
+zbx_agent_ListenIP:                                                 #   List of comma delimited IP addresses that the agent should listen on.
+zbx_agent_StartAgents: 3                                            #   Number of pre-forked instances of zabbix_agentd that process passive checks.
+zbx_agent_Hostname: "{{ hostname }}"                                #   Unique, case sensitive hostname.
+zbx_agent_HostMetadata:                                             #   Optional parameter that defines host metadata.
+zbx_agent_RefreshActiveChecks: 120                                  #   How often list of active checks is refreshed, in seconds.
+zbx_agent_BufferSend: 5                                             #   Do not keep data longer than N seconds in buffer.
+zbx_agent_BufferSize: 100                                           #   Maximum number of values in a memory buffer. The agent will send
+zbx_agent_MaxLinesPerSecond:                                        #   Maximum number of new lines the agent will send per second to Zabbix Server
+
+############ ADVANCED PARAMETERS #################
+
+zbx_agent_Timeout: 3                                                #   Spend no more than Timeout seconds on processing
+zbx_agent_AllowRoot: 0                                              #   Allow the agent to run as 'root'.
+zbx_agent_Include: []                                               #   You may include individual files or all files in a directory in the configuration file.
+
+####### USER-DEFINED MONITORED PARAMETERS #######
+zbx_agent_UserParameter: []                                         #   User-defined parameter to monitor.
+
+####### LOADABLE MODULES #######
+zbx_agent_LoadModulePath:                                           #   Full path to location of agent modules.
+zbx_agent_LoadModule: []                                            #   Module to load at agent startup.s

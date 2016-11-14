@@ -1,0 +1,11 @@
+---
+- name: Install qemu-guest-agent package
+  yum: name=qemu-guest-agent state=latest
+
+- name: Enable qemu-ga service (CentOS 6)
+  service: name=qemu-ga enabled=yes
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+- name: Enable qemu-guest-agent service (CentOS 7)
+  service: name=qemu-guest-agent enabled=yes
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"

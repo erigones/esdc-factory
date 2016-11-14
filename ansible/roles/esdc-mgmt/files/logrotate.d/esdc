@@ -1,0 +1,33 @@
+/opt/erigones/var/log/mgmt.log
+/opt/erigones/var/log/task.log {
+	daily
+	rotate 30
+	missingok
+	copytruncate
+	notifempty
+	compress
+	delaycompress
+	sharedscripts
+}
+
+/opt/erigones/var/log/gunicorn-gui.access_log
+/opt/erigones/var/log/gunicorn-gui.error_log
+/opt/erigones/var/log/gunicorn-api.access_log
+/opt/erigones/var/log/gunicorn-api.error_log
+/opt/erigones/var/log/gunicorn-sio.access_log
+/opt/erigones/var/log/gunicorn-sio.error_log
+/opt/erigones/var/log/main.log
+/opt/erigones/var/log/auth.log {
+	daily
+	rotate 180
+	missingok
+	copytruncate
+	notifempty
+	compress
+	delaycompress
+	sharedscripts
+
+	postrotate
+		mv /opt/erigones/var/log/*log*.gz /opt/erigones/var/log/old/
+	endscript
+}

@@ -1,0 +1,27 @@
+---
+- name: Create shipment group
+  group: gid={{ shipment_gid }}
+         name={{ shipment_group }}
+         state=present
+
+- name: Create shipment user
+  user: name={{ shipment_user }}
+        uid={{ shipment_uid }}
+        group={{ shipment_group }}
+        home={{ shipment_home }}
+        shell={{ shipment_shell }}
+        createhome=no
+        state=present
+
+- name: Install shipment dependencies
+  command: pkgin -y install {{ item }}
+  register: res_deps
+  changed_when: "'nothing to do.' not in res_deps.stdout"
+  with_items: "{{ shipment_dependencies }}"
+
+- name: Install git
+  command: pkgin -y install {{ item }}
+  register: res_git
+  changed_when: "'nothing to do.' not in res_git.stdout"
+  with_items:
+    - git-base

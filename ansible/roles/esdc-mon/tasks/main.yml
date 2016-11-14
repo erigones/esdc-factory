@@ -1,0 +1,6 @@
+---
+- include: 01-os.yml
+- include: 02-packages.yml
+- include: 03-httpd.yml
+- include: 04-zabbix.yml
+- include: 05-monitoring.yml

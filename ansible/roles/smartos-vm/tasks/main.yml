@@ -1,0 +1,20 @@
+---
+- name: Create VM (OS) configuration file
+  template: src=os.json.j2
+            dest=/tmp/{{ zone_uuid }}.json
+            validate="vmadm validate create joyent -f %s"
+  when: zone_brand == "joyent"
+
+- name: Create VM (KVM) configuration file
+  template: src=kvm.json.j2
+            dest=/tmp/{{ zone_uuid }}.json
+            validate="vmadm validate create kvm -f %s"
+  when: zone_brand == "kvm"
+
+- name: Create the virtual machine
+  vmadm: manifest={{ item }} state=present
+  with_items:
+    - /tmp/{{ zone_uuid }}.json
+
+- name: Ensure that virtual machine is running
+  vmadm: uuid={{ zone_uuid }} state=started

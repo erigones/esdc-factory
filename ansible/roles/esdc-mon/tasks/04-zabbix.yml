@@ -1,0 +1,419 @@
+---
+- name: Get Zabbix administrators user group
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: usergroup.get
+    api_params_dict:
+      filter: 
+        name: "Zabbix administrators"
+  register: admin_user_group
+
+- name: Get Guests user group
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: usergroup.get
+    api_params_dict: 
+      filter:
+        name: "Guests"
+  register: guest_user_group
+
+- name: Disable Guests user group
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: usergroup.update
+    api_params_dict:
+      usrgrpid: "{{ guest_user_group.result[0].usrgrpid }}"  # Guest user group
+      users_status: "1"  # Disabled user group
+
+- name: "Get 'No access to the frontend' user group"
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: usergroup.get
+    api_params_dict:
+      filter:
+        name: "No access to the frontend"
+  register: nofrontend_user_group
+
+- name: Create provisioner user
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: user.create
+    api_params_dict:
+        alias: "provisioner"
+        passwd: "zabbix"
+        autologout: 0
+        type: "3"   # 3 - Zabbix super admin
+        usrgrps:
+          - usrgrpid: "{{ nofrontend_user_group.result[0].usrgrpid }}"  # 12 Disbled frontend user group
+  register: provisioner_user
+
+- name: Get admin user
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: user.get
+    api_params_dict:
+      filter:
+        alias: "Admin"
+      output: "userid"
+  register: admin_user
+
+- name: Get current media types
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password:  "{{ login_password }}"
+    api_method: mediatype.get
+    api_params_dict:
+      output: "mediatypeid"
+  register: media_types
+
+- name: Delete default media types (email, sms, jabber)
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password:  "{{ login_password }}"
+    api_method: mediatype.delete
+    api_params_list: "{{ media_types.result|map(attribute='mediatypeid')|list }}"
+
+- name: Create Email media type (email)
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: mediatype.create
+    api_params_dict:
+      description: "E-mail"
+      type: 0  # email
+      smtp_server: "localhost"
+      smtp_helo: "localhost"
+      smtp_email: "monitoring@example.com"
+  register: email_media_type
+
+- name: Create HQSMS media type (script)
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: mediatype.create
+    api_params_dict:
+      description: "SMS"
+      type: 1  # script
+      exec_path: "hqsms.sh"
+
+- name: Create Ludolph media type (script)
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: mediatype.create
+    api_params_dict:
+      description: "Ludolph"
+      type: 1  # script
+      exec_path: "ludolph.sh"
+
+- name: Create Prowl media type (script)
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: mediatype.create
+    api_params_dict:
+      description: "Prowl"
+      type: 1  # script
+      exec_path: "prowl.sh"
+
+- name: Create NMA media type (script)
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: mediatype.create
+    api_params_dict:
+      description: "NMA"
+      type: 1  # script
+      exec_path: "nma.sh"
+
+- name: Create ICMP_LOSS macro
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: usermacro.createglobal
+    api_params_dict:
+      macro: "{$ICMP_LOSS}"
+      value: "20"
+
+- name: Create ICMP_RESPONSE macro
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: usermacro.createglobal
+    api_params_dict:
+      macro: "{$ICMP_RESPONSE}"
+      value: "0.5"
+
+- name: Create Compute nodes host group
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: hostgroup.create
+    api_params_dict:
+      name: "Compute nodes"
+
+- name: Create Compute Nodes IT service
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: service.create
+    api_params_dict:
+      name: "Compute Nodes"
+      algorithm: 1  # problem, if at least one child has a problem
+      goodsla: 99.99
+      showsla: 1
+      sortorder: 1
+
+- name: Create Notifications host group
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: hostgroup.create
+    api_params_dict:
+      name: "Notifications"
+  register: notifications
+
+- name: Get current actions
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password:  "{{ login_password }}"
+    api_method: action.get
+    api_params_dict:
+      output: "actionid"
+  register: actions
+
+- name: Delete default actions
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password:  "{{ login_password }}"
+    api_method: action.delete
+    api_params_list: "{{ actions.result|map(attribute='actionid')|list }}"
+
+- name: Create Notify action 1
+  vars:
+    notifications_host_group_id: "{{ notifications.result.groupids[0] }}"
+    admin_user_group_id: "{{ admin_user_group.result[0].usrgrpid }}"
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: action.create
+    api_params_dict:
+      name: "Notify (with recovery message)"
+      eventsource: 0
+      esc_period: 300
+      status: 0
+      def_longdata: "- {DATE} {TIME} - {TRIGGER.SEVERITY} - Value: {ITEM.VALUE1}|{ITEM.VALUE2}|{ITEM.VALUE3}|{ITEM.VALUE4} ({TRIGGER.NSEVERITY})"
+      def_shortdata: "**{EVENT.ID}** {HOST.NAME}: {TRIGGER.STATUS}: {TRIGGER.NAME}"
+      recovery_msg: 1
+      r_longdata: "- {DATE} {TIME} - {TRIGGER.SEVERITY} - Value: {ITEM.VALUE1}|{ITEM.VALUE2}|{ITEM.VALUE3}|{ITEM.VALUE4} ({TRIGGER.NSEVERITY})"
+      r_shortdata: "**{EVENT.ID}** {HOST.NAME}: {TRIGGER.STATUS}: {TRIGGER.NAME}"
+      filter:
+        evaltype: 0
+        conditions:
+          - conditiontype: 16
+            formulaid: "A"
+            operator: 7
+            value: ""
+          - conditiontype: 15
+            formulaid: "B"
+            operator: 3
+            value: "Custom Alerts"
+          - conditiontype: 5
+            formulaid: "C"
+            operator: 0
+            value: "1"
+          - conditiontype: 4
+            formulaid: "D"
+            operator: 5
+            value: "0"
+          - conditiontype: 0
+            formulaid: "E"
+            operator: 0
+            value: "{{ notifications_host_group_id }}"
+      operations:
+        - operationtype: 0
+          esc_period: 0
+          esc_step_from: 1
+          esc_step_to: 1
+          evaltype: 0
+          opconditions:
+            - conditiontype: 14
+              operator: 0
+              value: "0"
+          opmessage:
+            default_msg: 1
+            mediatypeid: 0
+          opmessage_grp:
+            - usrgrpid: "{{ admin_user_group_id }}"
+          opmessage_usr: []
+
+- name: Create Notify action 2
+  vars:
+    notifications_host_group_id: "{{ notifications.result.groupids[0] }}"
+    admin_user_group_id: "{{ admin_user_group.result[0].usrgrpid }}"
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: action.create
+    api_params_dict:
+      name: "Notify - Custom Alerts (without recovery message)"
+      eventsource: 0
+      esc_period: 300
+      status: 0
+      def_longdata: "- {DATE} {TIME} - {TRIGGER.SEVERITY} - Value: {ITEM.VALUE1}|{ITEM.VALUE2}|{ITEM.VALUE3}|{ITEM.VALUE4} ({TRIGGER.NSEVERITY})"
+      def_shortdata: "**{EVENT.ID}** {HOST.NAME}: {TRIGGER.STATUS}: {TRIGGER.NAME}"
+      recovery_msg: 0
+      r_longdata: ""
+      r_shortdata: ""
+      filter:
+        evaltype: 0
+        conditions:
+          - conditiontype: 16
+            formulaid: "A"
+            operator: 7
+            value: ""
+          - conditiontype: 15
+            formulaid: "B"
+            operator: 2
+            value: "Custom Alerts"
+          - conditiontype: 5
+            formulaid: "C"
+            operator: 0
+            value: "1"
+          - conditiontype: 4
+            formulaid: "D"
+            operator: 5
+            value: "0"
+          - conditiontype: "0"
+            formulaid: "E"
+            operator: "0"
+            value: "{{ notifications_host_group_id }}"
+      operations:
+        - operationtype: 0
+          esc_period: 0
+          esc_step_from: 1
+          esc_step_to: 1
+          evaltype: 0
+          opconditions:
+            - conditiontype: 14
+              operator: 0
+              value: "0"
+          opmessage:
+            default_msg: 1
+            mediatypeid: 0
+          opmessage_grp:
+            - usrgrpid: "{{ admin_user_group_id }}"
+          opmessage_usr: []
+
+- name: Create regular expressions (step 1)
+  shell: |
+    psql -U "{{ zabbix_db_user }}" -d "{{ zabbix_db_name }}" <<" EOF"
+    INSERT INTO regexps (regexpid, name, test_string) VALUES
+    (4, 'File systems for discovery by FSNAME (Linux)', ''),
+    (5, 'File systems for discovery by FSNAME (SmartOS)', ''),
+    (6, 'Network interfaces for discovery (SmartOS)', 'eth0');
+    EOF
+  environment:
+    PGPASSWORD: "{{ zabbix_db_password }}"
+  register: regexp
+  failed_when: "'INSERT 0 3' not in regexp.stdout"
+
+- name: Create regular expressions (step 2)
+  shell: |
+    psql -U "{{ zabbix_db_user }}" -d "{{ zabbix_db_name }}" <<" EOF"
+    INSERT INTO expressions (expressionid, regexpid, expression, expression_type, exp_delimiter, case_sensitive) VALUES
+    (5,  4, '^\\/', 3, ',', 0),
+    (6,  4, '^\\/var\\/named\\/chroot', 4, ',', 0),
+    (7,  4, '^\\/chroot', 4, ',', 0),
+    (8,  4, '^\\/(dev|mnt|media|proc|sys|selinux|cgroup|var\\/lib\\/nfs).*$', 4, ',', 0),
+    (9,  4, '^\\/.*\\/dev$', 4, ',', 0),
+    (10, 5, '^\\/(dev|devices|etc|lib|system|usbkey|usr|var\\/run)', 4, ',', 0),
+    (11, 5, '^\\/(checkpoints|dev|etc|lib|proc|sbin|system|usr|var\\/run)', 4, ',', 0),
+    (12, 5, '^\\/zones', 4, ',', 0),
+    (13, 5, '^\\/', 3, ',', 0),
+    (14, 6, 'tap[0-9]+', 4, ',', 0),
+    (15, 6, 'tun[0-9]+', 4, ',', 0),
+    (16, 6, 'lo0', 4, ',', 0);
+    EOF
+  environment:
+    PGPASSWORD: "{{ zabbix_db_password }}"
+  register: regexp_exp
+  failed_when: "'INSERT 0 12' not in regexp_exp.stdout"
+
+- name: Changed refresh_unsupported value
+  shell: |
+    psql -U "{{ zabbix_db_user }}" -d "{{ zabbix_db_name }}" <<" EOF"
+    UPDATE config SET refresh_unsupported = 180;
+    EOF
+  environment:
+    PGPASSWORD: "{{ zabbix_db_password }}"
+  register: refresh_unsupported
+  failed_when: "'UPDATE 1' not in refresh_unsupported.stdout"
+
+- name: Create placeholder directory for templates
+  file: path=/tmp/templates
+        state=directory
+
+- name: Copy monitoring templates
+  copy: src=templates/{{ item }}
+        dest=/tmp/templates/{{ item }}
+  with_items: "{{ monitoring_templates }}"
+
+- name: Import monitoring templates
+  zabbix_template: url="{{ zabbix_url }}"
+                   login_user="{{ login_user }}"
+                   login_password="{{ login_password }}"
+                   state=import
+                   format=json
+                   template=/tmp/templates/{{ item }}
+  with_items: "{{ monitoring_templates }}"
+
+- name: Remove placeholder directory for templates
+  file: path=/tmp/templates
+        state=absent
+
+- name: Install /usr/sbin/es-zabbix-config.py
+  template: src=es-zabbix-config.py.j2
+            dest=/usr/sbin/es-zabbix-config.py
+            mode=0750
+            owner=root
+            group=root
+
+- name: Install /usr/sbin/es-post-deploy.sh
+  vars:
+    admin_user_id: "{{ admin_user.result[0].userid }}"
+    provisioner_user_id: "{{ provisioner_user.result.userids[0] }}"
+    email_media_type_id: "{{ email_media_type.result.mediatypeids[0] }}"
+  template: src=es-post-deploy.sh.j2
+            dest=/var/lib/rc-scripts/50-es-post-deploy.sh
+            mode=0750
+            owner=root
+            group=root

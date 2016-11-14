@@ -1,0 +1,68 @@
+---
+monitoring_templates:
+  - t_custom_alerts.json
+
+  - t_icmp.json
+  - t_zabbix-agent.json
+
+  - t_erigones-zone.json
+  - t_erigonos.json
+  - t_solaris_disk.json
+
+  - t_linux.json
+  - t_linux-disk.json
+
+  - t_svc-api.json
+  - t_svc-cache.json
+  - t_svc-db.json
+  - t_svc-cfgdb.json
+  - t_svc-dns.json
+  - t_svc-erigonesd-compute.json
+  - t_svc-erigonesd-mgmt.json
+  - t_svc-gui.json
+  - t_svc-img.json
+  - t_svc-mq.json
+  - t_svc-remote-console.json
+  - t_svc-sio.json
+  - t_svc-web-proxy.json
+  - t_svc-web-static.json
+
+  - t_vm_cpu.json
+  - t_vm_disk_latency.json
+  - t_vm_disk_space.json
+  - t_vm_memory.json
+  - t_vm_zone_cpu.json
+  - t_vm_zone_dataset.json
+  - t_vm_zone_vfs.json
+  - t_vm_zone_zfs.json
+
+  - t_vm_kvm_disk0_io.json
+  - t_vm_kvm_disk1_io.json
+  - t_vm_kvm_disk2_io.json
+  - t_vm_kvm_disk3_io.json
+
+  - t_vm_network_net0.json
+  - t_vm_network_net1.json
+  - t_vm_network_net2.json
+  - t_vm_network_net3.json
+  - t_vm_network_net4.json
+  - t_vm_network_net5.json
+  - t_vm_network_net6.json
+  - t_vm_network_net7.json
+
+  - t_zfs_io_throttle.json
+  - t_zfs_arc.json
+  - t_zfs_l2arc.json
+
+  - t_zabbix-db.json
+  - t_zabbix-agent.json
+  - t_zabbix-proxy.json
+  - t_zabbix-server.json
+
+  - t_role-db.json
+  - t_role-cfgdb.json
+  - t_role-dns.json
+  - t_role-img.json
+  - t_role-mgmt.json
+  - t_role-mon.json
+  - t_role-compute.json

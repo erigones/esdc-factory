@@ -1,0 +1,100 @@
+factory_basedir: "{{ lookup('env', 'FACTORY_BASEDIR') | mandatory }}"
+
+builder_base_url: "{{ build_base_url | mandatory }}"
+builder_base_dir: "{{ build_base_dir | mandatory }}"
+builder_tmp_dir: "{{ build_base_dir }}/tmp"
+
+builder_uuid_generator: "{{ build_uuid_generator | default('uuid') }}"
+
+builder:
+  image:  # No 'ext' property on purpose
+    dir: "{{ builder_base_dir }}/images"
+    url: "{{ builder_base_url }}/images"
+  appliance:
+    dir: "{{ builder_base_dir }}/appliances"
+    url: "{{ builder_base_url }}/appliances"
+    ext: ".zfs.gz"
+  archive:
+    dir: "{{ builder_base_dir }}/archives"
+    url: "{{ builder_base_url }}/archives"
+    ext: ".tar.gz"
+  iso:
+    dir: "{{ builder_base_dir }}/isos"
+    url: "{{ builder_base_url }}/isos"
+    ext: ".iso"
+  platform:
+    dir: "{{ builder_base_dir }}/platform"
+    url: "{{ builder_base_url }}/platform"
+    ext: ".tgz"
+  usb:
+    dir: "{{ builder_base_dir }}/usb"
+    url: "{{ builder_base_url }}/usb"
+    ext: ".img.gz"
+
+builder_ssh_key: "{{ build_ssh_key | mandatory }}"
+
+builder_base_centos_imgmanifest: base-centos-7-latest.imgmanifest
+builder_base_centos_imgfile: base-centos-7-latest.zfs.gz
+builder_base_centos_imgmanifest_url: "{{ builder.appliance.url }}/base-centos-7/{{ builder_base_centos_imgmanifest }}"
+builder_base_centos_imgfile_url: "{{ builder.appliance.url }}/base-centos-7/{{ builder_base_centos_imgfile }}"
+
+pkgsrc_version: 15.4.1
+pkgin_release: 2015Q4
+builder_base_zone_imgmanifest: "base-64-es-{{ pkgsrc_version }}.imgmanifest"
+builder_base_zone_imgfile: "base-64-es-{{ pkgsrc_version }}.zfs.gz"
+builder_base_zone_imgmanifest_url: "{{ builder.appliance.url }}/base-64-es/{{ builder_base_zone_imgmanifest }}"
+builder_base_zone_imgfile_url: "{{ builder.appliance.url }}/base-64-es/{{ builder_base_zone_imgfile }}"
+
+builder_centos_mirror: "{{ build_centos_mirror | default('http://tux.rainside.sk/centos') }}"
+builder_epel_mirror: "{{ build_epel_mirror | default('http://ftp.upjs.sk/pub/mirrors/epel') }}"
+builder_imgapi_mirror: "{{ build_imgapi_mirror | default('https://images.joyent.com') }}"
+
+image_version: "{{ version | default( lookup('pipe', 'date -u +\"%Y%m%d\"')) }}"
+image_pass: "{{ build_image_password | mandatory }}"
+image_tags:
+  internal: false
+  resize: true
+  deploy: false
+image_base_homepage: "https://github.com/erigones/esdc-factory/blob/master/docs/appliances.rst"
+
+release_type: nightly
+release_version: latest
+release_edition: ce
+release_edition_long: "{% if release_edition == 'ce' %}Community Edition{% elif release_edition == 'ee' %}Enterprise Edition{% else %}{{ release_edition }}{% endif %}"
+
+software_branch: "{{ source_version | default('master') }}"
+software_version: "{% if release_type == 'stable' %}{{ image_version }}{% else %}{{ image_version }}-{{ software_branch }}{% endif %}"
+
+root_authorized_keys:
+  - "{{ builder_ssh_key }}"
+
+esdc_mgmt:
+  hostname: 'mgmt01.local'
+  rabbitmq:
+    user: 'esdc'
+    host: '127.0.0.1'
+    port: '5672'
+    password: 'S3cr3tP4ssw0rd'
+    vhost: 'esdc'
+  redis:
+    host: '127.0.0.1'
+    port: '6379'
+    password: 'S3cr3tP4ssw0rd'
+  pgsql_esdc:
+    name: 'esdc'
+    host: '127.0.0.1'
+    port: '6432'
+    user: 'esdc'
+    password: 'S3cr3tP4ssw0rd'
+  pgsql_pdns:
+    name: 'pdns'
+    host: '127.0.0.1'
+    port: '6432'
+    user: 'pdns'
+    password: 'S3cr3tP4ssw0rd'
+  pgsql_monitoring:
+    user: 'stats'
+    password: 'stats'
+  zabbix_api:
+    username: "provisioner"
+    password: "zabbix"

@@ -1,0 +1,31 @@
+---
+- name: Create Ludolph service group
+  group: name=ludolph
+         state=present
+
+- name: Create Ludolph service user
+  user: name=ludolph
+        group=ludolph
+        home=/var/lib/ludolph
+        shell=/sbin/nologin
+
+- name: Install Ludolph
+  pip: name=ludolph state=latest
+
+- name: Create Ludolph configuration file
+  template: src=ludolph.cfg.j2
+            dest=/etc/ludolph.cfg
+            owner=root
+            group=ludolph
+            mode=0640
+
+- name: Create Ludolph startup script
+  copy: src=ludolph.service
+        dest=/etc/systemd/system
+        owner=root
+        group=root
+        mode=0644
+
+- name: Ensure Ludolph is running
+  service: name=ludolph state=started enabled=yes
+  when: ludolph_service_enabled

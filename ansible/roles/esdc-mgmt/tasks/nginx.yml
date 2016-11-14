@@ -1,0 +1,12 @@
+---
+- name: Install nginx
+  yum: name={{ item }} state=latest
+  with_items:
+    - nginx
+
+- name: Start nginx and enable at boot
+  service: name=nginx enabled=yes state=started
+
+- name: Create /etc/nginx/vhost.d directory
+  file: path=/etc/nginx/vhost.d owner=root group=root mode=0755 state=directory
+

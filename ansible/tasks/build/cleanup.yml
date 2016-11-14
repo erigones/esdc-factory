@@ -1,0 +1,22 @@
+---
+- name: Check if a virtual machine exists from any previous failed build
+  shell: vmadm get "{{ zone_uuid }}"
+  ignore_errors: true
+  register: old_vm_manifest
+
+- name: Remove virtual machine from previous failed build
+  vmadm: name="{{ zone_uuid }}" state=absent
+  when: old_vm_manifest.rc == 0
+
+- name: Get base image of VM (KVM) from previous failed build
+  set_fact: old_image_uuid="{{ (old_vm_manifest.stdout | from_json)['disks'][0]['image_uuid'] }}"
+  when: remove_base_image and zone_brand == "kvm" and old_vm_manifest.rc == 0
+
+- name: Get base image of VM (OS) from previous failed build
+  set_fact: old_image_uuid="{{ (old_vm_manifest.stdout | from_json)['image_uuid'] }}"
+  when: remove_base_image and zone_brand != "kvm" and old_vm_manifest.rc == 0
+
+- name: Remove base image of VM from previous failed build
+  shell: imgadm delete -P zones "{{ old_image_uuid }}"
+  when: remove_base_image and old_vm_manifest.rc == 0
+  ignore_errors: true

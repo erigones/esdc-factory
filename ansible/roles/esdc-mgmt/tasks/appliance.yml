@@ -1,0 +1,17 @@
+---
+- name: Include variables specific to appliance
+  include_vars: ../defaults/appliance.yml
+
+- name: Recreate Danube Cloud local_settings.py
+  template: src=esdc/local_settings.py.j2
+            dest=/opt/erigones/core/local_settings.py
+            owner=erigones
+            group=erigones
+            mode=0640
+
+- name: Recreate Danube Cloud local_config.py
+  template: src=esdc/local_config.py.j2
+            dest=/opt/erigones/core/celery/local_config.py
+            owner=erigones
+            group=erigones
+            mode=0644  # zabbix uses erigonesd inspect

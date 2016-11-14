@@ -1,0 +1,6 @@
+---
+- name: Set up common repositories
+  yum: name={{ item }} state=present
+  with_items:
+    - epel-release
+  when: ansible_distribution == "CentOS"

@@ -1,0 +1,28 @@
+---
+zone_autoboot: false
+zone_brand: joyent
+zone_fs_allowed: []
+zone_firewall_enabled: false
+zone_maintain_resolvers: false
+zone_zfs_io_priority: 100
+zone_cpu_cap:
+zone_cpu_shares: 100
+zone_dns_domain: local
+zone_uuid:
+zone_image_uuid:
+zone_resolvers: []
+zone_hostname: tester
+zone_nics: []
+zone_quota: 10
+zone_zfs_root_recsize: 131072
+zone_zfs_data_recsize: 131072
+zone_delegate_dataset: yes
+zone_zfs_root_compression: lz4
+zone_zfs_data_compression: lz4
+zone_indestructible_zoneroot: false
+zone_indestructible_delegated: false
+zone_memory: 1024
+
+zone_customer_metadata: []
+zone_internal_metadata: []
+zone_tags: []

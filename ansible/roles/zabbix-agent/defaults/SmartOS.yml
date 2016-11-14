@@ -1,0 +1,6 @@
+---
+zabbix_agent_config_dir: /opt/local/etc/zabbix
+
+zabbix_agent_package: zabbix-agent-3.0.4.tgz
+
+zbx_agent_PidFile: "/tmp/zabbix_agentd.pid"
