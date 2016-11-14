@@ -60,3 +60,4 @@ usb_legal_files:
     dst: EULA.txt
   - src: LICENSES.txt
     dst: LICENSES.txt
+    base_url: "https://github.com/erigones/esdc-docs/raw/master/legal/usb"

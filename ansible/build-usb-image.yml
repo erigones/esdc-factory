@@ -107,7 +107,7 @@
       when: usb_type == 'cn'
 
     - name: Stage legal file {{ item }}
-      get_url: url="{{ legal_url }}/{{ item.src }}" dest="{{ usb_tmp_stage }}/{{ item.dst }}" mode=0444
+      get_url: url="{{ item.base_url|default(legal_url) }}/{{ item.src }}" dest="{{ usb_tmp_stage }}/{{ item.dst }}" mode=0444
       with_items: "{{ usb_legal_files }}"
 
     - name: Stage zones
