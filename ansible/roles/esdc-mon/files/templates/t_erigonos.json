@@ -1051,7 +1051,7 @@
                         "snmpv3_authprotocol": "0",
                         "valuemap": [],
                         "ipmi_sensor": "",
-                        "status": "0",
+                        "status": "1",
                         "authtype": "0",
                         "snmp_community": "",
                         "description": "",
