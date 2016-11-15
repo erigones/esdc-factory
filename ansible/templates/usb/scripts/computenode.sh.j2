@@ -134,33 +134,33 @@ function _zk() {
 }
 
 function wait_for_cfgdb() {
-    set +e
-    while true; do
-        printf_log "\r%-56s" "Waiting for cfgdb availability... "
-        /usr/sbin/ping -s -I 1 ${CFGDB_IP} 1492 10 > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            printf_log "done.\n"
-            break
-        fi
-        printf_log "not yet.\n"
-    done
-    set -e
+	set +e
+	while true; do
+		printf_log "\r%-56s" "Waiting for cfgdb availability... "
+		/usr/sbin/ping -s -I 1 ${CFGDB_IP} 1492 10 > /dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			printf_log "done.\n"
+			break
+		fi
+		printf_log "not yet.\n"
+	done
+	set -e
 }
 
 function query_cfgdb() {
-    # Wait for configuration database availability
-    wait_for_cfgdb
+	# Wait for configuration database availability
+	wait_for_cfgdb
 
 	printf_log "%-56s Retrieving headnode configuration information from cfgdb ..."
 
-    _mgmt_ip=$(_zk get "/esdc/settings/rabbitmq/host")
-    _mon_ip=$(_zk get "/esdc/settings/zabbix/host")
-    _rabbitmq_password=$(_zk get "/esdc/settings/rabbitmq/password")
-    _redis_password=$(_zk get "/esdc/settings/redis/password")
+	_mgmt_ip=$(_zk get "/esdc/settings/rabbitmq/host")
+	_mon_ip=$(_zk get "/esdc/settings/zabbix/host")
+	_rabbitmq_password=$(_zk get "/esdc/settings/rabbitmq/password")
+	_redis_password=$(_zk get "/esdc/settings/redis/password")
 
-    if [[ -z "${_mgmt_ip}" || -z "${_mon_ip}" || -z "${_rabbitmq_password}" || -z "${_redis_password}" ]]; then
-        fatal "Incomplete data in configuration database, aborting setup."
-    fi
+	if [[ -z "${_mgmt_ip}" || -z "${_mon_ip}" || -z "${_rabbitmq_password}" || -z "${_redis_password}" ]]; then
+		fatal "Incomplete data in configuration database, aborting setup."
+	fi
 
 	printf_log "%-56s Registering compute node into cfgdb ..."
 
@@ -169,10 +169,10 @@ function query_cfgdb() {
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "false"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/hostname" "${SYSINFO_Hostname}"
 
-    MGMT_IP=${_mgmt_ip}
-    MON_IP=${_mon_ip}
-    RABBITMQ_PASSWORD=${_rabbitmq_password}
-    REDIS_PASSWORD=${_redis_password}
+	MGMT_IP=${_mgmt_ip}
+	MON_IP=${_mon_ip}
+	RABBITMQ_PASSWORD=${_rabbitmq_password}
+	REDIS_PASSWORD=${_redis_password}
 
 	printf_log "%4s\n" "done"
 }
@@ -221,11 +221,10 @@ function random_string() {
 	openssl rand -base64 "${length}" | tr -dc _A-Z-a-z-0-9
 }
 
-function reload_smf_manifests()
-{
-    printf_log "%-56s\n" "===> Reloading SMF manifests... "
-    /usr/sbin/svcadm restart svc:/system/manifest-import:default
-    printf_log "%4s\n" "done"
+function reload_smf_manifests() {
+	printf_log "%-56s\n" "===> Reloading SMF manifests... "
+	/usr/sbin/svcadm restart svc:/system/manifest-import:default
+	printf_log "%4s\n" "done"
 }
 
 #
