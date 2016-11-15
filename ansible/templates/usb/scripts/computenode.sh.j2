@@ -120,13 +120,17 @@ function install_archives() {
 	fi
 }
 
-function _zk() {
+function __zk() {
 	zkcli="${USB_COPY}/scripts/zookeepercli"
-	cmd="${@}"
+	args="${@}"
 
-	if ! "${zkcli}" -servers "${CFGDB_IP}:2181" -auth_usr "esdc" -auth_pwd "${ESDC_INSTALL_PASSWORD}" -c ${cmd} 2> /dev/null; then
+	if ! "${zkcli}" -servers "${CFGDB_IP}:2181" -auth_usr "esdc" -auth_pwd "${ESDC_INSTALL_PASSWORD}" ${args} 2> /dev/null; then
 		fatal "Error: cfgdb command \"${cmd}\" failed"
 	fi
+}
+
+function _zk() {
+	__zk -c "${@}"
 }
 
 function wait_for_cfgdb() {
@@ -160,6 +164,7 @@ function query_cfgdb() {
 
 	printf_log "%-56s Registering compute node into cfgdb ..."
 
+	__zk -force=true -c rmr "/esdc/nodes/hosts/${SYSINFO_UUID}" &> /dev/null || true
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "false"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/hostname" "${SYSINFO_Hostname}"
