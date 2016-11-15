@@ -23,8 +23,8 @@
   file: path=/opt/custom/smf mode=0755 state=directory
 
 - name: Clone esDC source code repository
-  git: repo={{ esdc_node_source.repo }}
-       version={{ esdc_node_source.version }}
+  git: repo={{ esdc_source_repo }}
+       version={{ esdc_source_version }}
        dest=/opt/erigones
        accept_hostkey=yes
 

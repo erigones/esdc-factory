@@ -59,8 +59,8 @@
 
 # Prepare ERIGONES_HOME
 - name: Clone Danube Cloud source code repository
-  git: repo={{ esdc_source.repo }}
-       version={{ esdc_source.version }}
+  git: repo={{ esdc_source_repo }}
+       version={{ esdc_source_version }}
        dest=/opt/erigones
        accept_hostkey=yes
 
