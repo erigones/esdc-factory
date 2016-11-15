@@ -137,6 +137,7 @@ Usage
         EXTRA_VARS   override ansible variables
             - usb_type={hn,cn}  (default: hn)
             - release_edition={ce,ee}  (default: ce)
+            - esdc_source_repo="https://github.com/erigones/esdc-ce.git"
 
 
 Links

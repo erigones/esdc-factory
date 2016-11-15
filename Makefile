@@ -43,6 +43,7 @@ define HELP_TEXT
   EXTRA_VARS   override ansible variables, e.g.:
     - usb_type={hn,cn}  (default: hn)
     - release_edition={ce,ee}  (default: ce)
+    - esdc_source_repo="https://github.com/erigones/esdc-ce.git"
 
 endef
 
