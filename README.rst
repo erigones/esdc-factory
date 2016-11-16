@@ -138,6 +138,7 @@ Usage
             - usb_type={hn,cn}  (default: hn)
             - release_edition={ce,ee}  (default: ce)
             - esdc_source_repo="https://github.com/erigones/esdc-ce.git"
+            - image_debug={false,true}  (default: false)
 
 
 Links
