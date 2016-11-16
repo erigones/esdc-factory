@@ -28,6 +28,10 @@
        dest=/opt/erigones
        accept_hostkey=yes
 
+- name: Switch remote in esDC source code repository
+  shell: chdir=/opt/erigones git remote set-url origin "{{ esdc_prod_repo }}"
+  when: esdc_prod_repo is defined and esdc_prod_repo
+
 - name: Initialize esDC virtualenvs
   shell: /opt/erigones/bin/ctl.sh init_envs_copy
 

@@ -44,6 +44,7 @@ define HELP_TEXT
     - usb_type={hn,cn}  (default: hn)
     - release_edition={ce,ee}  (default: ce)
     - esdc_source_repo="https://github.com/erigones/esdc-ce.git"
+    - esdc_prod_repo=""
     - image_debug={false,true}  (default: false)
 
 endef

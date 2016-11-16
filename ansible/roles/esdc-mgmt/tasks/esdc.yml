@@ -64,6 +64,10 @@
        dest=/opt/erigones
        accept_hostkey=yes
 
+- name: Switch remote in Danube Cloud source code repository
+  shell: chdir=/opt/erigones git remote set-url origin "{{ esdc_prod_repo }}"
+  when: esdc_prod_repo is defined and esdc_prod_repo
+
 - name: Initialize Danube Cloud virtualenvs
   shell: /opt/erigones/bin/ctl.sh init_envs  # Switch to init_envs_copy after https://github.com/pypa/virtualenv/issues/565
 
