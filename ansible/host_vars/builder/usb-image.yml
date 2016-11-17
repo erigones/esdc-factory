@@ -32,9 +32,8 @@ image_server:
 usb_images:
   - name: base-64-es
     version: latest
-  # No space left for more images
-  #- name: centos-7
-  #  version: latest
+  - name: esdc-mon
+    version: "{{ release_version }}"
 
 usb_archives:
   - name: monitoring
