@@ -151,7 +151,7 @@ function query_cfgdb() {
 	# Wait for configuration database availability
 	wait_for_cfgdb
 
-	printf_log "%-56s Retrieving headnode configuration information from cfgdb ..."
+	printf_log "\r%-56s Retrieving headnode configuration information from cfgdb ..."
 
 	_mgmt_ip=$(_zk get "/esdc/settings/rabbitmq/host")
 	_mon_ip=$(_zk get "/esdc/settings/zabbix/host")
@@ -162,7 +162,8 @@ function query_cfgdb() {
 		fatal "Incomplete data in configuration database, aborting setup."
 	fi
 
-	printf_log "%-56s Registering compute node into cfgdb ..."
+	printf_log "%4s\n" "done"
+	printf_log "\r%-56s Registering compute node into cfgdb ..."
 
 	set +e
 	__zk -force=true -c rmr "/esdc/nodes/hosts/${SYSINFO_UUID}" &> /dev/null
@@ -182,7 +183,7 @@ function query_cfgdb() {
 function inform_user() {
 	computenode_setup_duration=$(($(date +%s) - COMPUTENODE_SETUP_START))
 
-	printf_log "%-56s Waiting for Danube Cloud Compute Node to initialize ..."
+	printf_log "\r%-56s Waiting for Danube Cloud Compute Node to initialize ..."
 	sleep 60
 	printf_log "%4s\n" "done"
 

@@ -111,7 +111,7 @@ function install_isos() {
 	zfs list zones/iso &>/dev/null
 	if [[ $? -eq 0 && -d "${USB_COPY}/isos" ]]; then
 		for iso in "${USB_COPY}"/isos/*.iso; do
-			printf_log "%-56s Copying $(basename "${iso}") "
+			printf_log "\r%-56s Copying $(basename "${iso}") "
 			cp "${iso}" /iso/
 			printf_log "%4s\n" "done"
 		done
@@ -380,7 +380,7 @@ function _zk() {
 }
 
 function configure_cfgdb() {
-	printf_log "%-56s Saving configuration information into cfgdb ..."
+	printf_log "\r%-56s Saving configuration information into cfgdb ..."
 
 	_zk creater /esdc/settings/rabbitmq/username "{{ esdc_mgmt.rabbitmq.user }}"
 	_zk creater /esdc/settings/rabbitmq/password "${RABBITMQ_PASSWORD}"
@@ -436,12 +436,12 @@ function configure_cfgdb() {
 function inform_user() {
 	headnode_setup_duration=$(($(date +%s) - HEADNODE_SETUP_START))
 
-	printf_log "%-56s Waiting for Danube Cloud to initialize ..."
+	printf_log "\r%-56s Waiting for Danube Cloud to initialize ..."
 	sleep 60
 	printf_log "%4s\n" "done"
 
 	printf_log "==> Setup complete (in %s seconds).\n" "${headnode_setup_duration}"
-	printf_log "==> IMPORTANT: Please save the following information\n".
+	printf_log "==> IMPORTANT: Please save the following information\n"
 	printf_log "==>   Danube Cloud URL: https://${MGMT_IP}\n"
 	printf_log "==>   Danube Cloud username: admin\n"
 	printf_log "==>   Danube Cloud password: changeme\n"
