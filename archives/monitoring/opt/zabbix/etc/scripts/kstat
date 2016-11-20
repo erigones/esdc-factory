@@ -1,0 +1,9 @@
+#!/bin/bash
+
+STATISTIC=$1
+
+if [[ "${STATISTIC}" == *":-1::"* ]]; then
+	echo "0"
+else
+	/usr/bin/kstat -p "${STATISTIC}" | cut -s -f2
+fi

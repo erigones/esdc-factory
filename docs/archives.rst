@@ -41,7 +41,7 @@ Monitoring agent binaries, configurations and monitoring scripts.
 
     # Update /opt/zabbix/etc/zabbix_agentd.conf
     # Add /opt/zabbix/etc/zabbix_agentd.conf.d/esdc-node.conf
-    # Add /opt/zabbix/etc/scripts
+    # Add /opt/zabbix/etc/scripts (see archives/monitoring in this repo)
     # Prepare SMF manifests for monitoring services in /opt/custom/smf
     # Create tarball
     gtar -czvf monitoring-2015Q4-$(date +%Y%m%d).tar.gz /opt/zabbix /opt/custom

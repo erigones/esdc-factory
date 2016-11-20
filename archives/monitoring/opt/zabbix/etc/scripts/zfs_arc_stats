@@ -1,0 +1,25 @@
+#!/usr/perl5/bin/perl 
+#
+# Script for monitoring various ZFS-related statistics usable by Zabbix
+
+use strict;
+use Sun::Solaris::Kstat;
+use Switch;
+
+my $kstat = Sun::Solaris::Kstat->new();
+
+my $arc_size = $kstat->{zfs}->{0}->{arcstats}->{size};
+
+my $arc_hits = $kstat->{zfs}->{0}->{arcstats}->{hits};
+my $arc_misses = $kstat->{zfs}->{0}->{arcstats}->{misses};
+
+my $arc_total_accesses = $arc_hits + $arc_misses;
+
+my $arc_hits_perc = sprintf("%0.2f", 100*($arc_hits / $arc_total_accesses) );
+my $arc_misses_perc = sprintf("%0.2f", 100*($arc_misses / $arc_total_accesses) );
+
+switch ($ARGV[0]) {
+	case 'arc_size'			{ print "$arc_size\n";	      }
+	case 'arc_hits_perc' 		{ print "$arc_hits_perc\n";   }
+	case 'arc_misses_perc' 		{ print "$arc_misses_perc\n"; }
+}	
