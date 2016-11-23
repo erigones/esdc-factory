@@ -129,7 +129,7 @@ function __zk() {
 
 function _zk() {
 	if ! __zk -c "${@}" 2> /dev/null; then
-		fatal "Error: cfgdb command \"${cmd}\" failed"
+		fatal "Error: cfgdb command \"${@}\" failed"
 	fi
 }
 

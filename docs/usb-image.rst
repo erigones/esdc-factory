@@ -18,6 +18,18 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
+2.3.1 (unreleased)
+========================================
+
+Features
+--------
+
+Bugs
+----
+
+- Fixed zookeepercli command error log in _zk() in computenode.sh - `#4 <https://github.com/erigones/esdc-factory/issues/4>`__
+
+
 2.3.0 (released on 2016-11-17)
 ========================================
 
