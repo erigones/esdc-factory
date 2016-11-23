@@ -9,7 +9,7 @@ Output
 
 All build results are stored in following folders in ``build_base_dir``:
 
-* **appliances**: `Danube Cloud appliances <https://github.com/erigones/esdc-factory/blob/master/docs/appliances.rst>`__ (VM images), which then become part of the Danube Cloud USB image
+* **appliances**: `Danube Cloud appliances <docs/appliances.rst>`_ (VM images), which then become part of the Danube Cloud USB image
 
     * base-64-es
     * esdc-mon
@@ -20,17 +20,17 @@ All build results are stored in following folders in ``build_base_dir``:
 
 * **isos**: ISO images, which are downloaded from external sources and become part of the Danube Cloud USB image.
 
-* **archives**: `Tarballs <https://github.com/erigones/esdc-factory/blob/master/docs/archives.rst>`__, which become part of the Danube Cloud USB image (/opt)
+* **archives**: `Tarballs <docs/archives.rst>`_, which become part of the Danube Cloud USB image (/opt)
 
     * local
     * monitoring
     * esdc-node
 
-* **platform**: Tarballs, which contain the `hypervisor platform <https://github.com/erigones/esdc-factory/blob/master/docs/platform.rst>`__ - SmartOS raw kernel and boot_archive.
+* **platform**: Tarballs, which contain the `hypervisor platform <docs/platform.rst>`_ - SmartOS raw kernel and boot_archive.
 
 * **images**: This is just a directory, which holds symlinks to all appliances in an `IMGAPI <https://images.joyent.com/docs/>`__-like folder structure.
 
-* **usb**: Danube Cloud USB images.
+* **usb**: `Danube Cloud USB images <docs/usb-image.rst>`_.
 
 
 Requirements
@@ -75,7 +75,7 @@ Two network-connected Linux/Unix machines are required:
                 }
             }
 
-    * **NOTE**: Building the usb-image target currently requires an ErigonOS/SmartOS machine or zone with ``fs_allowed`` property set to ``"ufs,pcfs,tmpfs"``.
+    * **NOTE**: Building the usb-image target currently requires an ErigonOS/SmartOS machine or a zone with ``fs_allowed`` property set to ``"ufs,pcfs,tmpfs"``.
 
 
 Configuration
