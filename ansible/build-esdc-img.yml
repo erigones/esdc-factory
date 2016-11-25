@@ -35,6 +35,6 @@
   vars_files:
     - vars/build/vm/esdc-img.yml
   vars:
-    image_tags: {internal: true, resize: true, deploy: true}
+    image_tags: {internal: true, resize: true, deploy: false}
   tasks:
     - include: tasks/build/zone/create-image.yml
