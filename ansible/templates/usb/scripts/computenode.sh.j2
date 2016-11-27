@@ -87,8 +87,8 @@ function configure_erigonesd() {
 }
 
 function configure_zabbix() {
-	sed -i -e "s|@MON_IPADDR@|${MON_IP}|" /opt/zabbix/etc/zabbix_agentd.conf
-	sed -i -e "s|@NODE_HOSTNAME@|${SYSINFO_UUID}|" /opt/zabbix/etc/zabbix_agentd.conf
+	sed -i '' "s|@MON_IPADDR@|${MON_IP}|" /opt/zabbix/etc/zabbix_agentd.conf
+	sed -i '' "s|@NODE_HOSTNAME@|${SYSINFO_UUID}|" /opt/zabbix/etc/zabbix_agentd.conf
 }
 
 function install_isos() {
