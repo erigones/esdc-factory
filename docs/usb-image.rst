@@ -22,24 +22,13 @@ Changelog
 2.3.1 (unreleased)
 ========================================
 
-Features
---------
-
-Bugs
-----
-
 - Fixed zookeepercli command error log in _zk() in computenode.sh - `#4 <https://github.com/erigones/esdc-factory/issues/4>`__
 - Updated zabbix agent to 3.0.5 [monitoring-2015Q4-20161127] - `#7 <https://github.com/erigones/esdc-factory/issues/7>`__
+- Updated packages in local archive [local-2015Q4-20161127] - `#9 <https://github.com/erigones/esdc-factory/issues/9>`__
 
 
 2.3.0 (released on 2016-11-17)
 ========================================
 
-Features
---------
-
 - Going open source. Yeah!
-
-Bugs
-----
 

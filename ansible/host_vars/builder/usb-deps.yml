@@ -16,7 +16,7 @@ builder_archives:
     desc: '/opt/zabbix directory on hypervisor'
     link: 'monitoring-latest'
   - name: 'local'
-    version: '2015Q4-20160926'
+    version: '2015Q4-20161127'
     desc: '/opt/local directory on hypervisor'
     link: 'local-latest'
 
