@@ -33,6 +33,11 @@ Changelog
 
 - Initial release.
 
+2.3.1
+~~~~~
+
+- Updated zabbix agent to 3.0.5 - `#7 <https://github.com/erigones/esdc-factory/issues/7>`__
+
 
 ------------------------------------------------------------
 
@@ -55,6 +60,11 @@ Changelog
 ~~~~~
 
 - Initial release.
+
+2.3.1
+~~~~~
+
+- Version bump.
 
 
 ------------------------------------------------------------
@@ -80,6 +90,11 @@ Changelog
 
 - Initial release.
 
+2.3.1
+~~~~~
+
+- Version bump.
+
 
 ------------------------------------------------------------
 
@@ -96,6 +111,11 @@ Changelog
 ~~~~~
 
 - Initial release.
+
+2.3.1
+~~~~~
+
+- Version bump.
 
 
 ------------------------------------------------------------
@@ -125,6 +145,11 @@ Changelog
 ~~~~~
 
 - Initial release.
+
+2.3.1
+~~~~~
+
+- Version bump.
 
 
 ------------------------------------------------------------
@@ -179,6 +204,11 @@ Changelog
 
 - Initial release.
 
+2.3.1
+~~~~~
+
+- Version bump.
+
 
 ------------------------------------------------------------
 
@@ -200,4 +230,8 @@ Changelog
 
 - Initial release.
 
+2.3.1
+~~~~~
+
+- Version bump.
 

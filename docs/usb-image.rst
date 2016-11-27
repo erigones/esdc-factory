@@ -11,6 +11,7 @@ Both USB images are assembled together from these components:
     - `empty, bootable USB image <https://github.com/erigones/esdc-factory/tree/master/ansible/files/usb/images>`__
     - the `hypervisor platform <platform.rst>`_ - SmartOS raw kernel and boot_archive
     - `VM images and appliances <appliances.rst>`_
+    - `archives extracted to /opt <archives.rst>`_
     - ISO images
     - install scripts
 
@@ -28,6 +29,7 @@ Bugs
 ----
 
 - Fixed zookeepercli command error log in _zk() in computenode.sh - `#4 <https://github.com/erigones/esdc-factory/issues/4>`__
+- Updated zabbix agent to 3.0.5 [monitoring-2015Q4-20161127] - `#7 <https://github.com/erigones/esdc-factory/issues/7>`__
 
 
 2.3.0 (released on 2016-11-17)

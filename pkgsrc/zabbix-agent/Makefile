@@ -1,7 +1,7 @@
 # $NetBSD$
 
 PKGNAME=		zabbix-agent-${VER}
-VER=			3.0.4
+VER=			3.0.5
 DISTNAME=		zabbix-${VER}
 CATEGORIES=		net
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=zabbix/}
