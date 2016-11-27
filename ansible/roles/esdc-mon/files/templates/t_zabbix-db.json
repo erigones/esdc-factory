@@ -810,7 +810,7 @@
         ],
         "triggers": [
             {
-                "status": "0",
+                "status": "1",
                 "description": "Cache hit ratio of last 5 minutes is too low, which might indicate bad database performance.",
                 "url": "",
                 "type": "0",
