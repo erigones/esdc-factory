@@ -52,7 +52,7 @@ export SYS_ZPOOL
 
 function _begin_header()
 {
-    printf "%-56s" "$1"
+    printf "\r%-56s" "$1"
 }
 
 function _end_header()
@@ -602,7 +602,7 @@ setup_datasets()
   zfs set atime=off ${SYS_ZPOOL}
   # Create ROOT and default BE
   if [ ${inst_to_hdd} -eq 1 ]; then
-	  _begin_header "Transferring image to HDD..."
+	  echo "Transferring image to HDD...\n"
 
 	  if [ -d ${TMPROOT}/${SYS_ZPOOL} ]; then
 		  zfs unmount ${SYS_ZPOOL}
@@ -647,7 +647,7 @@ setup_datasets()
 
   if ! echo $datasets | grep ^${SYS_ZPOOL}/dump > /dev/null; then
     _begin_header "Making dump zvol... "
-    create_dump
+    create_dump > /dev/null 2>&1
     _end_header "done"
   fi
 
@@ -708,7 +708,7 @@ setup_datasets()
 
   if ! echo $datasets | grep ${SWAPVOL} > /dev/null; then
     _begin_header "Creating swap zvol..."
-    create_swap
+    create_swap > /dev/null 2>&1
     _end_header "done"
   fi
 
@@ -746,7 +746,7 @@ setup_datasets()
 # Create placeholder directory
         mkdir -p ${TMPROOT}/${SYS_ZPOOL}/boot/grub
         _begin_header "Activating boot environment ${DEFBE}... "
-        /usr/sbin/beadm activate ${DEFBE} > /dev/null 2>/dev/null || \
+        /usr/sbin/beadm activate -v ${DEFBE} >&4 2>&4 || \
             fatal "Failed to activate"
         _end_header "done"
         {% if usb_type == "hn" %}
@@ -852,78 +852,6 @@ printheader()
   for i in {1..80} ; do printf "-" ; done && printf "$newline"
 
 }
-
-{% if usb_type == "cn" %}
-function create_setup_file
-{
-    [[ -f /var/lib/setup.json ]] && rm -f /var/lib/setup.json
-    echo "{" \
-        "\"setup_time\": $(date +%s)," \
-        "\"complete\": true" \
-        "}" \
-        > /var/lib/setup.json
-    chmod 400 /var/lib/setup.json
-}
-
-function configure_queue
-{
-    # TODO:
-    # - Erigones queue should be self-configured (bug 744)
-    echo "BROKER_URL = 'amqp://erigones:ied4baiduca9Ih3ae8Co@${CONFIG_mgmt_admin_ip}:5672/erigones'" > /opt/erigones/erigones/celery/local_config.py
-    echo "CELERY_RESULT_BACKEND = 'redis://:shahJoca3equo5euN3gu@${CONFIG_mgmt_admin_ip}:6379/0'" >> /opt/erigones/erigones/celery/local_config.py
-    echo "ERIGONES_MGMT_WORKERS = ('mgmt@mgmt01.local',)" >> /opt/erigones/erigones/celery/local_config.py
-}
-
-function configure_zabbix
-{
-  sed -i -e "s|@MON_IPADDR@|${CONFIG_mon_admin_ip}|" /opt/zabbix/etc/zabbix_agentd.conf
-  sed -i -e "s|@NODE_HOSTNAME@|${SYSINFO_UUID}|" /opt/zabbix/etc/zabbix_agentd.conf
-}
-
-function mount_usb
-{
-    USBKEYS=$(/usr/bin/disklist -a)
-    for key in ${USBKEYS}; do
-        if [[ `/usr/sbin/fstyp /dev/dsk/${key}p0:1` == 'pcfs' ]]; then
-            /usr/sbin/mount -F pcfs -o foldcase,noatime /dev/dsk/${key}p0:1 \
-                ${USBMOUNTPOINT};
-            if [[ $? == "0" ]]; then
-                if [[ ! -f ${USBMOUNTPOINT}/.joyliveusb ]]; then
-                    /usr/sbin/umount ${USBMOUNTPOINT};
-                else
-                    break;
-                fi
-            fi
-        fi
-    done
-
-}
-
-function unmount_usb
-{
-    /usr/sbin/umount ${USBMOUNTPOINT}
-}
-
-function install_archive()
-{
-    local _archive=$1
-    local _dest=$2
-    local _banner=$3
-
-    if [ "${_archive}" == "" -o "${_dest}" == "" -o "${_banner}" == "" ]
-    then
-        return 1
-    fi
-
-    _begin_header "Installing ${_banner}... "
-    /usr/bin/gtar xf ${USBMOUNTPOINT}/archives/${_archive} -C ${_dest} || \
-        fatal "Failed to install ${_banner}"
-    _r=$?
-    _end_header "done"
-
-       return ${_r}
-}
-{% endif %}
 
 USBMNT=$1
 
