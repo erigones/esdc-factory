@@ -111,7 +111,7 @@ function install_isos() {
 	zfs list zones/iso &>/dev/null
 	if [[ $? -eq 0 && -d "${USB_COPY}/isos" ]]; then
 		for iso in "${USB_COPY}"/isos/*.iso; do
-			printf_log "\r%-56s Copying $(basename "${iso}") "
+			printf_log "\r%-56s" "Copying $(basename "${iso}") "
 			cp "${iso}" /iso/
 			printf_log "%4s\n" "done"
 		done
@@ -380,7 +380,7 @@ function _zk() {
 }
 
 function configure_cfgdb() {
-	printf_log "\r%-56s Saving configuration information into cfgdb ..."
+	printf_log "\r%-56s" "Saving configuration information into cfgdb ..."
 
 	_zk creater /esdc/settings/rabbitmq/username "{{ esdc_mgmt.rabbitmq.user }}"
 	_zk creater /esdc/settings/rabbitmq/password "${RABBITMQ_PASSWORD}"
@@ -436,7 +436,7 @@ function configure_cfgdb() {
 function inform_user() {
 	headnode_setup_duration=$(($(date +%s) - HEADNODE_SETUP_START))
 
-	printf_log "\r%-56s Waiting for Danube Cloud to initialize ..."
+	printf_log "\r%-56s" "Waiting for Danube Cloud to initialize ..."
 	sleep 60
 	printf_log "%4s\n" "done"
 
