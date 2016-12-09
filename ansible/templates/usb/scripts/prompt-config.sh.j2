@@ -602,7 +602,7 @@ setup_datasets()
   zfs set atime=off ${SYS_ZPOOL}
   # Create ROOT and default BE
   if [ ${inst_to_hdd} -eq 1 ]; then
-	  echo "Transferring image to HDD...\n"
+	  echo "Transferring image to HDD..."
 
 	  if [ -d ${TMPROOT}/${SYS_ZPOOL} ]; then
 		  zfs unmount ${SYS_ZPOOL}
