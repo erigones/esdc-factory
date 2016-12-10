@@ -42,7 +42,12 @@
                     }
                 ],
                 "name": "t_role-mgmt",
-                "macros": [],
+                "macros": [
+                    {
+                        "macro": "{$SWAP_FREE_THRESHOLD}",
+                        "value": "0M"
+                    }
+                ],
                 "items": [],
                 "screens": [
                     {

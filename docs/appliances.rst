@@ -182,6 +182,7 @@ Changelog
 ~~~~~
 
 - Disabled trigger "Cache hit ratio of database zabbix is below ??%" - `#8 <https://github.com/erigones/esdc-factory/issues/8>`__
+- Disabled trigger "Free swap space is below ??M" on mgmt and mon VMs - `#16 <https://github.com/erigones/esdc-factory/issues/16>`__
 
 
 ------------------------------------------------------------

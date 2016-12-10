@@ -11,7 +11,7 @@
                     },
                     {
                         "macro": "{$SWAP_FREE_THRESHOLD}",
-                        "value": "50M"
+                        "value": "25M"
                     }
                 ],
                 "items": [
