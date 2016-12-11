@@ -149,7 +149,7 @@ Changelog
 2.3.1
 ~~~~~
 
-- Version bump.
+- Added Ansible - `#17 <https://github.com/erigones/esdc-factory/issues/17>`__
 
 
 ------------------------------------------------------------

@@ -18,6 +18,7 @@
     - lsof
     - git
     - libjpeg
+    - ansible
 
 - name: Ensure Danube Cloud development dependencies are installed
   yum: name={{ item }} state=latest
