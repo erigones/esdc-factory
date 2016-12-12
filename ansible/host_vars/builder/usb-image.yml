@@ -5,7 +5,7 @@ usb_tmp_image: "{{ usb_tmp_dir }}/esdc-usb.img"
 usb_type: "hn"  # "hn" or "cn"
 usb_root_pw: "$5$9NwhzBL/$b8T1ooxt3zTNf743KJlbHWqPJC/nQnC7SksX6/yVm54"  # esdc
 
-platform_version: "20161111T125226Z"
+platform_version: "20161207T144343Z"
 platform_os_archive: "{{ builder.platform.dir }}/platform-{{ platform_version }}.tgz"
 platform_boot_archive: "{{ builder.platform.dir }}/boot-{{ platform_version }}.tgz"
 

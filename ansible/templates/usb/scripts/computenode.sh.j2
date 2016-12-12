@@ -225,7 +225,7 @@ function random_string() {
 }
 
 function reload_smf_manifests() {
-	printf_log "%-56s\n" "===> Reloading SMF manifests... "
+	printf_log "%-56s\n" "Reloading SMF manifests... "
 	/usr/sbin/svcadm restart svc:/system/manifest-import:default
 	printf_log "%4s\n" "done"
 }

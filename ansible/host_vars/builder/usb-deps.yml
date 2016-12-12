@@ -1,11 +1,11 @@
 builder_platform_url: 'http://download.erigones.org/esdc/factory/platform'
 builder_platform:
   - name: 'boot'
-    version: '20161111T125226Z'
+    version: '20161207T144343Z'
     desc: 'SmartOS grub boot loader'
     link: 'boot-latest'
   - name: 'platform'
-    version: '20161111T125226Z'
+    version: '20161207T144343Z'
     desc: 'SmartOS kernel and boot_archive'
     link: 'platform-latest'
 
