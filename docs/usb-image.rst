@@ -28,6 +28,7 @@ Changelog
 - Fixed zabbix_agentd.conf configuration during compute node installation - `#10 <https://github.com/erigones/esdc-factory/issues/10>`__
 - Removed old code from prompt-config.sh, headnode.sh, computenode.sh - `#2 <https://github.com/erigones/esdc-factory/issues/12>`__
 - Fixed alignment of some messages - `#3 <https://github.com/erigones/esdc-factory/issues/3>`__
+- Added functionality for adding the mgmt SSH key to all service VMs during headnode installation - `#18 <https://github.com/erigones/esdc-factory/issues/18>`__
 
 2.3.0 (released on 2016-11-17)
 ========================================

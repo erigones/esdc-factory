@@ -26,6 +26,9 @@ usb_vms:
     version: "{{ release_version }}"
     edition: "-{{ release_edition }}"
 
+mgmt_server:
+  name: esdc-mgmt
+
 image_server:
   name: esdc-img
 

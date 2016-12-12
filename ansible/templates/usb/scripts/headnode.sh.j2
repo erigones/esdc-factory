@@ -341,6 +341,15 @@ function create_vm() {
 	return 0
 }
 
+# The mgmt public SSH key is created during mgmt post deploy inside the VM
+# and set to the mgmt_ssh_key customer_metadata
+get_mgmt_ssh_key() {
+	mgmt_uuid="$(json uuid < "${USB_COPY}/zones/{{ mgmt_server.name }}/vmmanifest.tmpl")"
+	mgmt_ssh_key="$(vmadm get "${mgmt_uuid}" | json customer_metadata.mgmt_ssh_key || echo '')"
+
+	echo "${mgmt_ssh_key}"
+}
+
 function import_smf_manifests() {
 	printf_log "%-56s" "Importing SMF manifests "
 
@@ -423,11 +432,19 @@ function configure_cfgdb() {
 
 		vm_uuid="$(json uuid < "${vm_manifest}")"
 		vm_json="$(vmadm get "${vm_uuid}")"
+		vm_ip="$(echo ${vm_json} | json nics.0.ip)"
 
 		_zk creater "/esdc/vms/${vm}/hosts/1/uuid" "$(echo ${vm_json} | json uuid)"
 		_zk creater "/esdc/vms/${vm}/hosts/1/hostname" "$(echo ${vm_json} | json hostname)"
-		_zk creater "/esdc/vms/${vm}/hosts/1/ip" "$(echo ${vm_json} | json nics.0.ip)"
+		_zk creater "/esdc/vms/${vm}/hosts/1/ip" "${vm_ip}"
 		_zk creater "/esdc/vms/${vm}/hosts/1/node" "${SYSINFO_UUID}"
+
+		# Add MGMT ssh key to other VMs
+		if [[ -n "${vm_ip}" && -n "${MGMT_SSH_KEY}" ]]; then
+			if /usr/sbin/ping -s -I 1 "${vm_ip}" 1492 1 > /dev/null 2>&1; then
+				ssh -o BatchMode=yes -o StrictHostKeyChecking=no -l root "${vm_ip}" "echo \"${MGMT_SSH_KEY}\" >> /root/.ssh/authorized_keys" 2> /dev/null
+			fi
+		fi
 	done
 
 	printf_log "%4s\n" "done"
@@ -530,6 +547,8 @@ configure_zabbix
 {% for vm in usb_vms %}
 create_vm {{ vm.name }}
 {% endfor %}
+
+MGMT_SSH_KEY="$(get_mgmt_ssh_key)"
 
 install_isos
 configure_imgadm
