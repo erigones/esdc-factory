@@ -139,10 +139,10 @@ function wait_for_cfgdb() {
 		printf_log "\r%-56s" "Waiting for cfgdb availability... "
 		/usr/sbin/ping -s -I 1 ${CFGDB_IP} 1492 10 > /dev/null 2>&1
 		if [ $? -eq 0 ]; then
-			printf_log "done.\n"
+			printf_log "done\n"
 			break
 		fi
-		printf_log "not yet.\n"
+		printf_log "not yet\n"
 	done
 	set -e
 }
