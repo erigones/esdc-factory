@@ -441,13 +441,11 @@ function configure_cfgdb() {
 
 		# Add MGMT ssh key to other VMs
 		if [[ -n "${vm_ip}" && -n "${MGMT_SSH_KEY}" ]]; then
-			if /usr/sbin/ping -s -I 1 "${vm_ip}" 1492 1 > /dev/null 2>&1; then
-				ssh -o BatchMode=yes -o StrictHostKeyChecking=no -l root "${vm_ip}" "echo \"${MGMT_SSH_KEY}\" >> /root/.ssh/authorized_keys" 2> /dev/null
-			else
-				printf_log "Unexpected error: VM ${vm} is unreachable -> SSH key exchange failed"
+			if ! ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o ConnectTimeout=10 -T -l root "${vm_ip}" "echo \"${MGMT_SSH_KEY}\" >> /root/.ssh/authorized_keys" 2> /dev/null; then
+				printf_log "\nUnexpected error: VM ${vm} is unreachable -> SSH key exchange failed"
 			fi
 		else
-			printf_log "Unexpected error: SSH key exchange failed for VM ${vm}"
+			printf_log "\nUnexpected error: SSH key exchange failed for VM ${vm}"
 		fi
 	done
 
