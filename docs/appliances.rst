@@ -28,15 +28,15 @@ base-64-es
 Changelog
 ---------
 
-2.3.0
-~~~~~
-
-- Initial release.
-
 2.3.1
 ~~~~~
 
 - Updated zabbix agent to 3.0.5 - `#7 <https://github.com/erigones/esdc-factory/issues/7>`__
+
+2.3.0
+~~~~~
+
+- Initial release.
 
 
 ------------------------------------------------------------
@@ -56,15 +56,15 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
-2.3.0
-~~~~~
-
-- Initial release.
-
 2.3.1
 ~~~~~
 
 - Version bump.
+
+2.3.0
+~~~~~
+
+- Initial release.
 
 
 ------------------------------------------------------------
@@ -85,15 +85,15 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
-2.3.0
-~~~~~
-
-- Initial release.
-
 2.3.1
 ~~~~~
 
 - Version bump.
+
+2.3.0
+~~~~~
+
+- Initial release.
 
 
 ------------------------------------------------------------
@@ -107,15 +107,15 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 Changelog
 ---------
 
-2.3.0
-~~~~~
-
-- Initial release.
-
 2.3.1
 ~~~~~
 
 - Version bump.
+
+2.3.0
+~~~~~
+
+- Initial release.
 
 
 ------------------------------------------------------------
@@ -141,15 +141,15 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.3.0
-~~~~~
-
-- Initial release.
-
 2.3.1
 ~~~~~
 
 - Added Ansible - `#17 <https://github.com/erigones/esdc-factory/issues/17>`__
+
+2.3.0
+~~~~~
+
+- Initial release.
 
 
 ------------------------------------------------------------
@@ -173,16 +173,16 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.3.0
-~~~~~
-
-- Initial release.
-
 2.3.1
 ~~~~~
 
 - Disabled trigger "Cache hit ratio of database zabbix is below ??%" - `#8 <https://github.com/erigones/esdc-factory/issues/8>`__
 - Disabled trigger "Free swap space is below ??M" on mgmt and mon VMs - `#16 <https://github.com/erigones/esdc-factory/issues/16>`__
+
+2.3.0
+~~~~~
+
+- Initial release.
 
 
 ------------------------------------------------------------
@@ -200,15 +200,15 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.3.0
-~~~~~
-
-- Initial release.
-
 2.3.1
 ~~~~~
 
 - Version bump.
+
+2.3.0
+~~~~~
+
+- Initial release.
 
 
 ------------------------------------------------------------
@@ -226,13 +226,13 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.3.0
-~~~~~
-
-- Initial release.
-
 2.3.1
 ~~~~~
 
 - Version bump.
+
+2.3.0
+~~~~~
+
+- Initial release.
 
