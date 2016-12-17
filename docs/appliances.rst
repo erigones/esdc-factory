@@ -164,7 +164,7 @@ Changelog
 2.3.2
 ~~~~~
 
-- Version bump.
+- Fixed logrotate in /opt/erigones/var/log - `#20 <https://github.com/erigones/esdc-factory/issues/20>`__
 
 2.3.1
 ~~~~~
@@ -201,7 +201,7 @@ Changelog
 2.3.2
 ~~~~~
 
-- Fixed logrotate in /opt/erigones/var/log - `#20 <https://github.com/erigones/esdc-factory/issues/20>`__
+- Version bump.
 
 2.3.1
 ~~~~~
