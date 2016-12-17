@@ -161,6 +161,14 @@
         group=erigones
         recurse=yes
 
+# esdc-factory#20
+- name: Fix bug with wrong ownership of /opt/erigones/var/log
+  file: path=/opt/erigones/var/log
+        state=directory
+        owner=erigones
+        group=root
+        mode=0755
+
 - name: Restore SELinux contexts
   command: /sbin/restorecon -FR /opt/erigones
 
