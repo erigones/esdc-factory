@@ -1,6 +1,6 @@
 ---
 - name: Install pyserial (EL6)
-  yum: name=ftp://ftp.pbone.net/mirror/ftp.sourceforge.net/pub/sourceforge/h/ha/hamux/6/noarch/pyserial-2.6-5.el6.noarch.rpm state=present
+  yum: name=https://download.erigones.org/rpm/pyserial-2.7-1.rhel6.noarch.rpm state=present
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
 
 - name: Install pyserial (EL7)
