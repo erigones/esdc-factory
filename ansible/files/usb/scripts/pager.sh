@@ -2,6 +2,7 @@
 
 FILE="${1}"
 FOOTER="n = next page, p = previous page, q = quit       "
+FOOTER_MSG="After pressing 'q' (quit) you will be able to accept or decline the license."
 TOTAL=$(cat ${FILE} | wc -l | tr -d '[[:space:]]')
 ROWS=$(tput lines)
 ROWS=$((ROWS-5))
@@ -9,9 +10,13 @@ START=1
 END=$((ROWS+1))
 
 print_page() {
+	percentage=$((END*100/TOTAL))
+	position="lines ${START}-${END}/${TOTAL} (${percentage}%)"
+
 	clear
 	sed -n "${START},${END}p" "${FILE}"
-	echo -e "\033[30;47m${FOOTER}lines ${START}-${END}/${TOTAL}\033[0m"
+	printf "\033[30;47m%s %-26s\033[0m\n" "${FOOTER}" "${position}"
+	printf "\033[37;100m%s\033[0m" "${FOOTER_MSG}"
 }
 
 if [[ ${ROWS} -ge ${TOTAL} ]]; then
