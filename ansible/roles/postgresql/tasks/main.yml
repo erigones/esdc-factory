@@ -31,7 +31,7 @@
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
 
 - name: Initiate database (CentOS 7)
-  command: env GSETUP_INITDB_OPTIONS="--encoding={{ pg_encoding }} --locale={{ pg_locale }}" /usr/pgsql-{{ pg_version }}/bin/postgresql{{ pg_version_nodot }}-setup initdb creates={{ pg_datadir }}/postgresql.conf
+  command: env PGSETUP_INITDB_OPTIONS="--encoding={{ pg_encoding }} --locale={{ pg_locale }}" /usr/pgsql-{{ pg_version }}/bin/postgresql{{ pg_version_nodot }}-setup initdb creates={{ pg_datadir }}/postgresql.conf
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 
 - name: Initiate database (SmartOS)
