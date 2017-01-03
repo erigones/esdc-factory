@@ -1,15 +1,15 @@
 ---
 - name: Load appliance manifest
   set_fact:
-    img_manifest: "{{ lookup('file', '{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition }}-{{ app.version | default(version) }}.imgmanifest') | from_json }}"
+    img_manifest: "{{ lookup('file', '{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition|default('') }}-{{ app.version | default(version) }}.imgmanifest') | from_json }}"
 
 - name: Hardlink appliance image in datasets/
-  file: src="{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition }}-{{ img_manifest.version }}{{ builder.appliance.ext }}"
+  file: src="{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition|default('') }}-{{ img_manifest.version }}{{ builder.appliance.ext }}"
         dest="{{ usb_tmp_stage }}/datasets/{{ app.name }}-{{ img_manifest.version }}{{ builder.appliance.ext }}"
         state=hard
 
 - name: Hardlink appliance manifest in datasets/
-  file: src="{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition }}-{{ img_manifest.version }}.imgmanifest"
+  file: src="{{ builder.appliance.dir }}/{{ app.name }}/{{ app.name }}{{ app.edition|default('') }}-{{ img_manifest.version }}.imgmanifest"
         dest="{{ usb_tmp_stage }}/datasets/{{ app.name }}-{{ img_manifest.version }}.imgmanifest"
         state=hard
 

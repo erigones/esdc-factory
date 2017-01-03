@@ -124,6 +124,13 @@
         loop_var: img
       when: usb_type == "hn"
 
+    - name: Stage enterprise images
+      include: tasks/build/usb/images.yml
+      with_items: "{{ usb_images_ee }}"
+      loop_control:
+        loop_var: img
+      when: usb_type == "hn" and release_edition = "ee"
+
     - name: Stage ISO images
       include: tasks/build/usb/isos.yml
       with_items: "{{ usb_isos }}"
