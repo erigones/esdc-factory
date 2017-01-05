@@ -76,12 +76,16 @@ RABBITMQ_VHOST="{{ rabbitmq.vhost }}"
 RABBITMQ_USERNAME="{{ rabbitmq.user }}"
 RABBITMQ_PASSWORD="$(mdata-get org.erigones:rabbitmq_password 2> /dev/null)"
 log "Metadata key org.erigones:rabbitmq_password value=${RABBITMQ_PASSWORD}"
-if [[ -n "${RABBITMQ_PASSWORD}" ]]; then
-	log "Changing RabbitMQ password for user ${RABBITMQ_USERNAME}"
-	rabbitmqctl change_password "${RABBITMQ_USERNAME}" "${RABBITMQ_PASSWORD}"
-else
+if [[ -z "${RABBITMQ_PASSWORD}" ]]; then
+	# set default password if not defined
 	RABBITMQ_PASSWORD="{{ rabbitmq.password }}"
 fi
+log "Creating RabbitMQ user ${RABBITMQ_USERNAME}"
+rabbitmqctl add_vhost "${RABBITMQ_VHOST}"
+rabbitmqctl add_user "${RABBITMQ_USERNAME}" "${RABBITMQ_PASSWORD}"
+rabbitmqctl set_permissions -p "${RABBITMQ_VHOST}" "${RABBITMQ_USERNAME}" ".*" ".*" ".*"
+# permanently write rabbitmq nodename to allow future hostname changes
+echo "NODENAME=rabbit@$(hostname -s)" > "{{ rabbitmq.cfgdir }}/rabbitmq-env.conf"
 
 # Redis
 REDIS_HOST="{{ redis.host }}"

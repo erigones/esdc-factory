@@ -9,4 +9,5 @@
 - include: esdc.yml
 - include: test.yml
 - meta: flush_handlers
+- include: cleanup.yml
 - include: appliance.yml

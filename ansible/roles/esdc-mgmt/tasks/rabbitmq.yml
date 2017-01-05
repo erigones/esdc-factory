@@ -6,7 +6,7 @@
 
 - name: Create environment file for rabbitmq
   lineinfile: line="NODENAME=rabbit@{{ hostname.split('.').0 }}"
-              dest=/etc/rabbitmq/rabbitmq-env.conf
+              dest="{{ rabbitmq.cfgdir }}/rabbitmq-env.conf"
               state=present
               create=yes
 

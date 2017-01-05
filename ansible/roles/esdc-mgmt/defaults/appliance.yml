@@ -27,3 +27,5 @@ rabbitmq:
   port: "{{ esdc_mgmt.rabbitmq.port | mandatory }}"
   password: "@RABBITMQ_PASSWORD@"
   vhost: "{{ esdc_mgmt.rabbitmq.vhost | mandatory }}"
+  cfgdir: "{{ esdc_mgmt.rabbitmq.cfgdir | mandatory }}"
+  dbdir: "{{ esdc_mgmt.rabbitmq.dbdir | mandatory }}"
