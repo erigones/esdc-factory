@@ -31,6 +31,7 @@ esdc_pre_boot() {
 
 if [[ -f "${DONE_FILE}" ]]; then
 	log "Found ${DONE_FILE} - skipping post-deploy configuration"
+	sleep 60        # give time to all services to initialize
 	esdc_pre_boot
 	exit 0
 fi
