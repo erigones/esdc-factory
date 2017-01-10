@@ -8,7 +8,6 @@ pg_default_auth_method: 'md5'
 
 # conf.d/ansible.conf (overrides postgresql.conf) 
 pg_cfg_postgresql_conf:
-  listen_addresses: "'*'"
   shared_buffers: "64MB"
   work_mem: "8MB"
   maintenance_work_mem: "24MB"
@@ -20,7 +19,6 @@ pg_cfg_postgresql_conf:
   wal_log_hints: "on"
   min_wal_size: "128MB"
   max_wal_size: "1536MB"
-  max_replication_slots: "5"
   checkpoint_timeout: "15min"
   checkpoint_completion_target: "0.9"
   logging_collector: "on"
