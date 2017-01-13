@@ -48,7 +48,7 @@
 
 - name: Configure conf.d/ansible.conf
   template: src=postgresql.conf.j2 dest={{ pg_datadir }}/conf.d/ansible.conf owner=postgres group=postgres mode=0600
-  notify: restart postgresq
+  notify: restart postgresql
 
 - name: Deploy default pg_hba.conf
   template: src=pg_hba.conf.j2 dest={{ pg_datadir }}/pg_hba.conf owner=postgres group=postgres mode=0600
