@@ -28,6 +28,11 @@ base-64-es
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Version bump.
+
 2.3.2
 ~~~~~
 
@@ -60,6 +65,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 
 Changelog
 ---------
+
+2.4.0
+~~~~~
+
+- Version bump.
 
 2.3.2
 ~~~~~
@@ -95,6 +105,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Version bump.
+
 2.3.2
 ~~~~~
 
@@ -121,6 +136,11 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 
 Changelog
 ---------
+
+2.4.0
+~~~~~
+
+- Version bump.
 
 2.3.2
 ~~~~~
@@ -161,6 +181,13 @@ The image supports following metadata:
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Added used swap metric into compute node monitoring template (t_erigonos) - `#21 <https://github.com/erigones/esdc-factory/issues/21>`__
+- Removed hardcoded hostname and pre-installed RabbitMQ data dir - `#22 <https://github.com/erigones/esdc-factory/issues/22>`__
+- Removed hardcoded hostname in /etc/hosts - commit `54415d0 <https://github.com/erigones/esdc-factory/commit/54415d0a0bdb944c4a159c04304a21fbe395909d>`__
+
 2.3.2
 ~~~~~
 
@@ -198,6 +225,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Removed hardcoded hostname in /etc/hosts - commit `54415d0 <https://github.com/erigones/esdc-factory/commit/54415d0a0bdb944c4a159c04304a21fbe395909d>`__
+
 2.3.2
 ~~~~~
 
@@ -230,6 +262,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Version bump.
+
 2.3.2
 ~~~~~
 
@@ -260,6 +297,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.4.0
+~~~~~
+
+- Version bump.
 
 2.3.2
 ~~~~~
