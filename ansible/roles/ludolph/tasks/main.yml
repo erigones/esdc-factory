@@ -1,4 +1,7 @@
 ---
+- name: Install python-pip
+  yum: name=python-pip state=present
+
 - name: Create Ludolph service group
   group: name=ludolph
          state=present
