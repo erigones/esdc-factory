@@ -1,9 +1,6 @@
 - name: Set hostname to {{ hostname }}
   hostname: name={{ hostname }}
 
-- name: Add hostname to /etc/hosts
-  lineinfile: dest=/etc/hosts insertafter="EOF" line="127.0.0.1   {{ hostname | regex_replace('^(.*)\.(.*)$', '\\1') }}" state=present
-
 - name: Install Remi RPM repository
   yum: name="http://rpms.famillecollet.com/enterprise/remi-release-7.rpm" state=present
 

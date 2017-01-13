@@ -31,11 +31,11 @@
     - zabbix-agent
     - cloud-init
     - rc-scripts
-    - esdc-mon
     - iptables
     - mdata-client
     - qemu-guest-agent
     - ludolph
+    - esdc-mon
     - passwords
     - vm-image
 

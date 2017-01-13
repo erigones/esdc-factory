@@ -1,3 +1,1 @@
 ---
-- name: Add hostname to /etc/hosts
-  lineinfile: dest=/etc/hosts insertafter="EOF" line="127.0.0.1   {{ hostname | regex_replace('^(.*)\.(.*)$', '\\1') }}" state=present
