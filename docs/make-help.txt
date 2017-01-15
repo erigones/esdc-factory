@@ -1,0 +1,44 @@
+ **** Danube Cloud   Assembly Line ****
+
+ Please use 'make <target>' where <target> is one of:
+
+  init         initialize the builder directory structure
+  check        examine the builder directory structure and HTTP access
+  archives     download hypervisor OS archives
+  isos         download iso images 
+  platform     download hypervisor platform archive
+  usb-deps     download archives, isos and platform
+  usb-image    build USB image
+  imgapi-tree  rebuild the IMGAPI tree
+  clean        delete all appliance VMs and their base images in reverse order
+  clean-<app>  delete appliance VM and its base image
+  all          build all appliances/images
+  base         build all base appliances (base-centos-6 base-centos-7 base-64-es centos-6 centos-7)
+  esdc         build all Danube Cloud appliances (esdc-mon, esdc-mgmt, esdc-cfgdb, esdc-dns, esdc-img, esdc-node)
+  <app>        build an appliance/image, one of:
+
+    base-centos-6
+    base-centos-7
+    base-64-es
+    centos-6
+    centos-7
+    esdc-mon
+    esdc-mgmt
+    esdc-cfgdb
+    esdc-dns
+    esdc-img
+    esdc-node
+
+    NOTE: The build order is rather important.
+
+ Following environment variables will change the build behaviour:
+
+  VERSION      build a specific version of an appliance (default: current YYYYMMDD)
+  VERBOSE      make ansible more verbose
+  EXTRA_VARS   override ansible variables, e.g.:
+    - usb_type={hn,cn}  (default: hn)
+    - release_edition={ce,ee}  (default: ce)
+    - esdc_source_repo=https://github.com/erigones/esdc-ce.git
+    - esdc_prod_repo=
+    - image_debug={false,true}  (default: false)
+
