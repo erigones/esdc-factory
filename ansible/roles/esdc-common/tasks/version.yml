@@ -1,2 +1,3 @@
 - name: Save image version into /etc/esdc.version
   copy: content="{{ image_version }}" dest="/etc/esdc.version" mode=0644 owner=root group=root
+  when: release_type != "nightly"
