@@ -1,4 +1,15 @@
-BUILD_TARGETS = base-centos-6 base-centos-7 base-64-es centos-6 centos-7 esdc-mon esdc-mgmt esdc-cfgdb esdc-dns esdc-img esdc-node
+BUILD_TARGETS =	base-centos-6 \
+				base-centos-7 \
+				base-64-es \
+				centos-6 \
+				centos-7 \
+				esdc-mon \
+				esdc-mgmt \
+				esdc-cfgdb \
+				esdc-dns \
+				esdc-img \
+				esdc-node \
+				contrib-gitlab-ce
 
 define newline
 

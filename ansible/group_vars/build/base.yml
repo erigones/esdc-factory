@@ -55,7 +55,9 @@ image_tags:
   internal: false
   resize: true
   deploy: false
+
 image_base_homepage: "https://github.com/erigones/esdc-factory/blob/master/docs/appliances.rst"
+image_contrib_homepage: "https://github.com/erigones/esdc-factory/blob/master/docs/contrib"
 
 release_type: nightly
 release_version: latest
