@@ -39,6 +39,7 @@
   hosts: buildnode
   vars_files:
     - vars/build/vm/contrib-gitlab-ce.yml
+    - vars/build/os/contrib-gitlab-ce.yml
   vars:
     image_tags: {internal: false, resize: true, deploy: false}
   tasks:
