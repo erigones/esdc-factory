@@ -173,7 +173,7 @@ The image supports following metadata:
 * **org.erigones:redis_password**: esDC Redis password.
 * **org.erigones:pgsql_esdc_password**: esDc PostgreSQL password.
 * **org.erigones:pgsql_pdns_password**: esDC PostgreSQL password for PowerDNS.
-* **org.erigones:zabbix_server**: MON_ZABBIX_SERVER in esDC. If not set, value of *org.erigones:zabbix_ip* will be used.
+* **org.erigones:zabbix_server**: MON_ZABBIX_SERVER in esDC. If not set, monitoring support will be disabled.
 * **org.erigones:zabbix_esdc_username**: MON_ZABBIX_USERNAME in esDC.
 * **org.erigones:zabbix_esdc_password**: MON_ZABBIX_PASSWORD in esDC.
 * **org.erigones:esdc_admin_email**: change email of admin user.

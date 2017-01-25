@@ -35,8 +35,10 @@ CACHES = {
 }
 CACHES['default'] = CACHES['redis']
 
+{% if zabbix_api.enabled %}
 MON_ZABBIX_ENABLED = True
 MON_ZABBIX_SERVER_SSL_VERIFY = False
+{% endif %}
 {% if zabbix_api.username %}
 MON_ZABBIX_USERNAME = '{{ zabbix_api.username }}'
 {% endif %}

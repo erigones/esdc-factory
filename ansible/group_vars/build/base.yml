@@ -98,5 +98,6 @@ esdc_mgmt:
     user: 'stats'
     password: 'stats'
   zabbix_api:
+    enabled: true
     username: "provisioner"
     password: "zabbix"
