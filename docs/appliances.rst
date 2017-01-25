@@ -187,6 +187,7 @@ Changelog
 - Added used swap metric into compute node monitoring template (t_erigonos) - `#21 <https://github.com/erigones/esdc-factory/issues/21>`__
 - Removed hardcoded hostname and pre-installed RabbitMQ data dir - `#22 <https://github.com/erigones/esdc-factory/issues/22>`__
 - Removed hardcoded hostname in /etc/hosts - commit `54415d0 <https://github.com/erigones/esdc-factory/commit/54415d0a0bdb944c4a159c04304a21fbe395909d>`__
+- Disabled monitoring support by default - commit `dd1b671 <https://github.com/erigones/esdc-factory/commit/dd1b6715cbc5494d1d92281613a518486235d120>`__
 
 2.3.2
 ~~~~~
