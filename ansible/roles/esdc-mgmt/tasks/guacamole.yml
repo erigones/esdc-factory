@@ -7,6 +7,7 @@
     - libguac-client-vnc
     - libvncserver
     - tomcat
+    - tomcat-native
 
 - name: Download guacamole.war
   get_url: dest=/var/lib/tomcat/webapps/guacamole.war url=http://downloads.sourceforge.net/project/guacamole/current/binary/guacamole-0.9.9.war?use_mirror=netcologne
