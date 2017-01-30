@@ -21,12 +21,6 @@ esdc_pre_boot() {
 
 	log "Running ${CTL} pre_boot"
 	log "$(sudo -u erigones ${CTL} pre_boot 2>&1)"
-
-	# Warm-up tomcat/guacamole hack
-	(
-	  curl -s http://127.0.0.1:8080/guacamole/ > /dev/null
-	  curl -s -X POST -d '{"username": "test", "password": "test"}' http://127.0.0.1:8080/guacamole/api/tokens > /dev/null
-	) &
 }
 
 if [[ -f "${DONE_FILE}" ]]; then
@@ -163,6 +157,7 @@ systemctl restart zabbix-agent
 log "Updating esDC celery/local_config.py"
 sed -i -e "s/@RABBITMQ_PASSWORD@/${RABBITMQ_PASSWORD}/g" \
 	   -e "s/@REDIS_PASSWORD@/${REDIS_PASSWORD}/g" "${CELERY_CONFIG}"
+echo "ERIGONES_MGMT_WORKERS = ('mgmt@$(hostname)',)" >> "${CELERY_CONFIG}"
 
 log "Generating Django secret key"
 SECRET_KEY="$(openssl rand -base64 42)"
