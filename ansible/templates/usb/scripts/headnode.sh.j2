@@ -119,6 +119,7 @@ function install_isos() {
 }
 
 # If we have some images, we should copy them to the local image server
+# and import them, so they can be initialized inside the mgmt VM
 function _install_image() {
 	image=$1
 	img_repo_path=$2
@@ -145,6 +146,7 @@ function _install_image() {
 		cp "${img_filename}" "${img_dest}/file"
 		cp "${img_manifest}" "${img_dest}/manifest"
 		chown -R 10000:10000 "${img_dest}"  # shipment_uid and shipment_gid
+		imgadm install -m "${img_manifest}" -f "${img_filename}" &> /dev/null
 		printf_log "%4s\n" "done"
 	fi
 
