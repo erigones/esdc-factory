@@ -5,7 +5,7 @@
   init         initialize the builder directory structure
   check        examine the builder directory structure and HTTP access
   archives     download hypervisor OS archives
-  isos         download iso images 
+  isos         download iso images
   platform     download hypervisor platform archive
   usb-deps     download archives, isos and platform
   usb-image    build USB image
