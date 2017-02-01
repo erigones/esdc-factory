@@ -36,7 +36,7 @@ repo --name=updates --baseurl={{ builder_centos_mirror }}/7/updates/x86_64/
 repo --name=extras --baseurl={{ builder_centos_mirror }}/7/extras/x86_64/
 repo --name=epel --baseurl={{ builder_epel_mirror }}/7/x86_64/
 
-services --enabled="acpid,ntpd,network,iptables,ip6tables" --disabled="firewalld"
+services --enabled="acpid,ntpd,network,iptables,ip6tables" --disabled="firewalld,chronyd"
 
 logging --level=debug
 
@@ -106,6 +106,7 @@ logging --level=debug
 -btrfs-progs
 -xfsprogs
 -plymouth*
+-chrony
 
 bzip2
 yum-utils
