@@ -19,6 +19,12 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
+2.3.3 (unreleased)
+========================================
+
+- Fixed esdc_install_password handling (added missing quotes) in installer - `#23 <https://github.com/erigones/esdc-factory/issues/23>`__
+
+
 2.3.2 (released on 2016-12-17)
 ========================================
 
