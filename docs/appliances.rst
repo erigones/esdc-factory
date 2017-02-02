@@ -33,6 +33,11 @@ Changelog
 
 - Version bump.
 
+2.3.3
+~~~~~
+
+- Updated zabbix agent to 3.0.7 - commit `6f338b2 <https://github.com/erigones/esdc-factory/commit/6f338b22c71c3c022063bdd093a60a8afefa2342>`__
+
 2.3.2
 ~~~~~
 
@@ -67,6 +72,11 @@ Changelog
 ---------
 
 2.4.0
+~~~~~
+
+- Version bump.
+
+2.3.3
 ~~~~~
 
 - Version bump.
@@ -110,6 +120,11 @@ Changelog
 
 - Version bump.
 
+2.3.3
+~~~~~
+
+- Version bump.
+
 2.3.2
 ~~~~~
 
@@ -142,6 +157,11 @@ Changelog
 
 - Version bump.
 
+2.3.3
+~~~~~
+
+- Version bump.
+
 2.3.2
 ~~~~~
 
@@ -164,7 +184,7 @@ Changelog
 esdc-mgmt
 =========
 
-The *esdc-mgmt* appliance is a CentOS 7 virtual machine with the Danube Cloud application stack.
+The *esdc-mgmt* appliance is a `centos-7`_ virtual machine with the Danube Cloud application stack.
 The image supports following metadata:
 
 * **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
@@ -184,10 +204,14 @@ Changelog
 2.4.0
 ~~~~~
 
-- Added used swap metric into compute node monitoring template (t_erigonos) - `#21 <https://github.com/erigones/esdc-factory/issues/21>`__
 - Removed hardcoded hostname and pre-installed RabbitMQ data dir - `#22 <https://github.com/erigones/esdc-factory/issues/22>`__
 - Removed hardcoded hostname in /etc/hosts - commit `54415d0 <https://github.com/erigones/esdc-factory/commit/54415d0a0bdb944c4a159c04304a21fbe395909d>`__
 - Disabled monitoring support by default - commit `dd1b671 <https://github.com/erigones/esdc-factory/commit/dd1b6715cbc5494d1d92281613a518486235d120>`__
+
+2.3.3
+~~~~~
+
+- Version bump.
 
 2.3.2
 ~~~~~
@@ -211,7 +235,7 @@ Changelog
 esdc-mon
 ========
 
-The *esdc-mon* appliance is a CentOS 7 virtual machine with Zabbix server pre-installed.
+The *esdc-mon* appliance is a `centos-7`_ virtual machine with Zabbix server pre-installed.
 The image supports following metadata:
 
 * **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
@@ -229,7 +253,13 @@ Changelog
 2.4.0
 ~~~~~
 
+- Added used swap metric into compute node monitoring template (t_erigonos) - `#21 <https://github.com/erigones/esdc-factory/issues/21>`__
 - Removed hardcoded hostname in /etc/hosts - commit `54415d0 <https://github.com/erigones/esdc-factory/commit/54415d0a0bdb944c4a159c04304a21fbe395909d>`__
+
+2.3.3
+~~~~~
+
+- Version bump.
 
 2.3.2
 ~~~~~
@@ -264,6 +294,11 @@ Changelog
 ---------
 
 2.4.0
+~~~~~
+
+- Version bump.
+
+2.3.3
 ~~~~~
 
 - Version bump.
@@ -303,6 +338,11 @@ Changelog
 ~~~~~
 
 - Version bump.
+
+2.3.3
+~~~~~
+
+- Removed chrony (using ntpd instead) - commit `17880ed <https://github.com/erigones/esdc-factory/commit/17880ed7459ae455151eabb65094d5e91327d8f2>`__
 
 2.3.2
 ~~~~~
