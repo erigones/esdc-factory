@@ -28,6 +28,11 @@ base-64-es
 Changelog
 ---------
 
+2.3.3
+~~~~~
+
+- Updated zabbix agent to 3.0.7 - commit `6f338b2 <https://github.com/erigones/esdc-factory/commit/6f338b22c71c3c022063bdd093a60a8afefa2342>`__
+
 2.3.2
 ~~~~~
 
@@ -60,6 +65,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 
 Changelog
 ---------
+
+2.3.3
+~~~~~
+
+- Version bump.
 
 2.3.2
 ~~~~~
@@ -95,6 +105,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.3.3
+~~~~~
+
+- Version bump.
+
 2.3.2
 ~~~~~
 
@@ -122,6 +137,11 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 Changelog
 ---------
 
+2.3.3
+~~~~~
+
+- Version bump.
+
 2.3.2
 ~~~~~
 
@@ -144,7 +164,7 @@ Changelog
 esdc-mgmt
 =========
 
-The *esdc-mgmt* appliance is a CentOS 7 virtual machine with the Danube Cloud application stack.
+The *esdc-mgmt* appliance is a `centos-7`_ virtual machine with the Danube Cloud application stack.
 The image supports following metadata:
 
 * **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
@@ -160,6 +180,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.3.3
+~~~~~
+
+- Version bump.
 
 2.3.2
 ~~~~~
@@ -183,7 +208,7 @@ Changelog
 esdc-mon
 ========
 
-The *esdc-mon* appliance is a CentOS 7 virtual machine with Zabbix server pre-installed.
+The *esdc-mon* appliance is a `centos-7`_ virtual machine with Zabbix server pre-installed.
 The image supports following metadata:
 
 * **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
@@ -197,6 +222,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.3.3
+~~~~~
+
+- Version bump.
 
 2.3.2
 ~~~~~
@@ -230,6 +260,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+2.3.3
+~~~~~
+
+- Version bump.
+
 2.3.2
 ~~~~~
 
@@ -260,6 +295,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.3.3
+~~~~~
+
+- Removed chrony (using ntpd instead) - commit `17880ed <https://github.com/erigones/esdc-factory/commit/17880ed7459ae455151eabb65094d5e91327d8f2>`__
 
 2.3.2
 ~~~~~
