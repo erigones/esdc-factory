@@ -24,8 +24,9 @@ Changelog
 
 - Importing locally all images on the headnode USB key, so they can be initialized by the esdc-mgmt VM - commit `1a912d1 <https://github.com/erigones/esdc-factory/commit/1a912d1be36a7d6098d7e4d55cf8ed0f7b656b97>`__
 
-2.3.3 (unreleased)
-==================
+
+2.3.3 (released on 2017-02-04)
+==============================
 
 - Fixed esdc_install_password handling (added missing quotes) in installer - `#23 <https://github.com/erigones/esdc-factory/issues/23>`__
 
