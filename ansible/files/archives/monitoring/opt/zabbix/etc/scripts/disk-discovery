@@ -1,0 +1,29 @@
+#!/bin/bash
+
+POOLS=( $(zpool list -Ho name) )
+
+
+
+
+
+
+echo -e "{\n\t\"data\": ["
+
+for pool in ${POOLS[@]}; do 
+	
+	DISKS=( $(zpool status ${pool} | awk '/c[0-9]+t[0-9a-zA-Z]+d0/ { print $1; }') )
+
+	for line in $(paste -d';' <(iostat -E ${DISKS[@]} | grep -i errors | awk '{print $1}') <(iostat -Exn ${DISKS[@]} | grep -i errors | awk '{print $1}')); do
+		SD_NAME=$(echo ${line} | cut -d\; -f1)
+		DISK_NAME=$(echo ${line} | cut -d\; -f2)
+
+		echo -e "\t\t{ \"{#SD}\": \"${SD_NAME}\","
+		echo -e "\t\t  \"{#DISK}\": \"${DISK_NAME}\","
+		echo -e "\t\t  \"{#ZPOOL}\": \"${pool}\""
+
+		echo -e "\t\t},"
+
+	done
+done
+
+echo -e "\t]\n}"

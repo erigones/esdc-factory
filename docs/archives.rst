@@ -3,12 +3,14 @@ Danube Cloud :: Factory :: Archives
 
 Tarballs, which become part of the Erigones Danube Cloud USB image.
 
+The tarballs can be created by using the `Ansible build system <../README.rst>`_.
+
 local
 =====
 
 Additional software packages managed via pkgsrc.
 
-Created on clean SmartOS installation:
+Can be created using the ``make archive-local`` command or manually on a clean SmartOS installation:
 
 .. code-block:: bash
 
@@ -31,6 +33,8 @@ monitoring
 ==========
 
 Monitoring agent binaries, configurations and monitoring scripts.
+
+Can be created using the ``make archive-monitoring`` command or manually:
 
 .. code-block:: bash
 
