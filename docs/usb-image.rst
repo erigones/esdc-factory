@@ -23,7 +23,7 @@ Changelog
 ==================
 
 - Importing locally all images on the headnode USB key, so they can be initialized by the esdc-mgmt VM - commit `1a912d1 <https://github.com/erigones/esdc-factory/commit/1a912d1be36a7d6098d7e4d55cf8ed0f7b656b97>`__
-- Changed default VCPU count for esDC internal zones to 0 - commit `cd3094b <https://github.com/erigones/esdc-factory/commit/cd3094b009107a7dc1e88931c47bab0c31f2166e>`__§
+- Changed default VCPU count for esDC internal zones to 0 - commit `cd3094b <https://github.com/erigones/esdc-factory/commit/cd3094b009107a7dc1e88931c47bab0c31f2166e>`__
 
 
 2.3.3 (released on 2017-02-04)
