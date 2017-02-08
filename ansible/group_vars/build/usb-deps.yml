@@ -12,11 +12,11 @@ builder_platform:
 builder_archives_url: 'http://download.erigones.org/esdc/factory/archives'
 builder_archives:
   - name: 'monitoring'
-    version: '2015Q4-20161127'
+    version: '2015Q4-20170208'
     desc: '/opt/zabbix directory on hypervisor'
     link: 'monitoring-latest'
   - name: 'local'
-    version: '2015Q4-20161127'
+    version: '2015Q4-20170208'
     desc: '/opt/local directory on hypervisor'
     link: 'local-latest'
 
@@ -26,3 +26,5 @@ builder_isos:
     version: '4.8.3'
     url: 'http://downloads.sourceforge.net/project/systemrescuecd/sysresccd-x86/4.8.3/systemrescuecd-x86-4.8.3.iso?use_mirror=netcologne'
     link: 'rescuecd-latest'
+
+bootstrap_local_archive: "{{ bootstrap|default(false) }}"

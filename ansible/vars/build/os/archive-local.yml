@@ -1,0 +1,9 @@
+save_dir: "{{ builder.archive.dir }}"
+pkg_base_name: "local"
+pkg_desc: "/opt/local directory on hypervisor"
+pkg_version: "{{ pkgin_release }}-{{ version }}"
+pkg_name: "{{ pkg_base_name }}-{{ pkg_version }}"
+pkg_ext: ".tar.gz"
+pkg_link: "{{ pkg_base_name }}-latest"
+pkg_link_exts:
+  - "{{ pkg_ext }}"

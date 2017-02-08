@@ -1,0 +1,19 @@
+- name: Update system packages
+  shell: pkgin -y full-upgrade
+
+# esDC requirements: gcc49 gmake autoconf git-base python27 py27-virtualenv
+# glib2 is required by qemu-img
+- name: Install esDC OS dependencies
+  shell: pkgin -y install gcc49 gmake autoconf git-base python27 py27-virtualenv glib2
+
+- name: Cleanup pkgin cache
+  shell: rm -rf /var/db/pkgin/cache/*
+
+- name: Create local tarball {{ pkg_name }}.tar
+  shell: chdir=/var/tmp gtar -cvf "/var/tmp/{{ pkg_name }}.tar" /opt/local /var/db/pkgin/cache
+
+- name: Compress local tarball {{ pkg_name }}.tar
+  shell: chdir=/var/tmp gzip -9 "/var/tmp/{{ pkg_name }}.tar"
+
+- name: Save local tarball {{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}
+  fetch: src="/var/tmp/{{ pkg_name }}{{ pkg_ext }}" dest="{{ save_dir }}/" flat=yes fail_on_missing=yes validate_checksum=yes

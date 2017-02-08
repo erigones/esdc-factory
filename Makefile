@@ -17,20 +17,24 @@ define HELP_TEXT
 
  Please use 'make <target>' where <target> is one of:
 
-  init         initialize the builder directory structure
-  check        examine the builder directory structure and HTTP access
-  archives     download hypervisor OS archives
-  isos         download iso images 
-  platform     download hypervisor platform archive
-  usb-deps     download archives, isos and platform
-  usb-image    build USB image
-  imgapi-tree  rebuild the IMGAPI tree
-  clean        delete all appliance VMs and their base images in reverse order
-  clean-<app>  delete appliance VM and its base image
-  all          build all appliances/images
-  base         build all base appliances (base-centos-6 base-centos-7 base-64-es centos-6 centos-7)
-  esdc         build all Danube Cloud appliances (esdc-mon, esdc-mgmt, esdc-cfgdb, esdc-dns, esdc-img, esdc-node)
-  <app>        build an appliance/image, one of:
+  init           initialize the builder directory structure
+  check          examine the builder directory structure and HTTP access
+  archive-<pkg>  build a tarball for the hypervisor, one of:
+    local        /opt/local on the hypervisor
+    monitoring   /opt/zabbix on the hypervisor
+    esdc-node    /opt/erigones on the hypervior
+  archives       download hypervisor OS archives
+  isos           download iso images
+  platform       download hypervisor platform archive
+  usb-deps       download archives, isos and platform
+  usb-image      build USB image
+  imgapi-tree    rebuild the IMGAPI tree
+  clean          delete all appliance VMs and their base images in reverse order
+  clean-<app>    delete appliance VM and its base image
+  all            build all appliances/images
+  base           build all base appliances (base-centos-6 base-centos-7 base-64-es centos-6 centos-7)
+  esdc           build all Danube Cloud appliances (esdc-mon, esdc-mgmt, esdc-cfgdb, esdc-dns, esdc-img, esdc-node)
+  <app>          build an appliance/image, one of:
 
     $(build_targets)
 
@@ -84,3 +88,12 @@ all: $(BUILD_TARGETS)
 base: base-centos-6 base-centos-7 base-64-es centos-6 centos-7
 
 esdc: esdc-mon esdc-mgmt esdc-cfgdb esdc-dns esdc-img esdc-node
+
+archive-local local-archive:
+	@bin/ansible.sh build-archive-local
+
+archive-monitoring monitoring-archive:
+	@bin/ansible.sh build-archive-monitoring
+
+archive-esdc-node esdc-node-archive:
+	@bin/ansible.sh build-archive-esdc-node
