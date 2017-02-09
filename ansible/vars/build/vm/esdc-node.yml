@@ -1,7 +1,7 @@
 #Dependencies: base.yml, zone.yml
-remove_base_image: false
+remove_base_image: true
 zone_brand: joyent
 zone_uuid: e2eddb37-af46-4e17-b9c2-929ba1561536
 zone_image_uuid: "{{ (lookup('pipe', 'curl -s {{ builder_base_zone_imgmanifest_url }}') | from_json)['uuid'] }}"
-zone_hostname: "esdc-node"
+zone_hostname: "esdc-node-archive-erigones"
 zone_nic_0_ip: "{{ build_ips.esdc_node | default(build_ip) }}"

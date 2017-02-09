@@ -1,0 +1,14 @@
+---
+- name: Setup URL for `local` archive (bootstrap=false)
+  set_fact:
+    local_archive_url: "{{ builder.archive.url }}/{{ item.name + '-' + item.version | mandatory }}{{ builder.archive.ext }}"
+  with_items: "{{ builder_archives }}"
+  when: not bootstrap_local_archive and item.name == "local"
+
+- name: Setup URL for `local` archive (bootstrap=true)
+  set_fact:
+    local_archive_url: "http://pkgsrc.joyent.com/packages/SmartOS/bootstrap/bootstrap-{{ pkgin_release }}-x86_64.tar.gz"
+  when: bootstrap_local_archive
+
+- name: Install `local` archive from {{ local_archive_url }}
+  shell: mv /opt/local /opt/local.old; curl "{{ local_archive_url }}" | gzcat | gtar -C / -xf - && pkg_admin rebuild && pkgin -y update && pkgin -y install python27

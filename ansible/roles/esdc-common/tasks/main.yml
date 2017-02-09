@@ -3,3 +3,4 @@
 - include: packages.yml
 - include: motd.yml
 - include: ssh_keys.yml
+- include: version.yml

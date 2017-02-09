@@ -7,8 +7,6 @@ rc_scripts_after:
   - rabbitmq-server.service
   - tomcat.service
   - guacd.service
-  - postgresql-9.5.service
-  - pgbouncer.service
   - zabbix-agent.service
   - nginx.service
   - haproxy.service

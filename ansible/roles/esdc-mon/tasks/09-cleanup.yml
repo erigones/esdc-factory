@@ -1,0 +1,3 @@
+---
+- name: Revert hostname back to localhost.localdomain
+  hostname: name=localhost.localdomain

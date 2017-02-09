@@ -21,16 +21,11 @@ esdc_pre_boot() {
 
 	log "Running ${CTL} pre_boot"
 	log "$(sudo -u erigones ${CTL} pre_boot 2>&1)"
-
-	# Warm-up tomcat/guacamole hack
-	(
-	  curl -s http://127.0.0.1:8080/guacamole/ > /dev/null
-	  curl -s -X POST -d '{"username": "test", "password": "test"}' http://127.0.0.1:8080/guacamole/api/tokens > /dev/null
-	) &
 }
 
 if [[ -f "${DONE_FILE}" ]]; then
 	log "Found ${DONE_FILE} - skipping post-deploy configuration"
+	sleep 60        # give time to all services to initialize
 	esdc_pre_boot
 	exit 0
 fi
@@ -76,12 +71,16 @@ RABBITMQ_VHOST="{{ rabbitmq.vhost }}"
 RABBITMQ_USERNAME="{{ rabbitmq.user }}"
 RABBITMQ_PASSWORD="$(mdata-get org.erigones:rabbitmq_password 2> /dev/null)"
 log "Metadata key org.erigones:rabbitmq_password value=${RABBITMQ_PASSWORD}"
-if [[ -n "${RABBITMQ_PASSWORD}" ]]; then
-	log "Changing RabbitMQ password for user ${RABBITMQ_USERNAME}"
-	rabbitmqctl change_password "${RABBITMQ_USERNAME}" "${RABBITMQ_PASSWORD}"
-else
+if [[ -z "${RABBITMQ_PASSWORD}" ]]; then
+	# set default password if not defined
 	RABBITMQ_PASSWORD="{{ rabbitmq.password }}"
 fi
+log "Creating RabbitMQ user ${RABBITMQ_USERNAME}"
+rabbitmqctl add_vhost "${RABBITMQ_VHOST}"
+rabbitmqctl add_user "${RABBITMQ_USERNAME}" "${RABBITMQ_PASSWORD}"
+rabbitmqctl set_permissions -p "${RABBITMQ_VHOST}" "${RABBITMQ_USERNAME}" ".*" ".*" ".*"
+# permanently write rabbitmq nodename to allow future hostname changes
+echo "NODENAME=rabbit@$(hostname -s)" > "{{ rabbitmq.cfgdir }}/rabbitmq-env.conf"
 
 # Redis
 REDIS_HOST="{{ redis.host }}"
@@ -158,6 +157,7 @@ systemctl restart zabbix-agent
 log "Updating esDC celery/local_config.py"
 sed -i -e "s/@RABBITMQ_PASSWORD@/${RABBITMQ_PASSWORD}/g" \
 	   -e "s/@REDIS_PASSWORD@/${REDIS_PASSWORD}/g" "${CELERY_CONFIG}"
+echo "ERIGONES_MGMT_WORKERS = ('mgmt@$(hostname)',)" >> "${CELERY_CONFIG}"
 
 log "Generating Django secret key"
 SECRET_KEY="$(openssl rand -base64 42)"
@@ -168,10 +168,13 @@ log "Updating esDC local_settings.py"
 sed -i -e "s/@PGSQL_ESDC_PASSWORD@/${PGSQL_ESDC_PASSWORD}/g" \
 	   -e "s/@REDIS_PASSWORD@/${REDIS_PASSWORD}/g" "${SETTINGS}"
 
-ZABBIX_SERVER="$(mdata-get org.erigones:zabbix_server 2> /dev/null || echo "${ZABBIX_IP}")"
+ZABBIX_SERVER="$(mdata-get org.erigones:zabbix_server 2> /dev/null)"
 log "Metadata key org.erigones:zabbix_server value=${ZABBIX_SERVER}"
-[[ -n "${ZABBIX_SERVER}" ]] && \
+if [[ -n "${ZABBIX_SERVER}" ]]; then
+	echo "MON_ZABBIX_ENABLED = True" >> "${SETTINGS}"
+	echo "MON_ZABBIX_SERVER_SSL_VERIFY = False" >> "${SETTINGS}"
 	echo "MON_ZABBIX_SERVER = 'https://${ZABBIX_SERVER}/'" >> "${SETTINGS}"
+fi
 
 ZABBIX_ESDC_USERNAME="$(mdata-get org.erigones:zabbix_esdc_username 2> /dev/null)"
 log "Metadata key org.erigones:zabbix_esdc_username value=${ZABBIX_ESDC_USERNAME}"

@@ -28,6 +28,11 @@ base-64-es
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Version bump.
+
 2.3.3
 ~~~~~
 
@@ -65,6 +70,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 
 Changelog
 ---------
+
+2.4.0
+~~~~~
+
+- Version bump.
 
 2.3.3
 ~~~~~
@@ -105,6 +115,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Version bump.
+
 2.3.3
 ~~~~~
 
@@ -136,6 +151,11 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 
 Changelog
 ---------
+
+2.4.0
+~~~~~
+
+- Version bump.
 
 2.3.3
 ~~~~~
@@ -173,13 +193,20 @@ The image supports following metadata:
 * **org.erigones:redis_password**: esDC Redis password.
 * **org.erigones:pgsql_esdc_password**: esDc PostgreSQL password.
 * **org.erigones:pgsql_pdns_password**: esDC PostgreSQL password for PowerDNS.
-* **org.erigones:zabbix_server**: MON_ZABBIX_SERVER in esDC. If not set, value of *org.erigones:zabbix_ip* will be used.
+* **org.erigones:zabbix_server**: MON_ZABBIX_SERVER in esDC. If not set, monitoring support will be disabled.
 * **org.erigones:zabbix_esdc_username**: MON_ZABBIX_USERNAME in esDC.
 * **org.erigones:zabbix_esdc_password**: MON_ZABBIX_PASSWORD in esDC.
 * **org.erigones:esdc_admin_email**: change email of admin user.
 
 Changelog
 ---------
+
+2.4.0
+~~~~~
+
+- Removed hardcoded hostname and pre-installed RabbitMQ data dir - `#22 <https://github.com/erigones/esdc-factory/issues/22>`__
+- Removed hardcoded hostname in /etc/hosts - commit `54415d0 <https://github.com/erigones/esdc-factory/commit/54415d0a0bdb944c4a159c04304a21fbe395909d>`__
+- Disabled monitoring support by default - commit `dd1b671 <https://github.com/erigones/esdc-factory/commit/dd1b6715cbc5494d1d92281613a518486235d120>`__
 
 2.3.3
 ~~~~~
@@ -223,6 +250,12 @@ The image supports following metadata:
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Added used swap metric into compute node monitoring template (t_erigonos) - `#21 <https://github.com/erigones/esdc-factory/issues/21>`__
+- Removed hardcoded hostname in /etc/hosts - commit `54415d0 <https://github.com/erigones/esdc-factory/commit/54415d0a0bdb944c4a159c04304a21fbe395909d>`__
+
 2.3.3
 ~~~~~
 
@@ -260,6 +293,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+2.4.0
+~~~~~
+
+- Version bump.
+
 2.3.3
 ~~~~~
 
@@ -295,6 +333,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.4.0
+~~~~~
+
+- Version bump.
 
 2.3.3
 ~~~~~

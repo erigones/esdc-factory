@@ -15,6 +15,7 @@ pgsql_monitoring:
   name: "{{ esdc_mgmt.pgsql_monitoring.user }}"
   password: "{{ esdc_mgmt.pgsql_monitoring.password }}"
 zabbix_api:
+  enabled: ""   # Don't include into settings -> will be appended during post-deploy
   username: ""  # Don't include into settings -> will be appended during post-deploy
   password: ""  # Don't include into settings -> will be appended during post-deploy
 redis:
@@ -27,3 +28,5 @@ rabbitmq:
   port: "{{ esdc_mgmt.rabbitmq.port | mandatory }}"
   password: "@RABBITMQ_PASSWORD@"
   vhost: "{{ esdc_mgmt.rabbitmq.vhost | mandatory }}"
+  cfgdir: "{{ esdc_mgmt.rabbitmq.cfgdir | mandatory }}"
+  dbdir: "{{ esdc_mgmt.rabbitmq.dbdir | mandatory }}"

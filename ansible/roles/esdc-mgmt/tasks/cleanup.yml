@@ -1,0 +1,14 @@
+---
+
+- name: Stop rabbitmq-server before database cleanup
+  service: name=rabbitmq-server state=stopped
+
+- name: Delete rabbitmq-server database and config before creating image
+  file: path="{{ item }}" state=absent
+  with_items:
+      - "{{ rabbitmq.dbdir }}/mnesia"
+      - "{{ rabbitmq.dbdir }}/.erlang.cookie"
+      - "{{ rabbitmq.cfgdir }}/rabbitmq-env.conf"
+
+- name: Revert hostname back to localhost.localdomain
+  hostname: name=localhost.localdomain

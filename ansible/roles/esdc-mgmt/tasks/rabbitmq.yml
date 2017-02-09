@@ -6,12 +6,15 @@
 
 - name: Create environment file for rabbitmq
   lineinfile: line="NODENAME=rabbit@{{ hostname.split('.').0 }}"
-              dest=/etc/rabbitmq/rabbitmq-env.conf
+              dest="{{ rabbitmq.cfgdir }}/rabbitmq-env.conf"
               state=present
               create=yes
 
 - name: Start rabbitmq-server and enable at boot
   service: name=rabbitmq-server enabled=yes state=started
+
+- name: Remove default guest user
+  rabbitmq_user: user=guest state=absent
 
 - name: Ensure vhost erigones is present
   rabbitmq_vhost: name={{ rabbitmq.vhost }} state=present

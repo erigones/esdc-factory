@@ -69,13 +69,15 @@ root_authorized_keys:
   - "{{ builder_ssh_key }}"
 
 esdc_mgmt:
-  hostname: 'mgmt01.local'
+  hostname: 'mgmt01.local'  # temporary hostname for tests
   rabbitmq:
     user: 'esdc'
     host: '127.0.0.1'
     port: '5672'
     password: 'S3cr3tP4ssw0rd'
     vhost: 'esdc'
+    cfgdir: '/etc/rabbitmq'
+    dbdir: '/var/lib/rabbitmq'
   redis:
     host: '127.0.0.1'
     port: '6379'
@@ -96,5 +98,6 @@ esdc_mgmt:
     user: 'stats'
     password: 'stats'
   zabbix_api:
+    enabled: true
     username: "provisioner"
     password: "zabbix"

@@ -1,0 +1,7 @@
+#Dependencies: base.yml, zone.yml
+remove_base_image: true
+zone_brand: joyent
+zone_uuid: 9f9a8ea0-938b-4563-b6ce-64b8307605b1
+zone_image_uuid: "{{ (lookup('pipe', 'curl -s {{ builder_base_zone_imgmanifest_url }}') | from_json)['uuid'] }}"
+zone_hostname: "esdc-node-archive-monitoring"
+zone_nic_0_ip: "{{ build_ips.esdc_node | default(build_ip) }}"
