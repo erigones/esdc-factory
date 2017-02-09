@@ -1,7 +1,6 @@
 ---
 pg_repo_el6: "http://yum.postgresql.org/{{ pg_version }}/redhat/rhel-6-x86_64/pgdg-redhat{{ pg_version_nodot }}-{{ pg_version }}-1.noarch.rpm"
 pg_repo_el7: "http://yum.postgresql.org/{{ pg_version }}/redhat/rhel-7-x86_64/pgdg-centos{{ pg_version_nodot }}-{{ pg_version }}-3.noarch.rpm"
-pg_repo_el7_erigones: "http://mirror.erigones.com/mirror/PostgreSQL/repos/yum/{{ pg_version }}/redhat/rhel-7-x86_64/pgdg-centos{{ pg_version_nodot }}-{{ pg_version }}-3.noarch.rpm"
 
 pg_packages:
   - "postgresql{{ pg_version_nodot }}"

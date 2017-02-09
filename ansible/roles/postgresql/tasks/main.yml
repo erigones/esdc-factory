@@ -7,7 +7,7 @@
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
 
 - name: Set up PostgreSQL repositories (CentOS 7)
-  yum: name={{ pg_repo_el7_erigones }} state=present
+  yum: name={{ pg_repo_el7 }} state=present
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 
 - name: Install PostgreSQL (CentOS)
