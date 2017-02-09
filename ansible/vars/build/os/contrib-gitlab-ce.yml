@@ -1,0 +1,17 @@
+root_pw: ""  # auto-generate password
+grub_pw: null
+
+rc_scripts_after:
+  - zabbix-agent.service
+
+firewall_allowed_tcp_ports:
+  - port: 22
+  - port: 80
+  - port: 443
+  - port: 10051
+
+selinux_permissive_domains:
+  - zabbix_agent_t
+
+gitlab_ce_version: "8.16.4"
+gitlab_ce_checksum: "eddbb617ddd8d25364e7761042463e6581054c17"  # sha1

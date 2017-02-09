@@ -1,0 +1,46 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-gitlab-ce.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/centos/register-host.yml
+        hostname=contrib-gitlab-ce
+
+- name: Install and configure appliance
+  hosts: contrib-gitlab-ce
+  gather_facts: true
+  vars_files:
+    - vars/build/os/contrib-gitlab-ce.yml
+  roles:
+    - esdc-common
+    - selinux
+    - zabbix-agent
+    - cloud-init
+    - rc-scripts
+    - iptables
+    - mdata-client
+    - qemu-guest-agent
+    - contrib-gitlab-ce
+    - passwords
+    - vm-image
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-gitlab-ce.yml
+    - vars/build/os/contrib-gitlab-ce.yml
+  vars:
+    image_tags: {internal: false, resize: true, deploy: false}
+  tasks:
+    - include: tasks/build/centos/create-image.yml

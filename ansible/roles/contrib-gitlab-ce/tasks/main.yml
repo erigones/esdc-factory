@@ -1,0 +1,33 @@
+- fail: msg="Invalid OS; Only CentOS 7 is supported."
+  when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "7"
+
+- name: Install required packages
+  yum: name="{{ item }}" state=present
+  with_items:
+    - curl
+    - policycoreutils
+    - openssh-server
+    - openssh-clients
+    - postfix
+
+- name: Ensure that required services are running
+  service: name="{{ item }}" enabled=yes state=started
+  with_items:
+    - sshd
+    - postfix
+
+# Using the yum module directly with the RPM URL does not work
+# Downloading to /tmp (tmpfs on RHEL 7) => we don't have to delete it
+- name: Download GitLab CE {{ gitlab_ce_version }} RPM package
+  get_url: url="https://packages.gitlab.com/gitlab/gitlab-ce/packages/el/7/gitlab-ce-{{ gitlab_ce_version }}-ce.0.el7.x86_64.rpm/download"
+           dest="/tmp/gitlab-ce.rpm"
+           checksum="sha1:{{ gitlab_ce_checksum }}"
+
+- name: Install GitLab CE {{ gitlab_ce_version }} package
+  yum: name="/tmp/gitlab-ce.rpm" state=present
+
+- name: Configure and start GitLab
+  shell: gitlab-ctl reconfigure
+
+- name: Install /var/lib/rc-scripts/50-es-post-deploy.sh
+  copy: src=es-post-deploy.sh dest=/var/lib/rc-scripts/50-es-post-deploy.sh mode=0750 owner=root group=root
