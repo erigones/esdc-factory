@@ -11,11 +11,12 @@ usbmnt="/mnt/$(svcprop -p 'joyentfs/usb_mountpoint' svc:/system/filesystem/smart
 
 mount | grep "^${usbmnt}" >/dev/null 2>&1 && fatal "${usbmnt} is already mounted"
 
+mkdir -p "${usbmnt}"
+
 USBKEYS=`/usr/bin/disklist -a`
 for key in ${USBKEYS}; do
     if [[ `/usr/sbin/fstyp /dev/dsk/${key}p1` == 'pcfs' ]]; then
-        /usr/sbin/mount -F pcfs -o foldcase,noatime /dev/dsk/${key}p1 \
-            ${usbmnt};
+        /usr/sbin/mount -F pcfs -o foldcase,noatime /dev/dsk/${key}p1 ${usbmnt};
         if [[ $? == "0" ]]; then
             if [[ ! -f ${usbmnt}/.joyliveusb ]]; then
                 /usr/sbin/umount ${usbmnt};
