@@ -3,7 +3,7 @@ usb_tmp_stage: "{{ usb_tmp_dir }}/esdc-usb-stage"
 usb_tmp_mountpoint: "{{ usb_tmp_dir }}/esdc-usb-image"
 usb_tmp_image: "{{ usb_tmp_dir }}/esdc-usb.img"
 usb_type: "hn"  # "hn" or "cn"
-usb_root_pw: "$5$9NwhzBL/$b8T1ooxt3zTNf743KJlbHWqPJC/nQnC7SksX6/yVm54"  # esdc
+usb_root_pw: "$5$2HOHRnK3$NvLlm.1KQBbB0WjoP7xcIwGnllhzp2HnT.mDO7DpxYA"  # root
 
 platform_version: "20161207T144343Z"
 platform_os_archive: "{{ builder.platform.dir }}/platform-{{ platform_version }}.tgz"

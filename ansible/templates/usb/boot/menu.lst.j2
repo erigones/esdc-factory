@@ -1,27 +1,30 @@
 default 0
 timeout 10
 min_mem64 1024
+serial --speed=115200 --unit=1,0,2,3 --word=8 --parity=no --stop=1
+terminal composite
+variable os_console vga
 splashimage=/boot/splash.xpm.gz
 
 {% if usb_type == "cn" %}
 title Compute Node 64-bit
-  kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=text,computenode=true,smartos=true
+  kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=${os_console},${os_console}-mode="115200,8,n,1,-",computenode=true,smartos=true
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive.hash
 
 title Compute Node 64-bit Rescue (l/p: root/root)
-  kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=text,root_shadow='{{ usb_root_pw|mandatory }}',computenode=true,smartos=true,standalone=true,noimport=true,hostname=erigonos
+  kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=${os_console},${os_console}-mode="115200,8,n,1,-",root_shadow='{{ usb_root_pw|mandatory }}',computenode=true,smartos=true,standalone=true,noimport=true,hostname=erigonos
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive.hash
 {% endif %}
 {% if usb_type == "hn" %}
 title Headnode 64-bit
-  kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=text,headnode=true
+  kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=${os_console},${os_console}-mode="115200,8,n,1,-",headnode=true
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive.hash
 
 title Headnode 64-bit Rescue (l/p: root/root)
-  kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=text,root_shadow='{{ usb_root_pw|mandatory }}',headnode=true,standalone=true,noimport=true,hostname=erigonos
+  kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=${os_console},${os_console}-mode="115200,8,n,1,-",root_shadow='{{ usb_root_pw|mandatory }}',headnode=true,standalone=true,noimport=true,hostname=erigonos
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive.hash
 {% endif %}
