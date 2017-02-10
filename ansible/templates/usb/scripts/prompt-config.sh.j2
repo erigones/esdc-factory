@@ -462,7 +462,11 @@ promptpool()
 
     disklayout -f ${_d} ${layout} > ${_dl}
 
-    ERR="$(json -f ${_dl} error)"
+    if json --validate -f "${_dl}" &> /dev/null; then
+      ERR="$(json -f ${_dl} error)"
+    else
+      ERR="No disks found!"
+    fi
 
     if [[ -n ${ERR} ]] ; then
       warning "${ERR}"
