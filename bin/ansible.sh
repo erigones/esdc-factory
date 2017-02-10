@@ -87,6 +87,16 @@ esac
 EXTRA_VARS="${EXTRA_VARS## -- }"
 EXTRA_VARS="${EXTRA_VARS## }"
 
+LOCKFILE="/tmp/esdc-factory-${PLAYBOOK%.*}.lock"
+
+if [[ -e "${LOCK}" ]]; then
+	echo "Already running (${LOCKFILE})" >&2
+	exit 2
+fi
+
+trap "rm -f ${LOCKFILE}" INT TERM EXIT
+echo $$ > "${LOCKFILE}"
+
 cat << EOF
 --------------------------------------------------------------------------------
 
