@@ -452,7 +452,7 @@ promptpool()
       elif [ ${_single_candidates} -gt 0 ]; then
           layout="single"
       else
-          layout="manual"
+          layout="single"
       fi
   else
       layout=""
@@ -743,7 +743,7 @@ setup_datasets()
   touch ${TMPROOT}/${SYS_ZPOOL}/.system_pool
 
   if [ ${inst_to_hdd} -eq 1 ]; then
-        _begin_header "Transferring USB dongle contents to HDD... "
+        _begin_header "Transferring USB drive contents to HDD... "
         /usr/bin/rsync -a ${USBMNT}/ /usbkey || \
             fatal "Failed to transfer"
         _end_header "done"
