@@ -961,9 +961,6 @@ while [ /usr/bin/true ]; do
 
     printheader "Networking - Continued"
 
-    message=""
-    printf "$message"
-
     message="
   The default gateway will determine which router will be used to connect this
   node to other networks. This will almost certainly be the router connected
@@ -974,8 +971,7 @@ while [ /usr/bin/true ]; do
     headnode_default_gateway="$val"
 
     printheader "Networking - Hostname and DNS"
-
-    message=""
+    message="\n"
     printf "${message}"
 
     promptval "Enter the domain name" "$domainname"
@@ -1036,15 +1032,14 @@ while [ /usr/bin/true ]; do
     esdc_install_password="${val}"
 
     printheader "Root password"
-
-    message=""
+    message="\n"
     printf "$message"
 
     promptpw "Enter root password" "nolen"
     root_shadow="$val"
 
     printheader "Installation to disk"
-	message=""
+	message="\n"
 	printf "${message}"
 
     promptval "Install to HDD instead of booting from USB?" "n"
@@ -1065,9 +1060,6 @@ while [ /usr/bin/true ]; do
 {% if usb_type == "hn" %}
 	printheader "Administrator's e-mail address"
 
-	message=""
-	printf "$message"
-
 	message="
   Administrator's e-mail address for receiving system-generated messages.\n\n"
 	printf "$message"
@@ -1077,8 +1069,7 @@ while [ /usr/bin/true ]; do
 {% endif %}
 
 	printheader "Verify Configuration"
-	message=""
-
+	message="\n"
 	printf "$message"
 
 	echo "Verify that the following values are correct:"
