@@ -10,6 +10,9 @@
 - name: Add custom Zabbix configuration and SMF manifests
   copy: src=files/archives/monitoring/opt/ dest=/opt/
 
+- name: Fix permissions on monitoring scripts
+  shell: chmod +x /opt/zabbix/etc/scripts/*
+
 - name: Create monitoring tarball {{ pkg_name }}{{ pkg_ext }}
   shell: chdir=/var/tmp gtar -czvf "/var/tmp/{{ pkg_name }}{{ pkg_ext }}" /opt/zabbix /opt/custom
 
