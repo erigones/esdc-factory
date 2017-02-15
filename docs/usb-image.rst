@@ -25,7 +25,6 @@ Changelog
 - Importing locally all images on the headnode USB key, so they can be initialized by the esdc-mgmt VM - commit `1a912d1 <https://github.com/erigones/esdc-factory/commit/1a912d1be36a7d6098d7e4d55cf8ed0f7b656b97>`__
 - Updated the *local* and *monitoring* archives - `#24 <https://github.com/erigones/esdc-factory/issues/24>`__
 - Changed default VCPU count for esDC internal zones to 0 - commit `cd3094b <https://github.com/erigones/esdc-factory/commit/cd3094b009107a7dc1e88931c47bab0c31f2166e>`__
-- Fixed handling of installation input by adding quotes around config variables - commit `c0fe89b <https://github.com/erigones/esdc-factory/commit/c0fe89b883c483bd3ecd7e394cd76bea1bf4c04f>`__
 - Fixed error message when no disks are available during installation - commit `fa9eda2 <https://github.com/erigones/esdc-factory/commit/fa9eda26e63b6630cb645287af084579d64ca8bd>`__
 - Fixed internal SSH connection when network is not available - commit `faf8a4b <https://github.com/erigones/esdc-factory/commit/faf8a4bfbc4b518e34a4dd0f836a28f38303ea86>`__
 - Fixed situation when running mount-usb from HDD-installed machine - commit `f68eb5b <https://github.com/erigones/esdc-factory/commit/f68eb5bfdbf8a9fee817ae272b024270c06d43d5>`__

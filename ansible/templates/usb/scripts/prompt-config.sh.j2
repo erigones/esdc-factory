@@ -1139,28 +1139,28 @@ cat > ${tmp_config} <<EEOOFF
 # This file was auto-generated and must be source-able by bash.
 #
 # admin_nic is the nic admin_ip will be connected to for headnode zones.
-admin_nic='$admin_nic'
-admin_ip='$admin_ip'
-admin_netmask='$admin_netmask'
-admin_network='$admin_network'
-admin_gateway='$headnode_default_gateway'
+admin_nic=$admin_nic
+admin_ip=$admin_ip
+admin_netmask=$admin_netmask
+admin_network=$admin_network
+admin_gateway=$headnode_default_gateway
 root_shadow='${root_shadow}'
-cfgdb_admin_ip='$cfgdb_admin_ip'
+cfgdb_admin_ip=$cfgdb_admin_ip
 esdc_install_password='${esdc_install_password}'
-dns_resolvers='$dns_resolver1,$dns_resolver2'
-dns_domain='$dns_domain'
-hostname='$hostname'
-ntp_hosts='$ntp_hosts'
-compute_node_ntp_hosts='$admin_ip'
+dns_resolvers=$dns_resolver1,$dns_resolver2
+dns_domain=$dns_domain
+hostname=$hostname
+ntp_hosts=$ntp_hosts
+compute_node_ntp_hosts=$admin_ip
 
 {% if usb_type == "hn" %}
-headnode_default_gateway='$headnode_default_gateway'
+headnode_default_gateway=$headnode_default_gateway
 datacenter_name='$datacenter_name'
 # Danube Cloud core zone variables
-mgmt_admin_ip='$mgmt_admin_ip'
-mon_admin_ip='$mon_admin_ip'
-dns_admin_ip='$dns_admin_ip'
-img_admin_ip='$img_admin_ip'
+mgmt_admin_ip=$mgmt_admin_ip
+mon_admin_ip=$mon_admin_ip
+dns_admin_ip=$dns_admin_ip
+img_admin_ip=$img_admin_ip
 admin_email='${admin_email}'
 {% endif %}
 EEOOFF
