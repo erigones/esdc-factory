@@ -28,7 +28,7 @@ base-64-es
 Changelog
 ---------
 
-2.4.1
+2.5.0
 ~~~~~
 
 - Version bump.
@@ -76,7 +76,7 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
-2.4.1
+2.5.0
 ~~~~~
 
 - Version bump.
@@ -125,7 +125,7 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
-2.4.1
+2.5.0
 ~~~~~
 
 - Version bump.
@@ -167,10 +167,10 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 Changelog
 ---------
 
-2.4.1
+2.5.0
 ~~~~~
 
-- Version bump.
+-  Updated versions of the packages in requirements file - commit `503c087 <https://github.com/erigones/esdc-shipment/commit/503c087d353055de48e4c8f056f56f4bc6853974>`__
 
 2.4.0
 ~~~~~
@@ -221,7 +221,7 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.4.1
+2.5.0
 ~~~~~
 
 - Version bump.
@@ -275,7 +275,7 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.4.1
+2.5.0
 ~~~~~
 
 - Version bump.
@@ -323,7 +323,7 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.4.1
+2.5.0
 ~~~~~
 
 - Version bump.
@@ -369,7 +369,7 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.4.1
+2.5.0
 ~~~~~
 
 - Version bump.
