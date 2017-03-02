@@ -224,7 +224,7 @@ Changelog
 2.5.0
 ~~~~~
 
-- Version bump.
+- Added HTTP connection rate limit for the mgmt web portal - commit `398ce29 <https://github.com/erigones/esdc-factory/commit/398ce29b33e0e4f98794f021342dea44b4eba03b>`
 
 2.4.0
 ~~~~~
