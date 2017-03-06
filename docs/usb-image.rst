@@ -22,6 +22,7 @@ Changelog
 2.5.1 (unreleased)
 ==================
 
+- Fixed default values for admin_email and DC name after pressing `no` in the installer's confirmation dialog - `#25 <https://github.com/erigones/esdc-factory/issues/25>`__
 
 2.5.0 (released on 2017-03-03)
 ==============================
