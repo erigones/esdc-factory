@@ -916,7 +916,7 @@ while [ /usr/bin/true ]; do
   and Danube Cloud installation.\n\n"
     printf "$message"
 
-    promptval "Enter DC name"
+    promptval "Enter DC name" "${datacenter_name}"
     datacenter_name="$val"
 {% endif %}
 
@@ -1064,7 +1064,7 @@ while [ /usr/bin/true ]; do
   Administrator's e-mail address for receiving system-generated messages.\n\n"
 	printf "$message"
 
-	promptval "Enter administrator's e-mail address" "admin@example.com"
+	promptval "Enter administrator's e-mail address" "${admin_email}"
 	admin_email="${val}"
 {% endif %}
 
