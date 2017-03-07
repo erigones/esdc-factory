@@ -19,8 +19,8 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.5.1 (unreleased)
-==================
+2.5.1 (released on 2017-03-07)
+==============================
 
 - Fixed default values for admin_email and DC name after pressing `no` in the installer's confirmation dialog - `#25 <https://github.com/erigones/esdc-factory/issues/25>`__
 
