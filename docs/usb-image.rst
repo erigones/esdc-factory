@@ -22,7 +22,7 @@ Changelog
 2.5.2 (unreleased)
 ==================
 
-- Fixed "install to HDD" question handling after pressing `no` in the installer's confirmation dialog - commit `d065712 <https://github.com/erigones/esdc-factory/d0657120eef3a5ef472fdf8ad98984d0a4bc598c>`__
+- Fixed "install to HDD" question handling after pressing `no` in the installer's confirmation dialog - commit `d065712 <https://github.com/erigones/esdc-factory/commit/d0657120eef3a5ef472fdf8ad98984d0a4bc598c>`__
 
 2.5.1 (released on 2017-03-07)
 ==============================
