@@ -899,8 +899,6 @@ if [[ $continue == 'n' ]]; then
     exit 0
 fi
 
-export inst_to_hdd=0
-
 printheader "EULA"
 printeula
 prompteula
@@ -909,6 +907,8 @@ prompteula
 # Main loop to prompt for user input
 #
 while [ /usr/bin/true ]; do
+	export inst_to_hdd=0
+
 {% if usb_type == "hn" %}
 	printheader "Datacenter Information"
 	message="
