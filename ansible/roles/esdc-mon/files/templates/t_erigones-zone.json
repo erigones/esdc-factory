@@ -983,7 +983,7 @@
                                 "url": "",
                                 "type": "0",
                                 "priority": "4",
-                                "expression": "({TRIGGER.VALUE}=0 & {t_erigones-zone:vfs.fs.size[{#FSNAME},pfree].last(0)}<5)|({TRIGGER.VALUE}=1&{t_erigones-zone:vfs.fs.size[{#FSNAME},pfree].last(0)}<10)",
+                                "expression": "({TRIGGER.VALUE}=0 & {t_erigones-zone:vfs.fs.size[{#FSNAME},pfree].last(0)}<5)|({TRIGGER.VALUE}=1&{t_erigones-zone:vfs.fs.size[{#FSNAME},pfree].last(0)}<5)",
                                 "name": "Free disk space is less than 5% on volume {#FSNAME}"
                             },
                             {
@@ -992,7 +992,7 @@
                                 "url": "",
                                 "type": "0",
                                 "priority": "2",
-                                "expression": "({TRIGGER.VALUE}=0 & {t_erigones-zone:vfs.fs.size[{#FSNAME},pfree].last(0)}<20)|({TRIGGER.VALUE}=1&{t_erigones-zone:vfs.fs.size[{#FSNAME},pfree].last(0)}<25)",
+                                "expression": "({TRIGGER.VALUE}=0 & {t_erigones-zone:vfs.fs.size[{#FSNAME},pfree].last(0)}<20)|({TRIGGER.VALUE}=1&{t_erigones-zone:vfs.fs.size[{#FSNAME},pfree].last(0)}<20)",
                                 "name": "Free disk space is less than 20% on volume {#FSNAME}"
                             },
                             {
@@ -1001,7 +1001,7 @@
                                 "url": "",
                                 "type": "0",
                                 "priority": "4",
-                                "expression": "({TRIGGER.VALUE}=0 & {t_erigones-zone:vfs.fs.inode[{#FSNAME},pfree].last(0)}<5)|({TRIGGER.VALUE}=1&{t_erigones-zone:vfs.fs.inode[{#FSNAME},pfree].last(0)}<10)",
+                                "expression": "({TRIGGER.VALUE}=0 & {t_erigones-zone:vfs.fs.inode[{#FSNAME},pfree].last(0)}<5)|({TRIGGER.VALUE}=1&{t_erigones-zone:vfs.fs.inode[{#FSNAME},pfree].last(0)}<5)",
                                 "name": "Free inodes is less than 5% on volume {#FSNAME}"
                             },
                             {
@@ -1010,7 +1010,7 @@
                                 "url": "",
                                 "type": "0",
                                 "priority": "4",
-                                "expression": "({TRIGGER.VALUE}=0 & {t_erigones-zone:vfs.fs.inode[{#FSNAME},pfree].last(0)}<20)|({TRIGGER.VALUE}=1&{t_erigones-zone:vfs.fs.inode[{#FSNAME},pfree].last(0)}<25)",
+                                "expression": "({TRIGGER.VALUE}=0 & {t_erigones-zone:vfs.fs.inode[{#FSNAME},pfree].last(0)}<20)|({TRIGGER.VALUE}=1&{t_erigones-zone:vfs.fs.inode[{#FSNAME},pfree].last(0)}<20)",
                                 "name": "Free inodes is less than 20% on volume {#FSNAME}"
                             }
                         ],

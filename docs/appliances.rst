@@ -328,7 +328,7 @@ Changelog
 2.5.2
 ~~~~~
 
-- Version bump.
+- Fixed trigger value to be in line with trigger description in t_erigones-zone - `#28 <https://github.com/erigones/esdc-factory/issues/28>`__
 
 2.5.1
 ~~~~~
