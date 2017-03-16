@@ -210,7 +210,7 @@
                 "priority": "4",
                 "dependencies": [
                     {
-                        "expression": "{t_svc-mq:proc.num[beam,,,rabbitmq_server].max(3m)}<1",
+                        "expression": "{t_svc-mq:proc.num[,rabbitmq,,beam.*rabbitmq_server].max(3m)}<1",
                         "name": "Message queue is not running"
                     }
                 ],
@@ -229,7 +229,7 @@
                         "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
                     }
                 ],
-                "expression": "{t_svc-mq:proc.num[beam,,,rabbitmq_server].max(3m)}<1",
+                "expression": "{t_svc-mq:proc.num[,rabbitmq,,beam.*rabbitmq_server].max(3m)}<1",
                 "name": "Message queue is not running"
             }
         ]
