@@ -121,7 +121,7 @@
                         "delay_flex": "",
                         "units": "",
                         "value_type": "3",
-                        "key": "proc.num[beam,,,rabbitmq_server]",
+                        "key": "proc.num[,rabbitmq,,beam.*rabbitmq_server]",
                         "delta": "0",
                         "password": "",
                         "snmpv3_privpassphrase": "",
