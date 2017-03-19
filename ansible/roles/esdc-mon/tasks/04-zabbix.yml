@@ -101,7 +101,7 @@
       smtp_email: "monitoring@example.com"
   register: email_media_type
 
-- name: Create HQSMS media type (script)
+- name: Create SMS media type (script)
   zabbix:
     url: "{{ zabbix_url }}"
     login_user: "{{ login_user }}"
@@ -110,7 +110,8 @@
     api_params_dict:
       description: "SMS"
       type: 1  # script
-      exec_path: "hqsms.sh"
+      exec_path: "sms.sh"
+  register: sms_media_type
 
 - name: Create Ludolph media type (script)
   zabbix:
@@ -332,6 +333,66 @@
           opmessage_grp:
             - usrgrpid: "{{ admin_user_group_id }}"
           opmessage_usr: []
+
+- name: Create Notify action 3
+  vars:
+    notifications_host_group_id: "{{ notifications.result.groupids[0] }}"
+    admin_user_id: "{{ admin_user.result[0].userid }}"
+    sms_media_type_id: "{{ sms_media_type.result.mediatypeids[0] }}"
+  zabbix:
+    url: "{{ zabbix_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    api_method: action.create
+    api_params_dict:
+      name: "Escalation - SMS to Admin (without recovery message)"
+      eventsource: 0
+      esc_period: 300
+      status: 1
+      def_longdata: "- {DATE} {TIME} - {TRIGGER.SEVERITY} - Value: {ITEM.VALUE1}|{ITEM.VALUE2}|{ITEM.VALUE3}|{ITEM.VALUE4} ({TRIGGER.NSEVERITY})"
+      def_shortdata: "**{EVENT.ID}** {HOST.NAME}: {TRIGGER.STATUS}: {TRIGGER.NAME}"
+      recovery_msg: 0
+      r_longdata: ""
+      r_shortdata: ""
+      filter:
+        evaltype: 0
+        conditions:
+          - conditiontype: 16
+            formulaid: "A"
+            operator: 7
+            value: ""
+          - conditiontype: 15
+            formulaid: "B"
+            operator: 3
+            value: "Custom Alerts"
+          - conditiontype: 5
+            formulaid: "C"
+            operator: 0
+            value: "1"
+          - conditiontype: 4
+            formulaid: "D"
+            operator: 5
+            value: "0"
+          - conditiontype: 0
+            formulaid: "E"
+            operator: 0
+            value: "{{ notifications_host_group_id }}"
+      operations:
+        - operationtype: 0
+          esc_period: 0
+          esc_step_from: 3
+          esc_step_to: 3
+          evaltype: 0
+          opconditions:
+            - conditiontype: 14
+              operator: 0
+              value: "0"
+          opmessage:
+            default_msg: 1
+            mediatypeid: "{{ sms_media_type_id }}"
+          opmessage_grp: []
+          opmessage_usr:
+            - userid: "{{ admin_user_id }}"
 
 - name: Create regular expressions (step 1)
   shell: |
