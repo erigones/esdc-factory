@@ -17,6 +17,9 @@ firewall_allowed_tcp_ports:
 
 selinux_permissive_domains: [ zabbix_agent_t, zabbix_t ]
 ludolph_service_enabled: False
+ludolph_service_dependencies:
+  - network.target
+  - zabbix-server.service
 
 zabbix_db_users:
   zabbix:

@@ -1,5 +1,7 @@
 ---
 ludolph_service_enabled: False
+ludolph_service_dependencies:
+  - network.target
 
 ludolph_webserver_host: "127.0.0.1"
 ludolph_webserver_port: 8222

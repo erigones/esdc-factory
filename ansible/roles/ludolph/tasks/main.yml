@@ -1,4 +1,7 @@
 ---
+- fail: msg="Invalid OS; Only CentOS 7 is supported."
+  when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "7"
+
 - name: Install python-pip
   yum: name=python-pip state=present
 
@@ -23,11 +26,11 @@
             mode=0640
 
 - name: Create Ludolph startup script
-  copy: src=ludolph.service
-        dest=/etc/systemd/system
-        owner=root
-        group=root
-        mode=0644
+  template: src=ludolph.service.j2
+            dest=/etc/systemd/system/ludolph.service
+            owner=root
+            group=root
+            mode=0644
 
 - name: Ensure Ludolph is running
   service: name=ludolph state=started enabled=yes

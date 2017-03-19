@@ -3,7 +3,7 @@
 [Unit]
 Description=Ludolph - Monitoring Jabber Bot
 Documentation=https://github.com/erigones/Ludolph
-After=network.target
+After={{ ludolph_service_dependencies|join(" ") }}
 
 [Service]
 Type=simple
