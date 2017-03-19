@@ -48,7 +48,7 @@
                         ],
                         "privatekey": "",
                         "allowed_hosts": "",
-                        "history": "30"
+                        "history": "14"
                     },
                     {
                         "username": "",
@@ -91,7 +91,7 @@
                         ],
                         "privatekey": "",
                         "allowed_hosts": "",
-                        "history": "30"
+                        "history": "14"
                     },
                     {
                         "username": "",
@@ -134,7 +134,7 @@
                         ],
                         "privatekey": "",
                         "allowed_hosts": "",
-                        "history": "30"
+                        "history": "14"
                     },
                     {
                         "username": "",
@@ -177,7 +177,7 @@
                         ],
                         "privatekey": "",
                         "allowed_hosts": "",
-                        "history": "30"
+                        "history": "14"
                     },
                     {
                         "username": "",
@@ -220,7 +220,7 @@
                         ],
                         "privatekey": "",
                         "allowed_hosts": "",
-                        "history": "30"
+                        "history": "14"
                     }
                 ],
                 "screens": [],

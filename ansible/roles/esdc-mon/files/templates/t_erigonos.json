@@ -50,7 +50,7 @@
                         "snmpv3_securitylevel": "0",
                         "port": "",
                         "logtimefmt": "",
-                        "delay": "60",
+                        "delay": "30",
                         "publickey": "",
                         "params": "",
                         "snmpv3_securityname": "",
@@ -93,7 +93,7 @@
                         "snmpv3_securitylevel": "0",
                         "port": "",
                         "logtimefmt": "",
-                        "delay": "60",
+                        "delay": "30",
                         "publickey": "",
                         "params": "",
                         "snmpv3_securityname": "",
@@ -1669,7 +1669,7 @@
                                 ],
                                 "privatekey": "",
                                 "allowed_hosts": "",
-                                "history": "30"
+                                "history": "7"
                             },
                             {
                                 "username": "",
@@ -1682,7 +1682,7 @@
                                 "snmpv3_securitylevel": "0",
                                 "port": "",
                                 "logtimefmt": "",
-                                "delay": "60",
+                                "delay": "30",
                                 "publickey": "",
                                 "params": "",
                                 "snmpv3_securityname": "",
@@ -1712,7 +1712,7 @@
                                 ],
                                 "privatekey": "",
                                 "allowed_hosts": "",
-                                "history": "30"
+                                "history": "7"
                             },
                             {
                                 "username": "",
@@ -1725,7 +1725,7 @@
                                 "snmpv3_securitylevel": "0",
                                 "port": "",
                                 "logtimefmt": "",
-                                "delay": "60",
+                                "delay": "30",
                                 "publickey": "",
                                 "params": "",
                                 "snmpv3_securityname": "",
@@ -1755,7 +1755,7 @@
                                 ],
                                 "privatekey": "",
                                 "allowed_hosts": "",
-                                "history": "30"
+                                "history": "7"
                             },
                             {
                                 "username": "",
@@ -1798,7 +1798,7 @@
                                 ],
                                 "privatekey": "",
                                 "allowed_hosts": "",
-                                "history": "30"
+                                "history": "7"
                             },
                             {
                                 "username": "",
@@ -1811,7 +1811,7 @@
                                 "snmpv3_securitylevel": "0",
                                 "port": "",
                                 "logtimefmt": "",
-                                "delay": "60",
+                                "delay": "30",
                                 "publickey": "",
                                 "params": "",
                                 "snmpv3_securityname": "",
@@ -1841,7 +1841,7 @@
                                 ],
                                 "privatekey": "",
                                 "allowed_hosts": "",
-                                "history": "30"
+                                "history": "7"
                             },
                             {
                                 "username": "",
@@ -1854,7 +1854,7 @@
                                 "snmpv3_securitylevel": "0",
                                 "port": "",
                                 "logtimefmt": "",
-                                "delay": "60",
+                                "delay": "30",
                                 "publickey": "",
                                 "params": "",
                                 "snmpv3_securityname": "",
@@ -1884,7 +1884,7 @@
                                 ],
                                 "privatekey": "",
                                 "allowed_hosts": "",
-                                "history": "30"
+                                "history": "7"
                             }
                         ],
                         "delay": "3600",
