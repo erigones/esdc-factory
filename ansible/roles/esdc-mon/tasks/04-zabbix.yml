@@ -439,6 +439,13 @@
   register: refresh_unsupported
   failed_when: "'UPDATE 1' not in refresh_unsupported.stdout"
 
+- name: Copy alertscripts
+  copy: src=alertscripts/
+        dest=/etc/zabbix/alertscripts/
+        mode=0750
+        owner=root
+        group=zabbix
+
 - name: Create placeholder directory for templates
   file: path=/tmp/templates
         state=directory
