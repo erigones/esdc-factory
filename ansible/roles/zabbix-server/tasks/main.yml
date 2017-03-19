@@ -62,6 +62,14 @@
               regexp='^DocumentRoot'
               line='DocumentRoot "/usr/share/zabbix"'
 
+- name: Create externalscripts and alertscripts symlinks in /etc/zabbix
+  file: src="/usr/lib/zabbix/{{ item }}"
+        dest="/etc/zabbix/{{ item }}"
+        state=link
+  with_items:
+    - alertscripts
+    - externalscripts
+
 - name: SELinux configuration
   seboolean: name={{ item.name }} state={{ item.state }} persistent={{ item.persist }}
   with_items:
