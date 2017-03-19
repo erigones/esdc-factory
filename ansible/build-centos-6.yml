@@ -23,6 +23,7 @@
   roles:
     - iptables
     - cloud-init
+    - mdata-client
     - qemu-guest-agent
     - vm-image
 
