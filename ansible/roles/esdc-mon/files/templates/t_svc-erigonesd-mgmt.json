@@ -156,7 +156,7 @@
                         "snmpv3_authprotocol": "0",
                         "valuemap": [],
                         "ipmi_sensor": "",
-                        "status": "1",
+                        "status": "0",
                         "authtype": "0",
                         "snmp_community": "",
                         "description": "",
@@ -199,7 +199,7 @@
                         "snmpv3_authprotocol": "0",
                         "valuemap": [],
                         "ipmi_sensor": "",
-                        "status": "1",
+                        "status": "0",
                         "authtype": "0",
                         "snmp_community": "",
                         "description": "",
@@ -479,7 +479,7 @@
                 "name": "Beat mgmt is not running"
             },
             {
-                "status": "0",
+                "status": "1",
                 "description": "",
                 "url": "",
                 "type": "0",
@@ -494,7 +494,7 @@
                 "name": "Error in /opt/erigones/var/log/erigonesd-beat.log"
             },
             {
-                "status": "0",
+                "status": "1",
                 "description": "",
                 "url": "",
                 "type": "0",

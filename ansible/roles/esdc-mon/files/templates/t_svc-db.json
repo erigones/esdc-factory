@@ -848,7 +848,7 @@
                         "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
                         "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
                     }
-				],
+                ],
                 "expression": "{t_svc-db:proc.num[postgres].max(3m)}=0",
                 "name": "Database is not running"
             },
@@ -878,7 +878,7 @@
                         "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
                         "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
                     }
-				],
+                ],
                 "expression": "{t_svc-db:proc.num[pgbouncer].max(3m)}=0",
                 "name": "Database pooler is not running"
             }

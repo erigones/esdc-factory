@@ -411,15 +411,15 @@
   shell: |
     psql -U "{{ zabbix_db_user }}" -d "{{ zabbix_db_name }}" <<" EOF"
     INSERT INTO expressions (expressionid, regexpid, expression, expression_type, exp_delimiter, case_sensitive) VALUES
-    (5,  4, '^\\/', 3, ',', 0),
-    (6,  4, '^\\/var\\/named\\/chroot', 4, ',', 0),
-    (7,  4, '^\\/chroot', 4, ',', 0),
-    (8,  4, '^\\/(dev|mnt|media|proc|sys|selinux|cgroup|var\\/lib\\/nfs).*$', 4, ',', 0),
-    (9,  4, '^\\/.*\\/dev$', 4, ',', 0),
-    (10, 5, '^\\/(dev|devices|etc|lib|system|usbkey|usr|var\\/run)', 4, ',', 0),
-    (11, 5, '^\\/(checkpoints|dev|etc|lib|proc|sbin|system|usr|var\\/run)', 4, ',', 0),
-    (12, 5, '^\\/zones', 4, ',', 0),
-    (13, 5, '^\\/', 3, ',', 0),
+    (5,  4, '^/', 3, ',', 0),
+    (6,  4, '^/var/named/chroot', 4, ',', 0),
+    (7,  4, '^/chroot', 4, ',', 0),
+    (8,  4, '^/(dev|mnt|media|proc|sys|selinux|cgroup|var/lib/nfs).*$', 4, ',', 0),
+    (9,  4, '^/.*/dev$', 4, ',', 0),
+    (10, 5, '^/(dev|devices|etc|lib|system|usbkey|usr|var/run)', 4, ',', 0),
+    (11, 5, '^/(checkpoints|dev|etc|lib|proc|sbin|system|usr|var/run)', 4, ',', 0),
+    (12, 5, '^/zones', 4, ',', 0),
+    (13, 5, '^/', 3, ',', 0),
     (14, 6, 'tap[0-9]+', 4, ',', 0),
     (15, 6, 'tun[0-9]+', 4, ',', 0),
     (16, 6, 'lo0', 4, ',', 0);

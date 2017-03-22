@@ -1432,7 +1432,7 @@
                                 "description": "Partition {#FSNAME} is consuming too much space and might be using space needed by VMs.",
                                 "url": "",
                                 "type": "0",
-                                "priority": "4",
+                                "priority": "2",
                                 "expression": "{t_erigonos:vfs.fs.size[{#FSNAME}, used].last(0)}>{$FS_USED_THRESHOLD}",
                                 "name": "Volume {#FSNAME} is consuming more than {$FS_USED_THRESHOLD}B"
                             }
@@ -1511,7 +1511,7 @@
                         "snmp_oid": "",
                         "snmpv3_securitylevel": "0",
                         "port": "",
-                        "lifetime": "5",
+                        "lifetime": "1",
                         "graph_prototypes": [
                             {
                                 "show_3d": "0",
@@ -1916,7 +1916,7 @@
                         "snmp_oid": "",
                         "snmpv3_securitylevel": "0",
                         "port": "",
-                        "lifetime": "5",
+                        "lifetime": "1",
                         "graph_prototypes": [
                             {
                                 "show_3d": "0",

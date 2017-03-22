@@ -1372,7 +1372,7 @@
                         "snmp_oid": "",
                         "snmpv3_securitylevel": "0",
                         "port": "",
-                        "lifetime": "5",
+                        "lifetime": "1",
                         "graph_prototypes": [],
                         "trigger_prototypes": [
                             {
@@ -1562,7 +1562,7 @@
                         "snmpv3_privprotocol": "0",
                         "name": "Mounted filesystem discovery",
                         "privatekey": "",
-                        "filter": "{#FSNAME}:@File systems for discovery by FSNAME (Linux)",
+                        "filter": "{#FSTYPE}:@File systems for discovery",
                         "allowed_hosts": ""
                     },
                     {
@@ -1572,7 +1572,7 @@
                         "snmp_oid": "",
                         "snmpv3_securitylevel": "0",
                         "port": "",
-                        "lifetime": "5",
+                        "lifetime": "1",
                         "graph_prototypes": [
                             {
                                 "show_3d": "0",

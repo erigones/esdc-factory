@@ -977,7 +977,7 @@
                         "snmp_oid": "",
                         "snmpv3_securitylevel": "0",
                         "port": "",
-                        "lifetime": "30",
+                        "lifetime": "1",
                         "graph_prototypes": [],
                         "trigger_prototypes": [
                             {
@@ -1221,7 +1221,7 @@
                         "snmp_oid": "",
                         "snmpv3_securitylevel": "0",
                         "port": "",
-                        "lifetime": "5",
+                        "lifetime": "1",
                         "graph_prototypes": [
                             {
                                 "show_3d": "0",

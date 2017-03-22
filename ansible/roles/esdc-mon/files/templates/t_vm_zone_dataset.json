@@ -21,7 +21,7 @@
                         "snmp_oid": "",
                         "snmpv3_securitylevel": "0",
                         "port": "",
-                        "lifetime": "30",
+                        "lifetime": "1",
                         "graph_prototypes": [
                             {
                                 "show_3d": "0",
