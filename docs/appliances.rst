@@ -334,6 +334,7 @@ Changelog
 - Added sample SMS escalation action - commit `7c4f488 <https://github.com/erigones/esdc-factory/commit/7c4f4886d74750d35a988a74988abafefcb4e8ec>`__
 - Added sample Zabbix alert scripts - commit `d4a1c4c <https://github.com/erigones/esdc-factory/commit/d4a1c4c6659c702f22bff92456527e8adcd99b8a>`__
 - Added network interface monitoring into t_erigones-zone + small fixes - commit `bc37060 <https://github.com/erigones/esdc-factory/commit/bc37060b5ac77740cb0a3ae034f1cc339acd5b0d>`__
+- Fixed exec parameters of default media types - `#29 <https://github.com/erigones/esdc-factory/issues/29>`__
 - Fixed FS discovery in t_linux and t_erigonos templates - `#30 <https://github.com/erigones/esdc-factory/issues/30>`__
 
 2.5.1

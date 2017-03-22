@@ -111,6 +111,7 @@
       description: "SMS"
       type: 1  # script
       exec_path: "sms.sh"
+      exec_params: "{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n"
   register: sms_media_type
 
 - name: Create Ludolph media type (script)
@@ -123,6 +124,7 @@
       description: "Ludolph"
       type: 1  # script
       exec_path: "ludolph.sh"
+      exec_params: "{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n"
 
 - name: Create Prowl media type (script)
   zabbix:
@@ -134,6 +136,7 @@
       description: "Prowl"
       type: 1  # script
       exec_path: "prowl.sh"
+      exec_params: "{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n"
 
 - name: Create NMA media type (script)
   zabbix:
@@ -145,6 +148,7 @@
       description: "NMA"
       type: 1  # script
       exec_path: "nma.sh"
+      exec_params: "{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n"
 
 - name: Create ICMP_LOSS macro
   zabbix:
