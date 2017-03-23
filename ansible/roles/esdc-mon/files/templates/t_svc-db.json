@@ -778,7 +778,7 @@
         ],
         "triggers": [
             {
-                "status": "0",
+                "status": "1",
                 "description": "Cache hit ratio of last 5 minutes is too low, which might indicate bad database performance.",
                 "url": "",
                 "type": "0",
@@ -793,7 +793,7 @@
                 "name": "Cache hit ratio of database \"{$PG_DATABASE1}\" is below {$PGCACHEHIT_THRESHOLD}%"
             },
             {
-                "status": "0",
+                "status": "1",
                 "description": "Cache hit ratio of last 5 minutes is too low, which might indicate bad database performance.",
                 "url": "",
                 "type": "0",
