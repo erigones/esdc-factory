@@ -1,0 +1,42 @@
+- fail: msg="Invalid OS; Only CentOS 7 is supported."
+  when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "7"
+
+- name: Install GNOME full desktop environment
+  yum: name="@gnome-desktop-environment" state=present
+
+- name: Install additional packages
+  yum: name="{{ item }}" state=present
+  with_items:
+    - vim
+    - screen
+    - tmux
+    - telnet
+    - vinagre
+
+- name: Disable unneeded services
+  service: name="{{ item }}" enabled=no state=stopped
+  with_items:
+    - libvirtd
+    - smartd
+    - multipathd
+    - ModemManager
+    - mdmonitor
+    - lvm2-monitor
+    - dmraid-activation
+    - bluetooth
+    - ip6tables
+    - iptables
+    - firewalld
+
+- name: enable graphical boot target
+  shell: systemctl enable graphical.target --force
+
+- name: set graphical boot target default
+  shell: systemctl set-default graphical.target
+
+- name: Reconfigure GDM for XDMCP
+  copy: src="gdm-custom.conf" dest="/etc/gdm/custom.conf" mode=0644 owner=root group=root
+
+- name: Reconfigure policykit
+  copy: src="org.freedesktop.packagekit-erigones.rules" dest="/usr/share/polkit-1/rules.d/org.freedesktop.packagekit-erigones.rules" mode=0644 owner=root group=root
+

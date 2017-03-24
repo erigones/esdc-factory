@@ -1,0 +1,6 @@
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.packagekit.system-network-proxy-configure" ||
+        /org.freedesktop.color-manager.*/.test(action.id)) {
+            return polkit.Result.YES;
+    }
+});

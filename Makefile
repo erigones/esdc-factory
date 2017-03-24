@@ -9,7 +9,8 @@ BUILD_TARGETS =	base-centos-6 \
 				esdc-dns \
 				esdc-img \
 				esdc-node \
-				contrib-gitlab-ce
+				contrib-gitlab-ce \
+				contrib-centos7-desktop
 
 define newline
 

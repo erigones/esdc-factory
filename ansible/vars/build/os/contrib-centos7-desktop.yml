@@ -1,0 +1,9 @@
+root_pw: ""  # auto-generate password
+grub_pw: null
+
+rc_scripts_after:
+  - zabbix-agent.service
+
+selinux_permissive_domains:
+  - zabbix_agent_t
+
