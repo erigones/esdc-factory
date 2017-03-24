@@ -1,6 +1,6 @@
 # Dependencies: base.yml, zone.yml
 image_name: centos7-desktop
-image_desc: "Centos 7 with preinstalled full Gnome desktop environment"
+image_desc: "CentOS 7 with preinstalled full Gnome desktop environment"
 image_homepage: "{{ image_contrib_homepage }}/centos7-desktop.rst"
 image_requirements:
   min_ram: 1024
