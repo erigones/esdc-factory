@@ -12,7 +12,7 @@ builder_platform:
 builder_archives_url: 'http://download.erigones.org/esdc/factory/archives'
 builder_archives:
   - name: 'monitoring'
-    version: '2015Q4-20170208'
+    version: '2015Q4-20170324'
     desc: '/opt/zabbix directory on hypervisor'
     link: 'monitoring-latest'
   - name: 'local'
