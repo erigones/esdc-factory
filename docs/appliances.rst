@@ -31,7 +31,7 @@ Changelog
 2.5.2
 ~~~~~
 
-- Version bump.
+- Updated zabbix agent to 3.0.8 - commit `07194fa <https://github.com/erigones/esdc-factory/commit/07194fa5637893b25a0fcc539c4c0c62fef4b836>`__
 
 2.5.1
 ~~~~~
