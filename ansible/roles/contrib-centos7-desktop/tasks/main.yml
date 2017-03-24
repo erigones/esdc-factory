@@ -17,6 +17,24 @@
 - name: Disable unneeded services
   service: name="{{ item }}" enabled=no state=stopped
   with_items:
+    - iscsid
+    - iscsiuio
+    - vmtoolsd
+    - iscsi
+    - abrtd
+    - abrt-ccpp
+    - abrt-oops
+    - abrt-vmcore
+    - abrt-xorg
+    - rngd
+    - upower
+    - cups
+    - alsa-state
+    - spice-vdagentd
+    - ksm
+    - ksmtuned
+    - wpa_supplicant
+    - kdump
     - libvirtd
     - smartd
     - multipathd
@@ -41,3 +59,5 @@
 - name: Reconfigure policykit
   copy: src="org.freedesktop.packagekit-erigones.rules" dest="/usr/share/polkit-1/rules.d/org.freedesktop.packagekit-erigones.rules" mode=0644 owner=root group=root
 
+- name: Install /var/lib/rc-scripts/50-es-post-deploy.sh
+  copy: src=es-post-deploy.sh dest=/var/lib/rc-scripts/50-es-post-deploy.sh mode=0750 owner=root group=root
