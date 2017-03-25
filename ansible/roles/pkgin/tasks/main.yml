@@ -4,9 +4,16 @@
               regexp=^PKG_PATH
               line="PKG_PATH={{ pkgin_mirror }}/packages/SmartOS/{{ pkgin_release }}/{{ pkgin_arch }}/All"
 
-- name: Configure pkgin mirror
+- name: Configure pkgin repositories
   template: src=repositories.conf.j2
             dest=/opt/local/etc/pkgin/repositories.conf
             owner=root
             group=root
             mode=0644
+
+- name: Import pkgin repository keys
+  shell: curl "{{ item }}" | gpg --no-default-keyring --keyring /opt/local/etc/gnupg/pkgsrc.gpg --import
+  with_items: "{{ pkgin_repository_keys }}"
+
+- name: Refresh repository database
+  shell: pkgin -f update

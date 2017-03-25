@@ -5,5 +5,5 @@ sbin/zabbix_agentd
 man/man1/zabbix_get.1
 man/man1/zabbix_sender.1
 man/man8/zabbix_agentd.8
-etc/zabbix/zabbix_agentd.conf
+etc/zabbix/zabbix_agentd.conf.example
 @pkgdir etc/zabbix/zabbix_agentd.conf.d

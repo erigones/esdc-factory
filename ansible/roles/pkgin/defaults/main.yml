@@ -2,3 +2,9 @@
 pkgin_mirror: http://mirror.erigones.com
 pkgin_release: 2015Q4
 pkgin_arch: x86_64
+
+pkgin_repositories:
+  - "http://pkgsrc.erigones.com/packages/SmartOS/{{ pkgin_release }}/{{ pkgin_arch }}/All"
+
+pkgin_repository_keys:
+  - "https://pkgsrc.erigones.org/GPG.key.pub"

@@ -13,23 +13,8 @@
     - zabbix-sender
   when: ansible_distribution == "CentOS"
 
-- name: Copy Zabbix agent package
-  copy: src={{ zabbix_agent_package }}
-        dest=/tmp/{{ zabbix_agent_package }}
-        mode=0644
-        owner=root
-        group=root
-  when: ansible_distribution == "SmartOS"
-
-  # pkg_add will ask if we want to install unsigned package.
-  # We disable signature verification just for the package installation.
-  # TODO: sign our pkgsrc packages
-- name: Bypass package signing prompt
-  shell: echo "VERIFIED_INSTALLATION=never" > /tmp/pkg_install_noverify.conf
-  when: ansible_distribution == "SmartOS"
-
 - name: Install Zabbix agent (SmartOS)
-  command: pkg_add -f -C /tmp/pkg_install_noverify.conf /tmp/{{ zabbix_agent_package }}
+  pkgin: name=zabbix-agent state=present
   when: ansible_distribution == "SmartOS"
 
 - name: Create Zabbix agent configuration file

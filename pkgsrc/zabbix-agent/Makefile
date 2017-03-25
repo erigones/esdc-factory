@@ -7,7 +7,7 @@ CATEGORIES=		net
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=zabbix/}
 EXTRACT_SUFX=	.tar.gz
 
-MAINTAINER=		nobody@erigones.com
+MAINTAINER=		pkgsrc@erigones.com
 HOMEPAGE=		http://www.zabbix.com/
 COMMENT=		Network monitoring tool
 LICENSE=		gnu-gpl-v2
@@ -23,9 +23,10 @@ CONFIGURE_ARGS+=	--with-openssl=${PREFIX}
 BUILDLINK_API_DEPENDS.openssl+= openssl>=1.0
 
 PKG_SYSCONFSUBDIR=	zabbix
+CONF_FILES=     ${PKG_SYSCONFDIR}/zabbix_agentd.conf.example \
+					${PKG_SYSCONFDIR}/zabbix_agentd.conf
 RCD_SCRIPTS=	zabbix_agentd
 SMF_NAME=		zabbix-agent
-
 
 # ZABBIX user account
 ZBXUSER?=			zabbix
@@ -54,5 +55,8 @@ PKG_HOME.${ZBXUSER}=	${ZBXHOME}
 PKG_GECOS.${ZBXUSER}=	ZABBIX monitoring pseudo-user
 PKG_UID.${ZBXUSER}=		${ZBXUID}
 PKG_GID.${ZBXGROUP}=	${ZBXGID}
+
+post-install:
+	mv -f ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_agentd.conf ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_agentd.conf.example
 
 .include "../../mk/bsd.pkg.mk"
