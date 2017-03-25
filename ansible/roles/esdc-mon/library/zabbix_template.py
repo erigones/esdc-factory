@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# (c) 2012-2014, Erigones, s. r. o
+# (c) 2012-2017, Erigones, s. r. o
 # noinspection PyPep8Naming
 import xml.etree.ElementTree as ET
 import os
@@ -84,7 +84,7 @@ EXAMPLES = '''
       - Example group1
       - Example group2
 
-# Limit the Zabbix group creations to one host since Zabbix can return an error when doing concurent updates
+# Limit the Zabbix group creations to one host since Zabbix can return an error when doing concurrent updates
 - name: Create host groups
   local_action:
     module: zabbix_group
@@ -119,6 +119,7 @@ def indent(elem, level=0):
             elem.tail = i
 
 
+# noinspection PyShadowingBuiltins
 def get_template_name(module, filename):
     try:
         with open(filename, 'r') as f:
@@ -132,6 +133,7 @@ def get_template_name(module, filename):
     return data['zabbix_export']['templates'][0]['name']
 
 
+# noinspection PyShadowingBuiltins
 def get_template_id(module, zbx, name):
     try:
         result = zbx.template.get({
@@ -150,6 +152,7 @@ def get_template_id(module, zbx, name):
         raise ValueError("Template \"%s\" not found" % name)
 
 
+# noinspection PyShadowingBuiltins
 def check_template(module, zbx, name):
     try:
         return bool(get_template_id(module, zbx, name))
@@ -159,6 +162,7 @@ def check_template(module, zbx, name):
         module.fail_json(msg="Zabbix API problem: %s" % e)
 
 
+# noinspection PyShadowingBuiltins
 def import_template(module, zbx, filename, fmt):
     if not os.path.exists(filename):
         module.fail_json(msg="template file %s not found" % filename)
@@ -172,29 +176,37 @@ def import_template(module, zbx, filename, fmt):
             "source": data,
             "rules": {
                 "items": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "graphs": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "applications": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "triggers": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "templates": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "templateScreens": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "templateLinkage": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "discoveryRules": {
-                    "createMissing": True
-                }
+                    "createMissing": True,
+                    "updateExisting": True
+                },
             }
         })
     except BaseException as e:
@@ -202,6 +214,7 @@ def import_template(module, zbx, filename, fmt):
         raise AssertionError
 
 
+# noinspection PyShadowingBuiltins
 def export_template(module, zbx, template_id, target, fmt):
     try:
         result = zbx.configuration.export({
@@ -232,6 +245,7 @@ def export_template(module, zbx, template_id, target, fmt):
         raise AssertionError
 
 
+# noinspection PyShadowingBuiltins
 def remove_template(module, zbx, template_id):
     try:
         return zbx.template.delete([template_id])
@@ -241,6 +255,7 @@ def remove_template(module, zbx, template_id):
 
 
 def main():
+    # noinspection PyShadowingBuiltins
     module = AnsibleModule(
         argument_spec=dict(
             server_url=dict(required=True, default=None, aliases=['url']),
@@ -301,10 +316,15 @@ def main():
         module.fail_json(msg="Invalid state: '%s'" % state)
         raise AssertionError
 
-    if check_template(module, zbx, template_name):
-        if module.check_mode:
-            changed = True
+    if module.check_mode:
+        module.exit_json(changed=True)
 
+    if state in ('present', 'import'):
+        # noinspection PyUnboundLocalVariable
+        import_template(module, zbx, template_filename, fmt)
+        module.exit_json(changed=True)
+
+    if check_template(module, zbx, template_name):
         if state == 'absent':
             template_id = get_template_id(module, zbx, template_name)
             remove_template(module, zbx, template_id)
@@ -313,14 +333,6 @@ def main():
         if state == 'export':
             template_id = get_template_id(module, zbx, template_name)
             export_template(module, zbx, template_id, target, fmt)
-            changed = True
-    else:
-        if module.check_mode:
-            changed = True
-
-        if state in ('present', 'import'):
-            # noinspection PyUnboundLocalVariable
-            import_template(module, zbx, template_filename, fmt)
             changed = True
 
     module.exit_json(changed=changed)
