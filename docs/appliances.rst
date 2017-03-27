@@ -337,6 +337,7 @@ Changelog
 - Disabled cache hit ratio trigger in t_svc-db - commit `3ad5f55 <https://github.com/erigones/esdc-factory/commit/3ad5f5578e7897072fff223e080f0caae415560c>`__
 - Fixed exec parameters of default media types - `#29 <https://github.com/erigones/esdc-factory/issues/29>`__
 - Fixed FS discovery in t_linux and t_erigonos templates - `#30 <https://github.com/erigones/esdc-factory/issues/30>`__
+- Fixed node hard disk discovery and added trigger on SCSI errors into t_solaris_disk - commit `273ad34 <https://github.com/erigones/esdc-factory/commit/273ad34e0c24ab7cb5f2de2f4478534bfa13230e>`__
 
 2.5.1
 ~~~~~
