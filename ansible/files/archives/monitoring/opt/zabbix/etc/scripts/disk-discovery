@@ -2,11 +2,6 @@
 
 POOLS=( $(zpool list -Ho name) )
 
-
-
-
-
-
 echo -e "{\n\t\"data\": ["
 
 for pool in ${POOLS[@]}; do 
@@ -24,6 +19,6 @@ for pool in ${POOLS[@]}; do
 		echo -e "\t\t},"
 
 	done
-done
+done | sed '$ s/},/}/'
 
 echo -e "\t]\n}"
