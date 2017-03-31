@@ -338,6 +338,7 @@ Changelog
 - Fixed exec parameters of default media types - `#29 <https://github.com/erigones/esdc-factory/issues/29>`__
 - Fixed FS discovery in t_linux and t_erigonos templates - `#30 <https://github.com/erigones/esdc-factory/issues/30>`__
 - Fixed node hard disk discovery and added trigger on SCSI errors into t_solaris_disk - commit `273ad34 <https://github.com/erigones/esdc-factory/commit/273ad34e0c24ab7cb5f2de2f4478534bfa13230e>`__
+- Fixed invalid graph description for network monitoring in t_erigonos - `#34 <https://github.com/erigones/esdc-factory/issues/34>`__ - `#112 <https://github.com/erigones/esdc-ce/issues/112>`__
 
 2.5.1
 ~~~~~
