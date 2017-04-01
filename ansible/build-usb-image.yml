@@ -146,6 +146,9 @@
     - name: Stage esdc-node archive
       include: tasks/build/usb/esdc-node.yml
 
+    - name: Create version file
+      copy: content="esdc-{{ release_edition }}-{{ usb_type }}-{{ version }}" dest="{{ usb_tmp_stage }}/version"
+
     - name: Create USB image mountpoint
       file: path="{{ usb_tmp_mountpoint }}" state=directory mode=0755
 
