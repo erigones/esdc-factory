@@ -329,7 +329,7 @@ Changelog
 ~~~~~
 
 - Fixed trigger value to be in line with trigger description in t_erigones-zone - `#28 <https://github.com/erigones/esdc-factory/issues/28>`__
-- Updated Ludolph systemd service to start after zabbix-server.service - commit `0c6ee4a <https://github.com/erigones/esdc-factory/commit/0c6ee4ac00eede5388af215cdb8556b1d4c7f7ca>`__
+- Updated Ludolph systemd service to start after postgres, pgbouncer and httpd services - commit `0c6ee4a <https://github.com/erigones/esdc-factory/commit/0c6ee4ac00eede5388af215cdb8556b1d4c7f7ca>`__ and commit `a5afec0 <https://github.com/erigones/esdc-factory/commit/a5afec029c5a605d9fc3394ced90b0cb3aec8c7f>`__
 - Added externalscripts and alertscripts symlinks in /etc/zabbix - commit `40e99f6 <https://github.com/erigones/esdc-factory/commit/40e99f6cdaf699e87b0edf75c666e35861d1c1cd>`__
 - Added sample SMS escalation action - commit `7c4f488 <https://github.com/erigones/esdc-factory/commit/7c4f4886d74750d35a988a74988abafefcb4e8ec>`__
 - Added sample Zabbix alert scripts - commit `d4a1c4c <https://github.com/erigones/esdc-factory/commit/d4a1c4c6659c702f22bff92456527e8adcd99b8a>`__
