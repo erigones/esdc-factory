@@ -1,6 +1,6 @@
 # $NetBSD$
 
-PKGNAME=		zabbix-agent-${VER}
+PKGNAME=		zabbix-proxy-${VER}
 VER=			3.0.8
 DISTNAME=		zabbix-${VER}
 CATEGORIES=		net
@@ -9,24 +9,29 @@ EXTRACT_SUFX=	.tar.gz
 
 MAINTAINER=		pkgsrc@erigones.com
 HOMEPAGE=		http://www.zabbix.com/
-COMMENT=		Zabbix monitoring agent
+COMMENT=		Zabbix monitoring proxy
 LICENSE=		gnu-gpl-v2
 
 GNU_CONFIGURE=	YES
 MAKE_JOBS_SAFE=	no
 
 CONFIGURE_ARGS+=	--sysconfdir=${PKG_SYSCONFDIR:Q}
-CONFIGURE_ARGS+=	--enable-agent
+CONFIGURE_ARGS+=	--disable-agent
 CONFIGURE_ARGS+=	--disable-server
+CONFIGURE_ARGS+=	--enable-proxy
 CONFIGURE_ARGS+=	--with-openssl=${PREFIX}
+CONFIGURE_ARGS+=	--with-sqlite3=${PREFIX}
+CONFIGURE_ARGS+=	--with-libcurl
 
 BUILDLINK_API_DEPENDS.openssl+= openssl>=1.0
+BUILDLINK_API_DEPENDS.sqlite3+= sqlite3>=3.9.2
+BUILDLINK_API_DEPENDS.curl+= curl>=7.51.0
 
 PKG_SYSCONFSUBDIR=	zabbix
-CONF_FILES=		${PKG_SYSCONFDIR}/zabbix_agentd.conf.example \
-					${PKG_SYSCONFDIR}/zabbix_agentd.conf
-RCD_SCRIPTS=	zabbix_agentd
-SMF_NAME=		zabbix-agent
+CONF_FILES=		${PKG_SYSCONFDIR}/zabbix_proxy.conf.example \
+					${PKG_SYSCONFDIR}/zabbix_proxy.conf
+RCD_SCRIPTS=	zabbix_proxy
+SMF_NAME=		zabbix-proxy
 
 # ZABBIX user account
 ZBXUSER?=			zabbix
@@ -57,6 +62,6 @@ PKG_UID.${ZBXUSER}=		${ZBXUID}
 PKG_GID.${ZBXGROUP}=	${ZBXGID}
 
 post-install:
-	mv -f ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_agentd.conf ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_agentd.conf.example
+	mv -f ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_proxy.conf ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_proxy.conf.example
 
 .include "../../mk/bsd.pkg.mk"
