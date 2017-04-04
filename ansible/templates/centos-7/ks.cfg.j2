@@ -133,7 +133,7 @@ echo "Enablimg tmp.mount service"
 systemctl enable tmp.mount
 
 # Linux likes a bit of swap, so we create one
-fallocate -l 512M /swapfile
+fallocate -l 2048M /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
 # and add it to fstab
