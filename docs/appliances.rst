@@ -31,7 +31,7 @@ Changelog
 2.5.2
 ~~~~~
 
-- Switched to zabbix-agent package from pkgsrc.erigones.com - commit `ab681c3 <https://github.com/erigones/esdc-factory/commit/ab681c3929598796d99fdfadfed0e1aede46926c>`__ and commit `bd1cf98 <https://github.com/erigones/esdc-factory/commit/bd1cf9890b36adeb2809309314e0e1bf91a44a83>`__
+- Switched to zabbix-agent package from pkgsrc.erigones.com - commit `ab681c3 <https://github.com/erigones/esdc-factory/commit/ab681c3929598796d99fdfadfed0e1aede46926c>`__ and commit `d9386cd <https://github.com/erigones/esdc-factory/commit/d9386cddcfa26273d816d7de62d6b5ff13bc078f>`__
 - Updated zabbix agent to 3.0.8 - commit `07194fa <https://github.com/erigones/esdc-factory/commit/07194fa5637893b25a0fcc539c4c0c62fef4b836>`__
 
 2.5.1
