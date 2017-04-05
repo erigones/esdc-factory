@@ -239,9 +239,9 @@ promptval()
 	def="$2"
 	while [ -z "$val" ]; do
 		if [ -n "$def" ]; then
-			printf "%s [%s]: %s" "$1" "$def" "$3"
+			printf "%s [%s]: $3" "$1" "$def"
 		else
-			printf "%s: %s" "$1" "$3"
+			printf "%s: $3" "$1"
 		fi
 		read val
 		[ -z "$val" ] && val="$def"
