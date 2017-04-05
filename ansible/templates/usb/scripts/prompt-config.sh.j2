@@ -913,7 +913,7 @@ while [ /usr/bin/true ]; do
 	admin_nic="$val"
 
 	valid=0
-	§while [ $valid -ne 1 ]; do
+	while [ $valid -ne 1 ]; do
 {% if usb_type == "hn" %}
 		promptnet "(admin) headnode IP address" "$admin_ip"
 {% else %}
