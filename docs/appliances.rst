@@ -453,6 +453,7 @@ Changelog
 ~~~~~
 
 - Added mdata-client (mdata-list, mdata-get, etc.) - commit `a49b73f <https://github.com/erigones/esdc-factory/commit/a49b73f757c7d0f4910179c5934999bb0ce8e4fa>`__
+- Increased swap size - `#103 <https://github.com/erigones/esdc-ce/issues/103>`__
 
 2.5.1
 ~~~~~
