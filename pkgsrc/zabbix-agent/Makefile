@@ -20,8 +20,6 @@ CONFIGURE_ARGS+=	--enable-agent
 CONFIGURE_ARGS+=	--disable-server
 CONFIGURE_ARGS+=	--with-openssl=${PREFIX}
 
-BUILDLINK_API_DEPENDS.openssl+= openssl>=1.0
-
 PKG_SYSCONFSUBDIR=	zabbix
 CONF_FILES=		${PKG_SYSCONFDIR}/zabbix_agentd.conf.example \
 					${PKG_SYSCONFDIR}/zabbix_agentd.conf
@@ -58,5 +56,9 @@ PKG_GID.${ZBXGROUP}=	${ZBXGID}
 
 post-install:
 	mv -f ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_agentd.conf ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_agentd.conf.example
+	echo 'UserParameter=smf.maintenance,/usr/bin/svcs -x | grep -c svc:/' >> ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_agentd.conf.example
+	echo 'UserParameter=smf.status[*],/usr/bin/svcs -Ho state $$1 2>/dev/null || echo ZBX_NOTSUPPORTED' >> ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_agentd.conf.example
 
+.include "../../converters/libiconv/buildlink3.mk"
+.include "../../security/openssl/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"

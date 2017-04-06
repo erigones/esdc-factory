@@ -9,7 +9,7 @@ EXTRACT_SUFX=	.tar.gz
 
 MAINTAINER=		pkgsrc@erigones.com
 HOMEPAGE=		http://www.zabbix.com/
-COMMENT=		Zabbix monitoring proxy
+COMMENT=		Zabbix monitoring proxy compiled to use SQLite
 LICENSE=		gnu-gpl-v2
 
 GNU_CONFIGURE=	YES
@@ -22,10 +22,9 @@ CONFIGURE_ARGS+=	--enable-proxy
 CONFIGURE_ARGS+=	--with-openssl=${PREFIX}
 CONFIGURE_ARGS+=	--with-sqlite3=${PREFIX}
 CONFIGURE_ARGS+=	--with-libcurl
+CONFIGURE_ARGS+=	--with-fping=${PREFIX}
 
-BUILDLINK_API_DEPENDS.openssl+= openssl>=1.0
-BUILDLINK_API_DEPENDS.sqlite3+= sqlite3>=3.9.2
-BUILDLINK_API_DEPENDS.curl+= curl>=7.51.0
+DEPENDS+=		fping>=2.4b2:../../net/fping
 
 PKG_SYSCONFSUBDIR=	zabbix
 CONF_FILES=		${PKG_SYSCONFDIR}/zabbix_proxy.conf.example \
@@ -64,4 +63,12 @@ PKG_GID.${ZBXGROUP}=	${ZBXGID}
 post-install:
 	mv -f ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_proxy.conf ${DESTDIR}${PKG_SYSCONFDIR}/zabbix_proxy.conf.example
 
+.include "../../devel/zlib/buildlink3.mk"
+.include "../../converters/libiconv/buildlink3.mk"
+.include "../../www/curl/buildlink3.mk"
+.include "../../security/openssl/buildlink3.mk"
+.include "../../security/cyrus-sasl/buildlink3.mk"
+.include "../../security/libssh2/buildlink3.mk"
+.include "../../databases/sqlite3/buildlink3.mk"
+.include "../../databases/openldap-client/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
