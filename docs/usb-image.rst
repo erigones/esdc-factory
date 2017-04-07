@@ -26,6 +26,8 @@ Changelog
 - Updated zabbix agent to 3.0.8 [monitoring-2015Q4-20170324] - commit `07194fa <https://github.com/erigones/esdc-factory/commit/07194fa5637893b25a0fcc539c4c0c62fef4b836>`__
 - Fixed hard drive discovery on compute node [monitoring-2015Q4-20170324] - commit `273ad34 <https://github.com/erigones/esdc-factory/commit/273ad34e0c24ab7cb5f2de2f4478534bfa13230e>`__
 - Fixed various UX issues in installer - `#32 <https://github.com/erigones/esdc-factory/issues/32>`__
+- Fixed default value for "hostname" after pressing `no` in the installer's confirmation dialog - commit `4359a88 <https://github.com/erigones/esdc-factory/commit/4359a88874ac57e203c2ba22bac82b541c491556>`__
+- Unified indentation of all installer messages - commit `b87ba63 <https://github.com/erigones/esdc-factory/commit/b87ba63a459be1d367ee63d49923d79a9ee90269>`__
 
 2.5.1 (released on 2017-03-07)
 ==============================
