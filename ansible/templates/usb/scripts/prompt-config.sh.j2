@@ -958,10 +958,11 @@ while [ /usr/bin/true ]; do
 	promptval "Enter the domain name" "$domainname"
 	domainname="$val"
 {% if usb_type == "hn" %}
-	promptval "Enter system hostname" "headnode.$domainname"
+	[[ -z "$hostname" ]] && hostname="node01.$domainname"
 {% else %}
-	promptval "Enter system hostname" "computenode.$domainname"
+	[[ -z "$hostname" ]] && hostname="node02.$domainname"
 {% endif %}
+	promptval "Enter system hostname" "$hostname"
 	hostname="$val"
 	promptval "Enter the Primary DNS server IP" "$dns_resolver1"
 	dns_resolver1="$val"
