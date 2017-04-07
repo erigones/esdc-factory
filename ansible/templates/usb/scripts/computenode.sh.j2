@@ -95,7 +95,7 @@ function install_isos() {
 	zfs list zones/iso &>/dev/null
 	if [[ $? -eq 0 && -d "${USB_COPY}/isos" ]]; then
 		for iso in "${USB_COPY}"/isos/*.iso; do
-			printf_log "\r%-56s" "Copying $(basename "${iso}")... "
+			printf_log "\r%-64s" "Copying $(basename "${iso}")... "
 			cp "${iso}" /iso/
 			printf_log "%4s\n" "done"
 		done
@@ -106,7 +106,7 @@ function install_archives() {
 	{% for arch in usb_archives %}
 	if [[ ! -d "{{ arch.target }}" ]]; then
 		archive="{{ arch.name }}{{ builder.archive.ext }}"
-		printf_log "\r%-56s" "Preparing {{ arch.target }} by extracting ${archive}... "
+		printf_log "\r%-64s" "Preparing {{ arch.target }} by extracting ${archive}... "
 		gtar xf "${USB_COPY}/archives/${archive}" -C / &> /dev/null
 		printf_log "%4s\n" "done"
 	fi
@@ -114,7 +114,7 @@ function install_archives() {
 
 	if [[ ! -d "{{ usb_archive_esdc.target }}" ]]; then
 		archive="{{ usb_archive_esdc.name }}{{ builder.archive.ext }}"
-		printf_log "\r%-56s" "Preparing {{ usb_archive_esdc.target }} by extracting ${archive}... "
+		printf_log "\r%-64s" "Preparing {{ usb_archive_esdc.target }} by extracting ${archive}... "
 		gtar xf "${USB_COPY}/archives/${archive}" -C /opt &> /dev/null
 		printf_log "%4s\n" "done"
 	fi
@@ -136,7 +136,7 @@ function _zk() {
 function wait_for_cfgdb() {
 	set +e
 	while true; do
-		printf_log "\r%-56s" "Waiting for cfgdb availability... "
+		printf_log "\r%-64s" "Waiting for cfgdb availability... "
 		/usr/sbin/ping -s -n -I 1 ${CFGDB_IP} 1492 10 > /dev/null 2>&1
 		if [ $? -eq 0 ]; then
 			printf_log "done\n"
@@ -152,7 +152,7 @@ function query_cfgdb() {
 	# Wait for configuration database availability
 	wait_for_cfgdb
 
-	printf_log "\r%-56s" "Retrieving headnode configuration information from cfgdb... "
+	printf_log "\r%-64s" "Retrieving headnode configuration information from cfgdb... "
 
 	_mgmt_ip=$(_zk get "/esdc/settings/rabbitmq/host")
 	_mon_ip=$(_zk get "/esdc/settings/zabbix/host")
@@ -164,7 +164,7 @@ function query_cfgdb() {
 	fi
 
 	printf_log "%4s\n" "done"
-	printf_log "\r%-56s" "Registering compute node into cfgdb... "
+	printf_log "\r%-64s" "Registering compute node into cfgdb... "
 
 	set +e
 	__zk -force=true -c rmr "/esdc/nodes/hosts/${SYSINFO_UUID}" &> /dev/null
@@ -184,7 +184,7 @@ function query_cfgdb() {
 function inform_user() {
 	computenode_setup_duration=$(($(date +%s) - COMPUTENODE_SETUP_START))
 
-	printf_log "\r%-56s" "Waiting for Danube Cloud Compute Node to initialize... "
+	printf_log "\r%-64s" "Waiting for Danube Cloud Compute Node to initialize... "
 	sleep 60
 	printf_log "%4s\n" "done"
 
@@ -195,7 +195,7 @@ function inform_user() {
 function generate_ssh_keys() {
 	# We need to setup SSH key pair, so backups and data replication just work
 	if [[ ! -f "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}" ]] && [[ ! -f "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}" ]]; then
-		printf_log "%-56s" "Generating SSH key pair... "
+		printf_log "%-64s" "Generating SSH key pair... "
 		ssh-keygen -q -C "${CONFIG_hostname}" -t rsa -b 2048 -f "${CONFIG_config_inc_dir}/id_rsa" -q -N ''
 		chmod 400 "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}"
 		chmod 600 "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}"
@@ -226,7 +226,7 @@ function random_string() {
 }
 
 function reload_smf_manifests() {
-	printf_log "\r%-56s" "Reloading SMF manifests... "
+	printf_log "\r%-64s" "Reloading SMF manifests... "
 	/usr/sbin/svcadm restart svc:/system/manifest-import:default
 	printf_log "%4s\n" "done"
 }
@@ -236,7 +236,7 @@ function reload_smf_manifests() {
 #
 
 cr_once
-printf_log "%-56s\n" "==> Setup starting... "
+printf_log "%-64s\n" "==> Setup starting... "
 validate_config
 install_archives
 generate_ssh_keys

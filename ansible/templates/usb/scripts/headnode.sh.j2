@@ -111,7 +111,7 @@ function install_isos() {
 	zfs list zones/iso &>/dev/null
 	if [[ $? -eq 0 && -d "${USB_COPY}/isos" ]]; then
 		for iso in "${USB_COPY}"/isos/*.iso; do
-			printf_log "\r%-56s" "Copying $(basename "${iso}")... "
+			printf_log "\r%-64s" "Copying $(basename "${iso}")... "
 			cp "${iso}" /iso/
 			printf_log "%4s\n" "done"
 		done
@@ -138,7 +138,7 @@ function _install_image() {
 		img_uuid=$(json uuid < "${img_manifest}")
 
 		cr_once
-		printf_log "%-56s" "Copying image ${img_basename}... "
+		printf_log "%-64s" "Copying image ${img_basename}... "
 
 		img_dest="${img_repo_path}/${img_uuid}"
 
@@ -259,7 +259,7 @@ function create_vm() {
 		ds_uuid=$(json uuid < "${ds_manifest}")
 
 		if [[ ! -d "${SYS_ZPOOL}/${ds_uuid}" ]]; then
-			printf_log "%-58s" "Importing core image: ${ds_basename}... "
+			printf_log "%-64s" "Importing image ${ds_basename}... "
 			imgadm install -m "${ds_manifest}" -f "${ds_filename}"
 			printf_log "%4s\n" "done"
 		fi
@@ -273,13 +273,13 @@ function create_vm() {
 		vm_uuid=$(json uuid < "${vm_manifest}")
 
 		if vmadm list | grep "${vm_uuid}" > /dev/null; then
-			printf_log "%-58s" "VM ${vm} already exists... "
+			printf_log "%-64s" "VM ${vm} already exists... "
 			printf_log "%7s\n" "skipped"
 			return
 		fi
 	fi
 
-	printf_log "%-58s" "Creating VM ${vm}... "
+	printf_log "%-64s" "Creating VM ${vm}... "
 
 	vmadm create -f "${vm_manifest}"
 
@@ -353,7 +353,7 @@ get_mgmt_ssh_key() {
 }
 
 function import_smf_manifests() {
-	printf_log "%-56s" "Importing SMF manifests... "
+	printf_log "%-64s" "Importing SMF manifests... "
 
 	for manifest in /opt/custom/smf/*; do
 		svccfg validate "${manifest}" || fatal "Failed to validate SMF manifest at ${manifest}"
@@ -367,7 +367,7 @@ function install_archives() {
 	{% for arch in usb_archives %}
 	if [[ ! -d "{{ arch.target }}" ]]; then
 		archive="{{ arch.name }}{{ builder.archive.ext }}"
-		printf_log "%-56s" "Preparing {{ arch.target }} by extracting ${archive}... "
+		printf_log "%-64s" "Preparing {{ arch.target }} by extracting ${archive}... "
 		gtar xf "${USB_COPY}/archives/${archive}" -C / &> /dev/null
 		printf_log "%4s\n" "done"
 	fi
@@ -375,7 +375,7 @@ function install_archives() {
 
 	if [[ ! -d "{{ usb_archive_esdc.target }}" ]]; then
 		archive="{{ usb_archive_esdc.name }}{{ builder.archive.ext }}"
-		printf_log "%-56s" "Preparing {{ usb_archive_esdc.target }} by extracting ${archive}... "
+		printf_log "%-64s" "Preparing {{ usb_archive_esdc.target }} by extracting ${archive}... "
 		gtar xf "${USB_COPY}/archives/${archive}" -C /opt &> /dev/null
 		printf_log "%4s\n" "done"
 	fi
@@ -391,7 +391,7 @@ function _zk() {
 }
 
 function configure_cfgdb() {
-	printf_log "\r%-56s" "Saving configuration information into cfgdb... "
+	printf_log "\r%-64s" "Saving configuration information into cfgdb... "
 
 	_zk creater /esdc/settings/rabbitmq/username "{{ esdc_mgmt.rabbitmq.user }}"
 	_zk creater /esdc/settings/rabbitmq/password "${RABBITMQ_PASSWORD}"
@@ -457,7 +457,7 @@ function configure_cfgdb() {
 function inform_user() {
 	headnode_setup_duration=$(($(date +%s) - HEADNODE_SETUP_START))
 
-	printf_log "\r%-56s" "Waiting for Danube Cloud to initialize... "
+	printf_log "\r%-64s" "Waiting for Danube Cloud to initialize... "
 	sleep 60
 	printf_log "%4s\n" "done"
 
@@ -469,14 +469,14 @@ function inform_user() {
 	printf_log "==>   Monitoring URL: https://${MON_IP}\n"
 	printf_log "==>   Monitoring username: ${ZABBIX_ADMIN_USERNAME}\n"
 	printf_log "==>   Monitoring password: ${ZABBIX_ADMIN_PASSWORD}\n"
-    printf_log "==>   Configuration DB IP address: ${CFGDB_IP}\n"
+	printf_log "==>   Configuration DB IP address: ${CFGDB_IP}\n"
 	printf_log "==> Press [enter] to get login prompt or visit https://${MGMT_IP}.\n"
 }
 
 function generate_ssh_keys() {
 	# We need to setup SSH key pair, so backups and data replication just work
 	if [[ ! -f "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}" ]] && [[ ! -f "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}" ]]; then
-		printf_log "%-56s" "Generating SSH key pair... "
+		printf_log "%-64s" "Generating SSH key pair... "
 		ssh-keygen -q -C "${CONFIG_hostname}" -t rsa -b 2048 -f "${CONFIG_config_inc_dir}/id_rsa" -q -N ''
 		chmod 400 "${CONFIG_config_inc_dir}/${CONFIG_ssh_private_key_file}"
 		chmod 600 "${CONFIG_config_inc_dir}/${CONFIG_ssh_public_key_file}"
@@ -517,7 +517,7 @@ function random_string() {
 #
 
 cr_once
-printf_log "%-56s\n" "==> Setup starting... "
+printf_log "%-64s\n" "==> Setup starting... "
 validate_config
 install_archives
 generate_ssh_keys
