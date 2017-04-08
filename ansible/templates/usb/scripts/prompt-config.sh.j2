@@ -964,10 +964,14 @@ while [ /usr/bin/true ]; do
 {% endif %}
 	promptval "Enter system hostname" "$hostname"
 	hostname="$val"
+
 	promptval "Enter the Primary DNS server IP" "$dns_resolver1"
 	dns_resolver1="$val"
 	promptval "Enter the Secondary DNS server IP" "$dns_resolver2"
 	dns_resolver2="$val"
+
+	[[ -z "$dns_domain" ]] && dns_domain="$domainname"
+
 	promptval "Default DNS search domain" "$dns_domain"
 	dns_domain="$val"
 
