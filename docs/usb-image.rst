@@ -28,6 +28,7 @@ Changelog
 - Fixed various UX issues in installer - `#32 <https://github.com/erigones/esdc-factory/issues/32>`__
 - Fixed default value for "hostname" after pressing `no` in the installer's confirmation dialog - commit `4359a88 <https://github.com/erigones/esdc-factory/commit/4359a88874ac57e203c2ba22bac82b541c491556>`__
 - Unified indentation of all installer messages - commit `b87ba63 <https://github.com/erigones/esdc-factory/commit/b87ba63a459be1d367ee63d49923d79a9ee90269>`__
+- Added default value (*domain name*) for *DNS search domain* in the installer - commit `2a163b2 <https://github.com/erigones/esdc-factory/commit/2a163b285f5940becbd093b1768cafd831096e66>`__
 
 2.5.1 (released on 2017-03-07)
 ==============================
