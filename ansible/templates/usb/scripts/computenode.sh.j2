@@ -227,8 +227,10 @@ function random_string() {
 
 function reload_smf_manifests() {
 	printf_log "\r%-64s" "Reloading SMF manifests... "
-	/usr/sbin/svcadm restart svc:/system/manifest-import:default
 	printf_log "%4s\n" "done"
+	# This will make the output to look nicer/aligned
+	/usr/sbin/svcadm disable -s svc:/system/manifest-import:default
+	/usr/sbin/svcadm enable -s svc:/system/manifest-import:default
 }
 
 #
