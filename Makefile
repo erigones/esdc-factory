@@ -68,7 +68,7 @@ endef
 .PHONY: help init check clean imgapi-tree all $(BUILD_TARGETS) $(clean_targets)
 
 help:
-	@echo "$(subst $(newline),\n,${HELP_TEXT})"
+	@echo -e "$(subst $(newline),\n,${HELP_TEXT})"
 
 init:
 	@bin/ansible.sh init
