@@ -19,8 +19,8 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.5.2 (unreleased)
-==================
+2.5.2 (released on 2017-04-11)
+==============================
 
 - Fixed "install to HDD" question handling after pressing `no` in the installer's confirmation dialog - commit `d065712 <https://github.com/erigones/esdc-factory/commit/d0657120eef3a5ef472fdf8ad98984d0a4bc598c>`__
 - Updated zabbix agent to 3.0.8 [monitoring-2015Q4-20170324] - commit `07194fa <https://github.com/erigones/esdc-factory/commit/07194fa5637893b25a0fcc539c4c0c62fef4b836>`__
