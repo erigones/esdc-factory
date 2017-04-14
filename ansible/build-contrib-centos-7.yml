@@ -7,7 +7,7 @@
 - name: Create virtual machine
   hosts: buildnode
   vars_files:
-    - vars/build/vm/centos-6.yml
+    - vars/build/vm/contrib-centos-7.yml
   pre_tasks:
     - include: tasks/build/cleanup.yml
     - include: tasks/build/prepare-base-image.yml
@@ -15,21 +15,30 @@
     - smartos-vm
   tasks:
     - include: tasks/build/centos/register-host.yml
-        hostname=centos-6
+        hostname=contrib-centos-7
 
 - name: Install and configure appliance
-  hosts: centos-6
+  hosts: contrib-centos-7
   gather_facts: true
+  vars_files:
+    - vars/build/os/contrib-centos-7.yml
+  # Change hostname back to localhost.localdomain
+  pre_tasks:
+    - name: Configure hostname
+      hostname: name=localhost.localdomain
   roles:
     - iptables
     - cloud-init
     - mdata-client
+    - rc-scripts
     - qemu-guest-agent
+    - zabbix-agent
+    - contrib-centos-7
     - vm-image
 
 - name: Create and save image
   hosts: buildnode
   vars_files:
-    - vars/build/vm/centos-6.yml
+    - vars/build/vm/contrib-centos-7.yml
   tasks:
     - include: tasks/build/centos/create-image.yml
