@@ -5,7 +5,6 @@
   yum: name="{{ item }}" state=present
   with_items:
     - man-pages
-    - vim-enhanced
     - screen
 
 - name: Install /var/lib/rc-scripts/21-zabbix-agent.sh
