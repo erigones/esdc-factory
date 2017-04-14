@@ -1,10 +1,10 @@
-root_pw: ""  # auto-generate password
-grub_pw: null
-
 rc_scripts_after:
   - zabbix-agent.service
   - cloud-final.service
 
+firewall_allowed_tcp_ports:
+  - port: 22
+  - port: 10050
+
 selinux_permissive_domains:
   - zabbix_agent_t
-

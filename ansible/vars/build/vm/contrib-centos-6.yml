@@ -1,16 +1,16 @@
 # Dependencies: base.yml, zone.yml
 image_name: centos-6
 image_desc: "Minimal CentOS 6 image with cloud-init"
-image_homepage: "{{ image_base_homepage }}#centos-6"
+image_homepage: "{{ image_contrib_homepage }}/centos-6.rst"
 remove_base_image: true
-builder_dir: "{{ builder.appliance.dir }}/centos-6"
+builder_dir: "{{ builder.appliance.dir }}/contrib-centos-6"
 builder_base_centos_imgmanifest: base-centos-6-latest.imgmanifest
 builder_base_centos_imgfile: base-centos-6-latest.zfs.gz
 builder_base_centos_imgmanifest_url: "{{ builder.appliance.url }}/base-centos-6/{{ builder_base_centos_imgmanifest }}"
 builder_base_centos_imgfile_url: "{{ builder.appliance.url }}/base-centos-6/{{ builder_base_centos_imgfile }}"
 base_centos_imgmanifest: "{{ lookup('pipe', 'curl -s {{ builder_base_centos_imgmanifest_url }}') | from_json }}"
 zone_brand: kvm
-zone_vnc_port: "{{ build_vnc_ports.centos6 | default(build_vnc_port) | mandatory }}"
+zone_vnc_port: "{{ build_vnc_ports.contrib_centos6 | default(build_vnc_port) | mandatory }}"
 zone_uuid: 92fafd5c-d6c9-11e4-bf58-c3f14a8e0832
 zone_hostname: "{{ image_name }}"
 zone_disks:
@@ -19,4 +19,4 @@ zone_disks:
     image_size: "{{ base_centos_imgmanifest.image_size }}"
     image_uuid: "{{ base_centos_imgmanifest.uuid }}"
     refreservation: "{{ base_centos_imgmanifest.image_size }}"
-zone_nic_0_ip: "{{ build_ips.centos6 | default(build_ip) }}"
+zone_nic_0_ip: "{{ build_ips.contrib_centos6 | default(build_ip) }}"

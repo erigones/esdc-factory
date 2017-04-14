@@ -8,6 +8,7 @@ rc_scripts_after:
   - zabbix-agent.service
   - zabbix-server.service
   - httpd.service
+  - cloud-final.service
 
 firewall_allowed_tcp_ports:
   - port: 22

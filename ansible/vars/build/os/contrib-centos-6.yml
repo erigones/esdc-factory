@@ -1,0 +1,2 @@
+firewall_allowed_tcp_ports:
+  - port: 22
