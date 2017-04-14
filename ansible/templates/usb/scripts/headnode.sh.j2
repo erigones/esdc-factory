@@ -393,6 +393,10 @@ function _zk() {
 function configure_cfgdb() {
 	printf_log "\r%-64s" "Saving configuration information into cfgdb... "
 
+	_zk creater /esdc/settings/dc/datacenter_name "${CONFIG_datacenter_name}"
+	_zk creater /esdc/settings/dc/ntp_hosts "${CONFIG_ntp_hosts}"
+	_zk creater /esdc/settings/dc/admin_email "${CONFIG_admin_email}"
+
 	_zk creater /esdc/settings/rabbitmq/username "{{ esdc_mgmt.rabbitmq.user }}"
 	_zk creater /esdc/settings/rabbitmq/password "${RABBITMQ_PASSWORD}"
 	_zk creater /esdc/settings/rabbitmq/host "${MGMT_IP}"
