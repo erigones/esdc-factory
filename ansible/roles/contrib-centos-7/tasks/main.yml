@@ -1,0 +1,11 @@
+- fail: msg="Invalid OS; Only CentOS 7 is supported."
+  when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "7"
+
+- name: Install additional packages
+  yum: name="{{ item }}" state=present
+  with_items:
+    - man-pages
+    - screen
+
+- name: Install /var/lib/rc-scripts/21-zabbix-agent.sh
+  copy: src=zabbix-agent.sh dest=/var/lib/rc-scripts/21-zabbix-agent.sh mode=0750 owner=root group=root

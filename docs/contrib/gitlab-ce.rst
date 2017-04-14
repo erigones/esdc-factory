@@ -18,6 +18,12 @@ The image supports following metadata:
 Changelog
 ---------
 
+20170414
+~~~~~~~~
+
+- GitLab CE 9.0.5
+
+
 20170222
 ~~~~~~~~
 

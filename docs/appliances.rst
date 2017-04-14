@@ -1,7 +1,7 @@
 Danube Cloud :: Factory :: Appliances
 #####################################
 
-Danube Cloud appliances (VM images), which are part of the Danube Cloud head node image:
+Danube Cloud appliances (VM images), which are part of the Danube Cloud head node USB image:
 
     * `base-64-es`_ (OS zone)
     * `esdc-cfgdb`_ (OS zone)
@@ -10,10 +10,7 @@ Danube Cloud appliances (VM images), which are part of the Danube Cloud head nod
     * `esdc-mgmt`_ (KVM)
     * `esdc-mon`_ (KVM)
 
-Additional VM appliances are available for download at the public Danube Cloud image repository - https://images.danubecloud.org:
-
-    * `centos-6`_ (KVM)
-    * `centos-7`_ (KVM)
+`Additional VM appliances <contrib>`_ are available for download at the public Danube Cloud image repository - https://images.danubecloud.org.
 
 
 ------------------------------------------------------------
@@ -23,7 +20,7 @@ base-64-es
 ==========
 
 * **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
-* **org.erigones:zabbix_ip**: ``Server`` and ``ServerActive`` parameters zabbix_agentd.conf.
+* **org.erigones:zabbix_ip**: ``Server`` and ``ServerActive`` parameters in zabbix_agentd.conf.
 
 Changelog
 ---------
@@ -245,14 +242,14 @@ Changelog
 esdc-mgmt
 =========
 
-The *esdc-mgmt* appliance is a `centos-7`_ virtual machine with the Danube Cloud application stack.
+The *esdc-mgmt* appliance is a `CentOS 7 <contrib/centos-7.rst>`_ virtual machine with the Danube Cloud application stack.
 The image supports following metadata:
 
 * **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
-* **org.erigones:zabbix_ip**: ``Server`` and ``ServerActive`` parameters zabbix_agentd.conf.
+* **org.erigones:zabbix_ip**: ``Server`` and ``ServerActive`` parameters in zabbix_agentd.conf.
 * **org.erigones:rabbitmq_password**: esDC RabbitMQ password.
 * **org.erigones:redis_password**: esDC Redis password.
-* **org.erigones:pgsql_esdc_password**: esDc PostgreSQL password.
+* **org.erigones:pgsql_esdc_password**: esDC PostgreSQL password.
 * **org.erigones:pgsql_pdns_password**: esDC PostgreSQL password for PowerDNS.
 * **org.erigones:zabbix_server**: MON_ZABBIX_SERVER in esDC. If not set, monitoring support will be disabled.
 * **org.erigones:zabbix_esdc_username**: MON_ZABBIX_USERNAME in esDC.
@@ -311,11 +308,11 @@ Changelog
 esdc-mon
 ========
 
-The *esdc-mon* appliance is a `centos-7`_ virtual machine with Zabbix server pre-installed.
+The *esdc-mon* appliance is a `CentOS 7 <contrib/centos-7.rst>`_ virtual machine with Zabbix server pre-installed.
 The image supports following metadata:
 
 * **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
-* **org.erigones:zabbix_ip**: ``Server`` and ``ServerActive`` parameters zabbix_agentd.conf.
+* **org.erigones:zabbix_ip**: ``Server`` and ``ServerActive`` parameters in zabbix_agentd.conf.
 * **org.erigones:zabbix_esdc_password**: *provisioner* zabbix user password.
 * **org.erigones:zabbix_admin_password**: *Admin* zabbix user password.
 * **org.erigones:zabbix_admin_email**: create *E-mail* media type with this email for user *Admin*.
@@ -390,109 +387,12 @@ Changelog
 centos-6
 ========
 
-Minimal `CentOS 6 <https://www.centos.org/>`__ virtual machine with support for initialization through `Cloud-init <https://cloudinit.readthedocs.io/>`__.
-The image supports following metadata:
-
-* **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
-* **cloud-init** modules: ssh, set-passwords.
-
-Changelog
----------
-
-2.5.2
-~~~~~
-
-- Added mdata-client (mdata-list, mdata-get, etc.) - commit `a49b73f <https://github.com/erigones/esdc-factory/commit/a49b73f757c7d0f4910179c5934999bb0ce8e4fa>`__
-
-2.5.1
-~~~~~
-
-- Version bump.
-
-2.5.0
-~~~~~
-
-- Version bump.
-
-2.4.0
-~~~~~
-
-- Version bump.
-
-2.3.3
-~~~~~
-
-- Version bump.
-
-2.3.2
-~~~~~
-
-- Version bump.
-
-2.3.1
-~~~~~
-
-- Version bump.
-
-2.3.0
-~~~~~
-
-- Initial release.
-
+Moved to `contrib <contrib/centos-6.rst>`_.
 
 ------------------------------------------------------------
-
 
 centos-7
 ========
 
-Minimal `CentOS 7 <https://www.centos.org/>`__ virtual machine with support for initialization through `Cloud-init <https://cloudinit.readthedocs.io/>`__.
-The image supports following metadata:
-
-* **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
-* **cloud-init** modules: growpart, resizefs, ssh, set-passwords.
-
-Changelog
----------
-
-2.5.2
-~~~~~
-
-- Added mdata-client (mdata-list, mdata-get, etc.) - commit `a49b73f <https://github.com/erigones/esdc-factory/commit/a49b73f757c7d0f4910179c5934999bb0ce8e4fa>`__
-- Increased swap size - `#103 <https://github.com/erigones/esdc-ce/issues/103>`__
-
-2.5.1
-~~~~~
-
-- Version bump.
-
-2.5.0
-~~~~~
-
-- Version bump.
-
-2.4.0
-~~~~~
-
-- Version bump.
-
-2.3.3
-~~~~~
-
-- Removed chrony (using ntpd instead) - commit `17880ed <https://github.com/erigones/esdc-factory/commit/17880ed7459ae455151eabb65094d5e91327d8f2>`__
-
-2.3.2
-~~~~~
-
-- Version bump.
-
-2.3.1
-~~~~~
-
-- Version bump.
-
-2.3.0
-~~~~~
-
-- Initial release.
+Moved to `contrib <contrib/centos-7.rst>`_.
 

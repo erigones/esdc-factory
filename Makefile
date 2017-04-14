@@ -1,14 +1,14 @@
 BUILD_TARGETS =	base-centos-6 \
 				base-centos-7 \
 				base-64-es \
-				centos-6 \
-				centos-7 \
 				esdc-mon \
 				esdc-mgmt \
 				esdc-cfgdb \
 				esdc-dns \
 				esdc-img \
 				esdc-node \
+				contrib-centos-6 \
+				contrib-centos-7 \
 				contrib-gitlab-ce \
 				contrib-centos7-desktop
 
@@ -44,7 +44,7 @@ define HELP_TEXT
   clean          delete all appliance VMs and their base images in reverse order
   clean-<app>    delete appliance VM and its base image
   all            build all appliances/images
-  base           build all base appliances (base-centos-6 base-centos-7 base-64-es centos-6 centos-7)
+  base           build all base appliances (base-centos-6 base-centos-7 base-64-es)
   esdc           build all Danube Cloud appliances (esdc-mon, esdc-mgmt, esdc-cfgdb, esdc-dns, esdc-img, esdc-node)
   <app>          build an appliance/image, one of:
 
@@ -68,7 +68,7 @@ endef
 .PHONY: help init check clean imgapi-tree all $(BUILD_TARGETS) $(clean_targets)
 
 help:
-	@echo -e "$(subst $(newline),\n,${HELP_TEXT})"
+	@printf "$(subst $(newline),\n,${HELP_TEXT})"
 
 init:
 	@bin/ansible.sh init
@@ -97,7 +97,7 @@ $(BUILD_TARGETS):
 
 all: $(BUILD_TARGETS)
 
-base: base-centos-6 base-centos-7 base-64-es centos-6 centos-7
+base: base-centos-6 base-centos-7 base-64-es
 
 esdc: esdc-mon esdc-mgmt esdc-cfgdb esdc-dns esdc-img esdc-node
 
