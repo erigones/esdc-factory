@@ -28,6 +28,7 @@
       hostname: name=localhost.localdomain
   roles:
     - iptables
+    - selinux
     - cloud-init
     - mdata-client
     - rc-scripts
