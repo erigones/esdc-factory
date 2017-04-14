@@ -326,6 +326,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+2.6.0
+-----
+
+- Decreased severity of *Too many SCSI errors on disk...* alert and increased DISK_ERRORS_THRESHOLD - `#40 <https://github.com/erigones/esdc-factory/issues/40>`__
+
 2.5.2
 ~~~~~
 
