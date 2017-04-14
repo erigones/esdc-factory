@@ -3,6 +3,7 @@ grub_pw: null
 
 rc_scripts_after:
   - zabbix-agent.service
+  - cloud-final.service
 
 firewall_allowed_tcp_ports:
   - port: 22

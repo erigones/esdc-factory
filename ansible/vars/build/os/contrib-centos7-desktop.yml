@@ -3,6 +3,7 @@ grub_pw: null
 
 rc_scripts_after:
   - zabbix-agent.service
+  - cloud-final.service
 
 selinux_permissive_domains:
   - zabbix_agent_t

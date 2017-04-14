@@ -10,6 +10,7 @@ rc_scripts_after:
   - zabbix-agent.service
   - nginx.service
   - haproxy.service
+  - cloud-final.service
 
 postgresql_databases:
   - name: "{{ esdc_mgmt.pgsql_esdc.name | mandatory }}"
