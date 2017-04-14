@@ -790,7 +790,7 @@ promptpool()
 				print diskinfo;
 			}' > /var/tmp/mydisks
 
-		# We cannot suggest raidz? layouts when installing on HDD
+		# We cannot suggest raidz layouts when installing on HDD
 		if [[ "${install_to_hdd}" -eq 1 ]]; then
 			mirror_candidates=$(disklist -s | nawk -F'=' '{ print $2 }' | sort | uniq -c | nawk '{ print $1 }' | grep -c "^2$")
 
