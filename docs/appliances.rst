@@ -146,6 +146,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.6.0
+~~~~~
+
+- Changed default PowerDNS server settings to be preconfigured as a master name server - `#41 <https://github.com/erigones/esdc-factory/issues/41>`__
+
 2.5.2
 ~~~~~
 
