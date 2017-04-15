@@ -1568,7 +1568,8 @@ web management.\n\n"
 {% else %}
 	prompt_host_ok_val "Configuration database IP address" "${cfgdb_admin_ip}" "cfgdb_admin_ip"
 	cfgdb_admin_ip="${val}"
-	check_cfgdb
+	skip_cfgdb_check=$(getanswer "skip_cfgdb_check")
+	[[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]] && check_cfgdb
 {% endif %}
 
 	echo
@@ -1596,7 +1597,7 @@ installing the first compute node.\n\n"
 {% else %}
 	promptpw "Enter configuration master password" "nolen" "${esdc_install_password}" "esdc_install_password"
 	esdc_install_password="${val}"
-	query_cfgdb  # This will set the datacenter_name
+	[[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]] && query_cfgdb  # This will set the datacenter_name
 {% endif %}
 
 {% if usb_type == "hn" %}
