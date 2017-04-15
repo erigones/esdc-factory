@@ -35,6 +35,7 @@
     - qemu-guest-agent
     - zabbix-agent
     - contrib-centos-7
+    - passwords
     - vm-image
 
 - name: Create and save image

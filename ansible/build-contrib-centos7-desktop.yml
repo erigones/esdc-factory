@@ -23,7 +23,6 @@
   vars_files:
     - vars/build/os/contrib-centos7-desktop.yml
   roles:
-    - esdc-common
     - selinux
     - zabbix-agent
     - cloud-init
