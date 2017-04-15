@@ -26,4 +26,8 @@
   user: name=root password={{ root_pw }}
   when: root_pw is defined and root_pw
 
+- name: Delete root account password
+  shell: passwd -d root
+  when: root_pw is defined and root_pw == null
+
 # NOTE: After changing the root password ansible may not be able to access the machine
