@@ -27,6 +27,7 @@
     - cloud-init
     - mdata-client
     - qemu-guest-agent
+    - passwords
     - vm-image
 
 - name: Create and save image

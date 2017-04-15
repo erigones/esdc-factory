@@ -1,2 +1,4 @@
+root_pw: ""  # auto-generate password
+
 firewall_allowed_tcp_ports:
   - port: 22

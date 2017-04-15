@@ -186,6 +186,12 @@ tar xvvf /tmp/linux-rootfs-resize.tar.gz
 cd /tmp/linux-rootfs-resize-master
 ./install
 
+echo "Add builder SSH key"
+mkdir /root/.ssh
+chmod 0700 /root/.ssh
+echo '{{ builder_ssh_key }}' > /root/.ssh/authorized_keys
+chmod 0600 /root/.ssh/authorized_keys
+
 echo "Include prepare-image"
 curl -o /usr/sbin/prepare-image {{ builder_download_url }}/prepare-image
 chown root:root /usr/sbin/prepare-image

@@ -1,3 +1,5 @@
+root_pw: ""  # auto-generate password
+
 rc_scripts_after:
   - zabbix-agent.service
   - cloud-final.service

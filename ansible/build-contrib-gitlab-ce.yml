@@ -23,7 +23,6 @@
   vars_files:
     - vars/build/os/contrib-gitlab-ce.yml
   roles:
-    - esdc-common
     - selinux
     - zabbix-agent
     - cloud-init
