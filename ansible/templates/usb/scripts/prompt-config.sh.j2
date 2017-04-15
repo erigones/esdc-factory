@@ -844,8 +844,7 @@ EOF
 		if [[ "${install_to_hdd}" -eq 1 ]]; then
 			prmpt_str+=".\n"
 		else
-			prmpt_str+=",\n"
-			prmpt_str+="                                         'raidz1', 'raidz2', or 'raidz3'.\n"
+			prmpt_str+=",\n'raidz1', 'raidz2', or 'raidz3'.\n"
 		fi
 		prmpt_str+=" To specify a manual configuration, type: 'manual'.\n\n"
 		print $prmpt_str
@@ -1407,6 +1406,7 @@ The configured NIC will be used to access the compute node.\n\n"
 	done
 
 	promptvlan "(admin) VLAN ID" "$admin_vlan_id" "admin_vlan_id"
+	admin_vlan_id="$val"
 
 	printheader "Networking - Continued"
 	message=""
@@ -1626,7 +1626,6 @@ the system will set up and all data on the disks will be erased.\n\n"
 	fi
 
 	if [[ $(getanswer "skip_final_summary") != "true" ]]; then
-		printf "Datacenter name: %s\n" "$datacenter_name"
 		echo
 		printf "%8s %17s %15s %15s %15s\n" "Net" "MAC" "IP addr." "Netmask" "VLAN ID"
 		if [[ "$admin_ip" == "dhcp" ]]; then
@@ -1642,6 +1641,7 @@ the system will set up and all data on the disks will be erased.\n\n"
 		[[ "${install_to_hdd}" -eq 1 ]] && tohdd="Yes" || tohdd="No"
 		printf "Install to HDD: %s\n" "${tohdd}"
 		echo
+		printf "Datacenter name: %s\n" "$datacenter_name"
 {% if usb_type == "hn" %}
 		printf "Management portal IP address: %s\n" "${mgmt_admin_ip}"
 		printf "Administrator's e-mail address: %s\n" "${admin_email}"
