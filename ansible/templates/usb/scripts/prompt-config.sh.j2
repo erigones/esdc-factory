@@ -664,8 +664,8 @@ nicsup()
 	local vlan_opts=""
 
 	if [[ -n "${admin_vlan_id}" && "${admin_vlan_id}" -ne 0 ]]; then
-		admin_iface_active="${admin_iface}.${admin_vlan_id}"
-		dladm create-vlan -l ${admin_iface} -v ${admin_vlan_id} ${admin_iface_active}
+		admin_iface_active="${admin_iface}0"
+		dladm create-vnic -l ${admin_iface} -v ${admin_vlan_id} ${admin_iface_active}
 	else
 		admin_iface_active="${admin_iface}"
 	fi
@@ -701,7 +701,7 @@ nicsdown()
 	ifconfig ${admin_iface_active} inet down unplumb
 
 	if [[ -n "${admin_vlan_id}" && "${admin_vlan_id}" -ne 0 ]]; then
-		dladm delete-vlan ${admin_iface_active}
+		dladm delete-vnic ${admin_iface_active}
 	fi
 
 	if [[ -n ${external_nic} ]]; then
@@ -1635,7 +1635,8 @@ the system will set up and all data on the disks will be erased.\n\n"
 			printf "%8s %17s %15s %15s %15s %15s\n" "Admin" $admin_nic $admin_ip $admin_netmask $admin_vlan_id
 		fi
 		echo
-		printf "DNS Servers: (%s, %s), Search Domain: %s\n" "$dns_resolver1" "$dns_resolver2" "$dns_domain"
+		printf "DNS Servers: (%s, %s)\n" "$dns_resolver1" "$dns_resolver2"
+		printf "Search Domain: %s\n" "$dns_domain"
 		printf "Hostname: %s\n" "$hostname"
 		printf "NTP server: %s\n" "$ntp_hosts"
 		echo
