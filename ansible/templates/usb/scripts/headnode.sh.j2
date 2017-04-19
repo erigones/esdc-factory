@@ -173,6 +173,7 @@ function _build_vmmanifest() {
 			sed -e "s|@DNS_IP@|${DNS_IP}|" \
 				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
 				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@ADMIN_VLAN_ID@|${ADMIN_VLAN_ID}|" \
 				-e "s|@CFGDB_IP@|${CFGDB_IP}|" \
 				-e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
@@ -184,6 +185,7 @@ function _build_vmmanifest() {
 			sed -e "s|@DNS_IP@|${DNS_IP}|" \
 				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
 				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@ADMIN_VLAN_ID@|${ADMIN_VLAN_ID}|" \
 				-e "s|@MGMT_IP@|${MGMT_IP}|" \
 				-e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
@@ -195,6 +197,7 @@ function _build_vmmanifest() {
 			sed -e "s|@IMG_IP@|${IMG_IP}|" \
 				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
 				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@ADMIN_VLAN_ID@|${ADMIN_VLAN_ID}|" \
 				-e "s|@DNS_IP@|${DNS_IP}|" \
 				-e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
@@ -205,6 +208,7 @@ function _build_vmmanifest() {
 			sed -e "s|@MGMT_IP@|${MGMT_IP}|" \
 				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
 				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@ADMIN_VLAN_ID@|${ADMIN_VLAN_ID}|" \
 				-e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@DNS_IP@|${DNS_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
@@ -222,6 +226,7 @@ function _build_vmmanifest() {
 			sed -e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@ADMIN_NETMASK@|${ADMIN_NETMASK}|" \
 				-e "s|@ADMIN_GATEWAY@|${ADMIN_GATEWAY}|" \
+				-e "s|@ADMIN_VLAN_ID@|${ADMIN_VLAN_ID}|" \
 				-e "s|@DNS_IP@|${DNS_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
 				-e "s|@ZABBIX_ESDC_PASSWORD@|${ZABBIX_ESDC_PASSWORD}|" \
@@ -530,6 +535,7 @@ generate_ssh_keys
 ROOT_AUTHORIZED_KEYS="$(cat "/root/.ssh/${CONFIG_ssh_public_key_file}")"
 ADMIN_NETMASK="${CONFIG_admin_netmask}"
 ADMIN_GATEWAY="${CONFIG_headnode_default_gateway}"
+ADMIN_VLAN_ID="${CONFIG_admin_vlan_id:-0}"
 MGMT_IP="${CONFIG_mgmt_admin_ip}"
 MON_IP="${CONFIG_mon_admin_ip}"
 DNS_IP="${CONFIG_dns_admin_ip}"
