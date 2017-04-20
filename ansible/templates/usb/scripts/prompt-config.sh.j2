@@ -664,7 +664,7 @@ nicsup()
 	local vlan_opts=""
 
 	if [[ -n "${admin_vlan_id}" && "${admin_vlan_id}" -ne 0 ]]; then
-		admin_iface_active="${admin_iface}0"
+		admin_iface_active="admin0"
 		dladm create-vnic -l ${admin_iface} -v ${admin_vlan_id} ${admin_iface_active}
 	else
 		admin_iface_active="${admin_iface}"
