@@ -16,6 +16,8 @@ pdns_local_port: 53
 
 pdns_loglevel: 4
 
+pdns_master: "no"
+
 pdns_max_cache_entries: 1000000
 pdns_max_queue_length: 5000
 pdns_max_tcp_connections: 10
