@@ -539,10 +539,14 @@ promptvlan()
 	while [ /usr/bin/true ]; do
 		promptopt "${msg}" "${def}" "${key}"
 
-		[[ -z "${val}" ]] && break
-		isdigit ${val} && [[ "${val}" -ge 1 && "${val}" -le 4095 ]] && break
+		if [[ -z "${val}" || "${val}" -eq 0 || "${val}" == "none" ]]; then
+			val=""
+			break
+		elif isdigit "${val}" && [[ "${val}" -ge 1 && "${val}" -le 4095 ]]; then
+			break
+		fi
 
-		echo "A valid VLAN ID (1-4095) or empty string must be provided."
+		echo "A valid VLAN ID (1-4095) or \"none\" or empty string must be provided."
 	done
 }
 
@@ -666,6 +670,7 @@ nicsup()
 	if [[ -n "${admin_vlan_id}" && "${admin_vlan_id}" -ne 0 ]]; then
 		admin_iface_active="admin0"
 		dladm create-vnic -l ${admin_iface} -v ${admin_vlan_id} ${admin_iface_active}
+		ifconfig ${admin_iface_active} plumb
 	else
 		admin_iface_active="${admin_iface}"
 	fi
@@ -1707,6 +1712,7 @@ platform=$(smbios -t1 | nawk '{if ($1 == "Product:") print $2}')
 [ "$platform" == "VMware" ] && echo "coal=true" >>$tmp_config
 
 echo "admin_nic=$admin_nic" >>$tmp_config
+echo "admin_vlan_id=$admin_vlan_id" >>$tmp_config
 echo "admin_ip=$admin_ip" >>$tmp_config
 if [[ "$admin_ip" != "dhcp" ]]; then
 	echo "admin_netmask=$admin_netmask" >>$tmp_config
