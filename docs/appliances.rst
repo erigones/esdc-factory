@@ -259,6 +259,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+2.5.3
+~~~~~
+
+- Added bash completion for *es* - commit `ac851d0 <https://github.com/erigones/esdc-factory/commit/ac851d015da0347afa2bf4f4ee6120b83eab12ef>`__
+
 2.5.2
 ~~~~~
 
