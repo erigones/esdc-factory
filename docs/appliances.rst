@@ -84,6 +84,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.5.3
+~~~~~
+
+- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
+
 2.5.2
 ~~~~~
 
@@ -143,6 +148,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.5.3
+~~~~~
+
+- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
+
 2.5.2
 ~~~~~
 
@@ -194,6 +204,11 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 
 Changelog
 ---------
+
+2.5.3
+~~~~~
+
+- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
 ~~~~~
@@ -263,6 +278,7 @@ Changelog
 ~~~~~
 
 - Added bash completion for *es* - commit `ac851d0 <https://github.com/erigones/esdc-factory/commit/ac851d015da0347afa2bf4f4ee6120b83eab12ef>`__
+- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
 ~~~~~
@@ -332,6 +348,11 @@ Changelog
 -----
 
 - Decreased severity of *Too many SCSI errors on disk...* alert and increased DISK_ERRORS_THRESHOLD - `#40 <https://github.com/erigones/esdc-factory/issues/40>`__
+
+2.5.3
+~~~~~
+
+- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
 ~~~~~

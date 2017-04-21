@@ -23,6 +23,8 @@ esdc_pre_boot() {
 	log "$(sudo -u erigones ${CTL} pre_boot 2>&1)"
 }
 
+# allow updating authorized_keys from mdata on every reboot
+# https://github.com/erigones/esdc-factory/issues/43
 log "Populating authorized_keys"
 AUTHORIZED_KEYS="$(mdata-get root_authorized_keys || echo '')"
 mkdir -pm 700 /root/.ssh
