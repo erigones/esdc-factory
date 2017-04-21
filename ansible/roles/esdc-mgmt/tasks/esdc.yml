@@ -172,6 +172,11 @@
 - name: Restore SELinux contexts
   command: /sbin/restorecon -FR /opt/erigones
 
+- name: Enable bash completion for es
+  file: path=/etc/bash_completion.d/es_bash_completion.sh
+        src=/opt/erigones/doc/api/es_bash_completion.sh
+        state=link
+
 #
 # Configure other services related to Danube Cloud
 #
