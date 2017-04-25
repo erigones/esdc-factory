@@ -1085,6 +1085,7 @@ setup_datasets()
 		zfs create ${BACKUPDS} || fatal "failed to create the backup dataset"
 		zfs create -o compression=lz4 ${BACKUPDS}/file || fatal "failed to create file backup dataset"
 		zfs create -o compression=lz4 ${BACKUPDS}/ds || fatal "failed to create dataset backup dataset"
+		zfs create -o compression=lz4 ${BACKUPDS}/manifests || fatal "failed to create manifests backup dataset"
 		printf "%4s\n" "done"
 	fi
 
