@@ -156,7 +156,7 @@ Changelog
 2.5.3
 ~~~~~
 
-- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
+- Add support for appending additional SSH authorized_keys into the service VMs - `#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
 ~~~~~
@@ -213,7 +213,7 @@ Changelog
 2.5.3
 ~~~~~
 
-- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
+- Add support for appending additional SSH authorized_keys into the service VMs - `#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
 ~~~~~
@@ -283,7 +283,7 @@ Changelog
 ~~~~~
 
 - Added bash completion for *es* - commit `ac851d0 <https://github.com/erigones/esdc-factory/commit/ac851d015da0347afa2bf4f4ee6120b83eab12ef>`__
-- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
+- Add support for appending additional SSH authorized_keys into the service VMs - `#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
 ~~~~~
@@ -357,7 +357,7 @@ Changelog
 2.5.3
 ~~~~~
 
-- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
+- Add support for appending additional SSH authorized_keys into the service VMs - `#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
 ~~~~~
