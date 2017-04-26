@@ -2,3 +2,13 @@
 - name: Set up esDC-specific authorized keys for the root user
   authorized_key: user=root key="{{ item }}"
   with_file: "{{ root_authorized_key_files }}"
+
+# esdc-factory#43
+- name: Update zoneinit script to append authorized_keys from mdata
+  copy: src=zoneinit dest=/opt/local/lib/svc/method/zoneinit mode=0755 owner=root group=root
+  when: ansible_distribution == "SmartOS"
+
+- name: Delete zoneinit script for authorized_keys from base64-es
+  file: dest=/var/zoneinit/includes/93-authorized-keys.sh state=absent
+  when: ansible_distribution == "SmartOS"
+

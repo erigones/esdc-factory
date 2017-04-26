@@ -25,19 +25,26 @@ zbx() {
 	return "${e}"
 }
 
+# allow updating authorized_keys from mdata on every reboot
+# https://github.com/erigones/esdc-factory/issues/43
+log "Populating authorized_keys"
+AUTHORIZED_KEYS="$(mdata-get root_authorized_keys || echo '')"
+mkdir -pm 700 /root/.ssh
+while read -r AUTHKEY; do
+	[ -z "$AUTHKEY" ] && continue
+	if ! grep -q "^$AUTHKEY$" /root/.ssh/authorized_keys 2> /dev/null; then
+		echo "$AUTHKEY" >> /root/.ssh/authorized_keys
+	fi
+done <<< "$AUTHORIZED_KEYS"
+chmod 600 /root/.ssh/authorized_keys
+
+# check if post-deploy was already processed
 if [[ -f "${DONE_FILE}" ]]; then
 	log "Found ${DONE_FILE} - skipping post-deploy configuration"
 	exit 0
 fi
 
 log "Starting post-deploy configuration"
-
-AUTHORIZED_KEYS="$(mdata-get root_authorized_keys || echo '')"
-log "Populating authorized_keys"
-mkdir -pm 700 /root/.ssh
-echo "${AUTHORIZED_KEYS}" > /root/.ssh/authorized_keys
-chmod 600 /root/.ssh/authorized_keys
-sleep 3
 
 log "Generating SSL certificate"
 openssl req -new -nodes -x509 \
