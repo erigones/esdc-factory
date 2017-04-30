@@ -959,7 +959,7 @@ setup_datasets()
 			rmdir ${TMPROOT}/${SYS_ZPOOL}
 		fi
 
-		printf "%-56s" "Creating initial boot environment ${ROOTBE}..."
+		printf "%-56s" "Creating initial boot environment ${ROOTBE}... "
 		zfs create -o mountpoint=legacy "${SYS_ZPOOL}/${ROOTDS}"
 		platform_version=$(uname -v | sed -e 's|\(.*\)_\(.*\)|\2|')
 		zfs create -o mountpoint=/ "${ROOTBE}"
@@ -991,7 +991,7 @@ setup_datasets()
 			fatal "Failed to transfer platform image"
 		printf "%4s\n" "done"
 
-		printf "%-56s" "Mounting default dataset ${SYS_ZPOOL}"
+		printf "%-56s" "Mounting default dataset ${SYS_ZPOOL}... "
 		zfs mount ${SYS_ZPOOL} > /dev/null 2>/dev/null
 		printf "%4s\n" "done"
 
@@ -1670,14 +1670,18 @@ the system will set up and all data on the disks will be erased.\n\n"
 
 	if [[ $(getanswer "skip_final_confirm") != "true" ]]; then
 		promptbool "Is this correct, proceed with installation? (y/n)" "y"
-		[[ "${val}" -eq 1 ]] && break
-		clear
+		if [[ "${val}" -eq 1 ]]; then
+			clear
+			break
+		fi
 	else
 		break
 	fi
 done
 
+printf "%-56s" "==> Initializing new system...\n"
 
+printf "%-56s" "Generating config file... "
 # START: Danube Cloud service VM IPs
 # Calculate admin network
 ip_netmask_to_network "$admin_ip" "$admin_netmask"
@@ -1760,18 +1764,25 @@ echo "esdc_install_password='${esdc_install_password}'" >>$tmp_config
 echo "install_to_hdd=${install_to_hdd}" >>$tmp_config
 echo  >>$tmp_config
 # END: Danube Cloud settings
+printf "%4s\n" "done"
 
 create_zpools "$DISK_LAYOUT"
 
+printf "%-56s" "Saving /usbkey/config... "
 mv $tmp_config /usbkey/config || fatal "failed to persist configuration"
+printf "%4s\n" "done"
 
 # set the root password
+printf "%-56s" "Saving /usbkey/shadow... "
 root_shadow=$(/usr/lib/cryptpass "$root_shadow")
 sed -e "s|^root:[^\:]*:|root:${root_shadow}:|" /etc/shadow > /usbkey/shadow \
       && chmod 400 /usbkey/shadow
 [[ $? -eq 0 ]] || fatal "failed to preserve root password"
+printf "%4s\n" "done"
 
+printf "%-56s" "Saving /usbkey/ssh... "
 cp -rp /etc/ssh /usbkey/ssh || fatal "failed to set up preserve host keys"
+printf "%4s\n" "done"
 
 sync
 sleep 1
