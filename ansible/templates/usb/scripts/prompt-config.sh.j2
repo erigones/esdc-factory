@@ -706,6 +706,8 @@ nicsup()
 
 nicsdown()
 {
+	[ $nicsup_done -eq 0 ] && return
+
 	ifconfig ${admin_iface_active} inet down unplumb
 
 	if [[ -n "${admin_vlan_id}" && "${admin_vlan_id}" -ne 0 ]]; then
@@ -716,6 +718,8 @@ nicsdown()
 		ifconfig external0 inet down unplumb
 		dladm delete-vnic external0
 	fi
+
+	nicsup_done=0
 }
 
 printdisklayout()
@@ -1489,6 +1493,8 @@ if [[ -z ${skip_ntp} || ${skip_ntp} != "true" ]]; then
 		[ $? != 0 ] && print_warning "NTP failure setting date and time"
 fi
 
+	# Bring the admin and external nics down now: we don't need them anymore
+	nicsdown
 
 	# START: Danube Cloud install to HDD addition
 	printheader "Installation to disk"
