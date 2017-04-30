@@ -539,7 +539,10 @@ promptvlan()
 	while [ /usr/bin/true ]; do
 		promptopt "${msg}" "${def}" "${key}"
 
-		if [[ -z "${val}" || "${val}" -eq 0 || "${val}" == "none" ]]; then
+		if [[ -z "${val}" || "${val}" == "none" ]]; then
+			val=""
+			break
+		elif isdigit "${val}" && [[ "${val}" -eq 0 ]]; then
 			val=""
 			break
 		elif isdigit "${val}" && [[ "${val}" -ge 1 && "${val}" -le 4095 ]]; then
