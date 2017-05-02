@@ -1679,7 +1679,7 @@ the system will set up and all data on the disks will be erased.\n\n"
 	fi
 done
 
-printf "%-56s" "==> Initializing new system...\n"
+echo "==> Initializing new system..."
 
 printf "%-56s" "Generating config file... "
 # START: Danube Cloud service VM IPs
@@ -1789,13 +1789,13 @@ sleep 1
 
 if [[ ${install_to_hdd} -eq 1 ]]; then
     echo
-    echo "Please remove the USB flash drive and press [enter] to continue."
+    echo "==> Please remove the USB flash drive and press [enter] to continue."
     echo
     read PAUSE
 fi
 
-echo "The system will now finish configuration and reboot in 10 seconds."
-echo "Please wait..."
+echo "==> The system will now finish configuration and reboot in 10 seconds."
+echo "==> Please wait..."
 
 sleep 10
 reboot 2> /dev/null
