@@ -1409,7 +1409,7 @@ The configured NIC will be used to access the compute node.\n\n"
 			[[ -z "$admin_netmask" ]] && \
 			    admin_netmask="255.255.255.0"
 
-			promptnet "(admin) netmask" "$admin_netmask" "admin_netmask"
+			promptnet "(admin) Netmask" "$admin_netmask" "admin_netmask"
 			admin_netmask="$val"
 			ip_netmask_to_network "$admin_ip" "$admin_netmask"
 			[ $IP_NUM -ne $BCAST_ADDR ] && valid=1
@@ -1492,9 +1492,6 @@ if [[ -z ${skip_ntp} || ${skip_ntp} != "true" ]]; then
 		ntpdate -b $ntp_hosts >/dev/null 2>&1
 		[ $? != 0 ] && print_warning "NTP failure setting date and time"
 fi
-
-	# Bring the admin and external nics down now: we don't need them anymore
-	nicsdown
 
 	# START: Danube Cloud install to HDD addition
 	printheader "Installation to disk"
@@ -1612,7 +1609,11 @@ installing the first compute node.\n\n"
 {% else %}
 	promptpw "Enter configuration master password" "nolen" "${esdc_install_password}" "esdc_install_password"
 	esdc_install_password="${val}"
-	[[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]] && query_cfgdb  # This will set the datacenter_name
+	if [[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]]; then
+		if ! query_cfgdb; then  # This will set the datacenter_name
+			print_warning "Failed to read data from the configuration database"
+		fi
+	fi
 {% endif %}
 
 {% if usb_type == "hn" %}
@@ -1631,6 +1632,8 @@ monitoring alerts.\n\n"
 {% endif %}
 	# END: Danube Cloud management configuration
 
+	# Bring the admin and external nics down now: we don't need them anymore
+	nicsdown
 
 	printheader "Verify Configuration"
 	message="
