@@ -971,7 +971,7 @@ setup_datasets()
 		printf "%-56s" "Transferring base OS files... "
 		_oldwd=$(pwd)
 		cd /
-		(find bin boot dev devices etc kernel lib opt platform root sbin smartdc usr | cpio -pdmu "${TMPROOT}") || \
+		(find bin boot dev devices etc kernel lib opt platform root sbin smartdc usr | cpio -pdmuq "${TMPROOT}") || \
 			fatal "Failed to transfer system to HDD"
 		cd "${_oldwd}"
 		printf "%4s\n" "done"
@@ -987,7 +987,7 @@ setup_datasets()
 		printf "%4s\n" "done"
 
 		printf "%-56s" "Transferring platform image... "
-		/usr/bin/rsync -av ${USBMNT}/os/${platform_version}/platform/i86pc/amd64 ${TMPROOT}/platform/i86pc || \
+		/usr/bin/rsync -aq ${USBMNT}/os/${platform_version}/platform/i86pc/amd64 ${TMPROOT}/platform/i86pc || \
 			fatal "Failed to transfer platform image"
 		printf "%4s\n" "done"
 
