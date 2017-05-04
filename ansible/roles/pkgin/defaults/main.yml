@@ -7,4 +7,4 @@ pkgin_repositories:
   - "http://pkgsrc.erigones.com/packages/SmartOS/{{ pkgin_release }}/{{ pkgin_arch }}/All"
 
 pkgin_repository_keys:
-  - "https://pkgsrc.erigones.org/GPG.key.pub"
+  - "https://pkgsrc.erigones.com/GPG.key.pub"
