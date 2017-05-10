@@ -19,6 +19,12 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
+2.6.0 (unreleased)
+==================
+
+- Updated zabbix agent to 3.0.9 [monitoring-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
+- Updated pkgsrc to 2016Q4 in local archive [local-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
+
 2.5.3 (unreleased)
 ==================
 
