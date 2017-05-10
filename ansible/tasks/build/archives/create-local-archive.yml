@@ -1,3 +1,7 @@
+- name: Upgrade openssl before system upgrade
+  shell: pkg_add -U openssl
+  when: pkgin_release == "2016Q4"
+
 - name: Update system packages
   shell: pkgin -y full-upgrade
 

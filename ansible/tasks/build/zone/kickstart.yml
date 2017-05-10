@@ -3,7 +3,6 @@
   shell: pkgin -y remove "{{ item }}"
   with_items:
     - nodejs
-    - gcc47-libs
 
 - name: Marking python27 as non auto-removable
   shell: pkgin keep python27
