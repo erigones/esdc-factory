@@ -25,6 +25,12 @@ base-64-es
 Changelog
 ---------
 
+2.6.0
+~~~~~
+
+- Updated pkgsrc in /opt/local to 2016Q4 - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
+- Updated zabbix agent to 3.0.9 - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
+
 2.5.3
 ~~~~~
 
@@ -88,6 +94,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 
 Changelog
 ---------
+
+2.6.0
+~~~~~
+
+- Built from new `base-64-es`_ with 2016Q4 pkgsrc - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 
 2.5.3
 ~~~~~
@@ -153,6 +164,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.6.0
+~~~~~
+
+- Built from new `base-64-es`_ with 2016Q4 pkgsrc - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
+
 2.5.3
 ~~~~~
 
@@ -214,6 +230,11 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 
 Changelog
 ---------
+
+2.6.0
+~~~~~
+
+- Built from new `base-64-es`_ with 2016Q4 pkgsrc - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 
 2.5.3
 ~~~~~
@@ -283,6 +304,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.6.0
+~~~~~
+
+- Built from new `base-64-es`_ with 2016Q4 pkgsrc - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 
 2.5.3
 ~~~~~
