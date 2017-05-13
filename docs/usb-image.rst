@@ -22,6 +22,14 @@ Changelog
 2.6.0 (unreleased)
 ==================
 
+- Updated to new platform version - 20170513T080150Z from upstream/release-20170511 + backported changes from upstream - `#46 <https://github.com/erigones/esdc-factory/issues/46>`__ `#35 <https://github.com/erigones/esdc-factory/issues/35>`__
+    - Updated installer (prompt-config), which now supports custom NTP configuration - `#31 <https://github.com/erigones/esdc-factory/issues/31>`__
+    - Added support for admin_vlan_id into installer
+    - Improved cfgdb availability check during installation
+    - Added /esdc/settings/dc tree into cfgdb
+    - Reboot stderr goes to /dev/null to hide the bootadm update-archive message
+    - Added creation of zones/backups/manifests - `esdc-ce#155 <https://github.com/erigones/esdc-ce/issues/155>`__
+    - Changed Headnode to Compute node - we want to remove the headnode concept - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
 - Updated zabbix agent to 3.0.9 [monitoring-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 - Updated pkgsrc to 2016Q4 in local archive [local-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 
