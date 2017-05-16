@@ -423,12 +423,12 @@ Changelog
 centos-6
 ========
 
-Moved to `contrib <contrib/centos-6.rst>`_.
+Moved to `contrib/centos-6.rst <contrib/centos-6.rst>`_.
 
 ------------------------------------------------------------
 
 centos-7
 ========
 
-Moved to `contrib <contrib/centos-7.rst>`_.
+Moved to `contrib/centos-7.rst <contrib/centos-7.rst>`_.
 
