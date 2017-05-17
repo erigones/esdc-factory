@@ -377,7 +377,7 @@ Changelog
 ---------
 
 2.5.3
------
+~~~~~
 
 - Decreased severity of *Too many SCSI errors on disk...* alert and increased DISK_ERRORS_THRESHOLD - `#40 <https://github.com/erigones/esdc-factory/issues/40>`__
 - Add support for appending additional SSH authorized_keys into the service VMs - `#43 <https://github.com/erigones/esdc-factory/issues/43>`__
