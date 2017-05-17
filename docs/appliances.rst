@@ -173,10 +173,6 @@ Changelog
 ~~~~~
 
 - Changed default PowerDNS server settings to be preconfigured as a master name server - `#41 <https://github.com/erigones/esdc-factory/issues/41>`__
-
-2.5.3
-~~~~~
-
 - Add support for appending additional SSH authorized_keys into the service VMs - `#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
@@ -384,10 +380,6 @@ Changelog
 -----
 
 - Decreased severity of *Too many SCSI errors on disk...* alert and increased DISK_ERRORS_THRESHOLD - `#40 <https://github.com/erigones/esdc-factory/issues/40>`__
-
-2.5.3
-~~~~~
-
 - Add support for appending additional SSH authorized_keys into the service VMs - `#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 2.5.2
@@ -449,12 +441,12 @@ Changelog
 centos-6
 ========
 
-Moved to `contrib <contrib/centos-6.rst>`_.
+Moved to `contrib/centos-6.rst <contrib/centos-6.rst>`_.
 
 ------------------------------------------------------------
 
 centos-7
 ========
 
-Moved to `contrib <contrib/centos-7.rst>`_.
+Moved to `contrib/centos-7.rst <contrib/centos-7.rst>`_.
 
