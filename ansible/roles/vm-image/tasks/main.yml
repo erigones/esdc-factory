@@ -5,6 +5,16 @@
   pause:
   when: image_debug is defined and image_debug
 
+- name: Register OS information (CentOS)
+  shell: cat /etc/redhat-release
+  register: os_info
+  when: ansible_distribution == "CentOS"
+
+- name: Register OS information (SmartOS)
+  shell: cat /etc/pkgsrc_version
+  register: os_info
+  when: ansible_distribution == "SmartOS"
+
 - name: Prepare virtual machine for snapshotting (CentOS)
   shell: prepare-image
   when: ansible_distribution == "CentOS"
@@ -12,3 +22,7 @@
 - name: Prepare virtual machine for snapshotting (SmartOS)
   shell: sm-prepare-image -y
   when: ansible_distribution == "SmartOS"
+
+- name: Display OS information
+  debug:
+    var: os_info
