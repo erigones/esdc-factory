@@ -26,3 +26,6 @@
 - name: Display OS information
   debug:
     var: os_info
+
+- name: Cleanup /root/.ssh/authorized_keys
+  file: path=/root/.ssh/authorized_keys state=absent
