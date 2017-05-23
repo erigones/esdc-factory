@@ -137,8 +137,8 @@ function wait_for_cfgdb() {
 	set +e
 	while true; do
 		printf_log "\r%-64s" "Waiting for cfgdb availability... "
-		if ping -n ${CFGDB_IP} > /dev/null 2>&1; then
-			if echo "ruok" | nc -n -w 10 10.0.60.106 2181 2> /dev/null | grep imok >/dev/null 2>&1; then
+		if ping -n "${CFGDB_IP}" > /dev/null 2>&1; then
+			if echo "ruok" | nc -n -w 10 "${CFGDB_IP}" 2181 2> /dev/null | grep imok >/dev/null 2>&1; then
 				printf_log "done\n"
 				break
 			fi
