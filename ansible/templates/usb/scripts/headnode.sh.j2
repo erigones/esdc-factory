@@ -436,7 +436,8 @@ function configure_cfgdb() {
 	_zk creater "/esdc/nodes/headnodes" "${SYSINFO_UUID}"
 
 	for vm in {{ usb_vms|map(attribute='name')|list|join(' ') }}; do
-		_zk creater "/esdc/vms/${vm}/master" "1"
+		_zk creater "/esdc/vms/${vm}/master/id" "1"
+		_zk creater "/esdc/vms/${vm}/master/ip" "${vm_ip}"
 
 		vm_manifest="${USB_COPY}/zones/${vm}/vmmanifest"
 		[[ ! -f "${vm_manifest}" ]] && continue
