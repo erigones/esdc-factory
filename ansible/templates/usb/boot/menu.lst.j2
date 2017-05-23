@@ -6,12 +6,12 @@ terminal composite
 variable os_console vga
 splashimage=/boot/splash.xpm.gz
 
-title Compute Node 64-bit
+title {% if usb_type == "hn" %}First {% endif %}Compute Node 64-bit
   kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=${os_console},${os_console}-mode="115200,8,n,1,-",computenode=true,smartos=true
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive.hash
 
-title Compute Node 64-bit Rescue (l/p: root/root)
+title {% if usb_type == "hn" %}First {% endif %}Compute Node 64-bit Rescue (l/p: root/root)
   kernel$ /os/{{ platform_version }}/platform/i86pc/kernel/amd64/unix -B console=${os_console},${os_console}-mode="115200,8,n,1,-",root_shadow='{{ usb_root_pw|mandatory }}',computenode=true,smartos=true,standalone=true,noimport=true,hostname=erigonos
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive
   module /os/{{ platform_version }}/platform/i86pc/amd64/boot_archive.hash
