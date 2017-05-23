@@ -137,10 +137,11 @@ function wait_for_cfgdb() {
 	set +e
 	while true; do
 		printf_log "\r%-64s" "Waiting for cfgdb availability... "
-		/usr/sbin/ping -s -n -I 1 ${CFGDB_IP} 1492 10 > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			printf_log "done\n"
-			break
+		if ping -n "${CFGDB_IP}" > /dev/null 2>&1; then
+			if echo "ruok" | nc -n -w 10 "${CFGDB_IP}" 2181 2> /dev/null | grep imok >/dev/null 2>&1; then
+				printf_log "done\n"
+				break
+			fi
 		fi
 		printf_log "not yet\n"
 		sleep 1
@@ -152,7 +153,7 @@ function query_cfgdb() {
 	# Wait for configuration database availability
 	wait_for_cfgdb
 
-	printf_log "\r%-64s" "Retrieving headnode configuration information from cfgdb... "
+	printf_log "\r%-64s" "Retrieving Danube Cloud management configuration from cfgdb... "
 
 	_mgmt_ip=$(_zk get "/esdc/settings/rabbitmq/host")
 	_mon_ip=$(_zk get "/esdc/settings/zabbix/host")
@@ -229,8 +230,8 @@ function reload_smf_manifests() {
 	printf_log "\r%-64s" "Reloading SMF manifests... "
 	printf_log "%4s\n" "done"
 	# This will make the output to look nicer/aligned
-	/usr/sbin/svcadm disable -s svc:/system/manifest-import:default
-	/usr/sbin/svcadm enable -s svc:/system/manifest-import:default
+	svcadm disable -s svc:/system/manifest-import:default
+	svcadm enable -s svc:/system/manifest-import:default
 }
 
 #
