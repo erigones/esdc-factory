@@ -24,10 +24,21 @@
                     },
                     {
                         "name": "t_zfs_io_throttle"
+                    },
+                    {
+                        "name": "t_vm_zone_vfs"
+                    },
+                    {
+                        "name": "t_vm_zone_zfs"
                     }
                 ],
                 "name": "t_role-compute",
-                "macros": [],
+                "macros": [
+                    {
+                        "macro": "{$UUID_SHORT}",
+                        "value": "global"
+                    }
+                ],
                 "items": [],
                 "screens": [],
                 "applications": [],
