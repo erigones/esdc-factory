@@ -5,3 +5,17 @@
         owner=root
         group=root
         mode=0755
+
+- name: Copy zookeepercli script
+  copy: src=zookeepercli
+        dest=/usr/local/bin/zookeepercli
+        owner=root
+        group=root
+        mode=0755
+
+- name: Copy query_cfgdb script
+  copy: src=query_cfgdb
+        dest=/usr/local/bin/query_cfgdb
+        owner=root
+        group=root
+        mode=0755
