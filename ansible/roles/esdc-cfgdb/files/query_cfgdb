@@ -3,15 +3,15 @@
 ZKCLI=/usr/local/bin/zookeepercli
 QUERY_STRING="$@"
 
-if [ -z "${QUERY_STRING}" ]; then
-                echo "Usage:   $0 <query>" 1>&2
-                echo "Example: $0 ls /esdc/nodes" 1>&2
-                exit 10
+if [[ -z "${QUERY_STRING}" ]]; then
+	echo "Usage:   $0 <query>" 1>&2
+	echo "Example: $0 ls /esdc/nodes" 1>&2
+	exit 10
 fi
 
-if [ ! -x "${ZKCLI}" ]; then
-                echo "Error: Cannot find binary ${ZKCLI}" 1>&2
-                exit 20
+if [[ ! -x "${ZKCLI}" ]]; then
+	echo "Error: Cannot find binary ${ZKCLI}" 1>&2
+	exit 20
 fi
 
 # query cfgdb credentials
