@@ -163,7 +163,7 @@
         - remove loopback device
 
     - name: Mount USB image loopback device
-      shell: mount -F pcfs -o foldcase,noclamptime,noatime {{ lofiadm.stdout }}:c "{{ usb_tmp_mountpoint }}"
+      shell: mount -F pcfs -o noclamptime,noatime {{ lofiadm.stdout }}:c "{{ usb_tmp_mountpoint }}"
       notify:
         - unmount USB image
         - remove loopback device
