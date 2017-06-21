@@ -1439,11 +1439,12 @@ connected to your 'admin' network. Use 'none' if you have no gateway.\n\n"
 
 	# default to external_gateway if that's set, if not, use 'none'
 	[[ -z "$headnode_default_gateway" && -n ${external_gateway} ]] && \
-	    headnode_default_gateway="$external_gateway"
+		headnode_default_gateway="$external_gateway"
+	[[ -z "$headnode_default_gateway" && "$admin_ip" != "dhcp" ]] && \
+		headnode_default_gateway="$(num_to_ip $((NET_NUM+1)); echo $ip_addr)"
 	[[ -z "$headnode_default_gateway" ]] && \
-	    headnode_default_gateway="none"
+		headnode_default_gateway="none"
 
-	[[ -z "$headnode_default_gateway" ]] && headnode_default_gateway="$(num_to_ip $((NET_NUM+1)); echo $ip_addr)"
 	promptnet "Enter the default gateway IP" "$headnode_default_gateway" "headnode_default_gateway"
 	headnode_default_gateway="$val"
 
@@ -1734,7 +1735,7 @@ echo "admin_ip=$admin_ip" >>$tmp_config
 if [[ "$admin_ip" != "dhcp" ]]; then
 	echo "admin_netmask=$admin_netmask" >>$tmp_config
 	echo "admin_network=$admin_network" >>$tmp_config
-	echo "admin_gateway=$admin_ip" >>$tmp_config
+	echo "admin_gateway=$headnode_default_gateway" >>$tmp_config
 	echo >>$tmp_config
 fi
 
