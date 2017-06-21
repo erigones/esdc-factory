@@ -1102,6 +1102,21 @@ setup_datasets()
 		zfs set atime=on ${ISODS} || fatal "failed to set atime=on for ${ISODS}"
 		printf "%4s\n" "done"
 	fi
+
+	if [[ "${install_to_hdd}" -eq 1 ]]; then
+		printf "%-56s" "Transferring USB drive contents to HDD... "
+		/usr/bin/rsync -a ${USBMNT}/ /usbkey/ || fatal "Failed to transfer"
+		printf "%4s\n" "done"
+
+		# Create placeholder directory
+		mkdir -p "${TMPROOT}/${SYS_ZPOOL}/boot/grub"
+		printf "%-56s" "Activating boot environment ${DEFBE}... "
+		/usr/sbin/beadm activate -v "${DEFBE}" >&4 2>&4 || fatal "Failed to activate"
+		printf "%4s\n" "done"
+
+		echo 'boot-args="-B smartos=true,computenode=true"' >> ${TMPROOT}/boot/loader.conf
+		echo "7.0" > ${TMPROOT}/.smartdc_version
+	fi
 }
 
 create_zpool()
@@ -1783,6 +1798,15 @@ sed -e "s|^root:[^\:]*:|root:${root_shadow}:|" /etc/shadow > /usbkey/shadow \
       && chmod 400 /usbkey/shadow
 [[ $? -eq 0 ]] || fatal "failed to preserve root password"
 printf "%4s\n" "done"
+
+if [[ ${install_to_hdd} -eq 1 ]]; then
+	printf "%-56s" "Saving /etc/shadow... "
+	sed -e "s|^root:[^\:]*:|root:${root_shadow}:|" ${TMPROOT}/etc/shadow > ${TMPROOT}/etc/shadow.new \
+		&& chmod 400 ${TMPROOT}/etc/shadow.new \
+		&& mv ${TMPROOT}/etc/shadow.new ${TMPROOT}/etc/shadow
+	[[ $? -eq 0 ]] || fatal "failed to set root password"
+	printf "%4s\n" "done"
+fi
 
 printf "%-56s" "Saving /usbkey/ssh... "
 cp -rp /etc/ssh /usbkey/ssh || fatal "failed to set up preserve host keys"
