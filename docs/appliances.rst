@@ -305,7 +305,7 @@ Changelog
 2.6.0
 ~~~~~
 
-- Built from new `base-64-es`_ with 2016Q4 pkgsrc - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
+- Version bump.
 
 2.5.3
 ~~~~~
@@ -376,6 +376,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.6.0
+~~~~~
+
+- Updated several templates - switched from ZONEID to UUID_SHORT macro - `#49 <https://github.com/erigones/esdc-factory/issues/49>`__
 
 2.5.3
 ~~~~~
