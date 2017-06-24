@@ -1102,6 +1102,21 @@ setup_datasets()
 		zfs set atime=on ${ISODS} || fatal "failed to set atime=on for ${ISODS}"
 		printf "%4s\n" "done"
 	fi
+
+	if [[ "${install_to_hdd}" -eq 1 ]]; then
+		printf "%-56s" "Transferring USB drive contents to HDD... "
+		/usr/bin/rsync -a ${USBMNT}/ /usbkey/ || fatal "Failed to transfer"
+		printf "%4s\n" "done"
+
+		# Create placeholder directory
+		mkdir -p "${TMPROOT}/${SYS_ZPOOL}/boot/grub"
+		printf "%-56s" "Activating boot environment ${DEFBE}... "
+		/usr/sbin/beadm activate -v "${DEFBE}" >&4 2>&4 || fatal "Failed to activate"
+		printf "%4s\n" "done"
+
+		echo 'boot-args="-B smartos=true,computenode=true"' >> ${TMPROOT}/boot/loader.conf
+		echo "7.0" > ${TMPROOT}/.smartdc_version
+	fi
 }
 
 create_zpool()
@@ -1126,7 +1141,7 @@ create_zpool()
 
 	# If this is not a manual layout, then we've been given
 	# a JSON file describing the desired pool, so use that:
-	mkzpool -f ${rpoolarg} ${pool} ${layout} || \
+	mkzpool -f ${rpoolarg} "${pool}" "${layout}" || \
 	    fatal "failed to create pool ${pool}"
 
 	zfs set atime=off ${pool} || \
@@ -1439,11 +1454,12 @@ connected to your 'admin' network. Use 'none' if you have no gateway.\n\n"
 
 	# default to external_gateway if that's set, if not, use 'none'
 	[[ -z "$headnode_default_gateway" && -n ${external_gateway} ]] && \
-	    headnode_default_gateway="$external_gateway"
+		headnode_default_gateway="$external_gateway"
+	[[ -z "$headnode_default_gateway" && "$admin_ip" != "dhcp" ]] && \
+		headnode_default_gateway="$(num_to_ip $((NET_NUM+1)); echo $ip_addr)"
 	[[ -z "$headnode_default_gateway" ]] && \
-	    headnode_default_gateway="none"
+		headnode_default_gateway="none"
 
-	[[ -z "$headnode_default_gateway" ]] && headnode_default_gateway="$(num_to_ip $((NET_NUM+1)); echo $ip_addr)"
 	promptnet "Enter the default gateway IP" "$headnode_default_gateway" "headnode_default_gateway"
 	headnode_default_gateway="$val"
 
@@ -1686,12 +1702,13 @@ echo "==> Initializing new system..."
 
 printf "%-56s" "Generating config file... "
 # START: Danube Cloud service VM IPs
+
+{% if usb_type == "hn" %}
 # Calculate admin network
 ip_netmask_to_network "$admin_ip" "$admin_netmask"
 num_to_ip $NET_NUM
 admin_network="$ip_addr"
 
-{% if usb_type == "hn" %}
 # Calculate admin network address for every core zone.
 ip_netmask_to_network "$mgmt_admin_ip" "$admin_netmask"
 
@@ -1733,13 +1750,15 @@ echo "admin_vlan_id=$admin_vlan_id" >>$tmp_config
 echo "admin_ip=$admin_ip" >>$tmp_config
 if [[ "$admin_ip" != "dhcp" ]]; then
 	echo "admin_netmask=$admin_netmask" >>$tmp_config
-	echo "admin_network=$admin_network" >>$tmp_config
-	echo "admin_gateway=$admin_ip" >>$tmp_config
+	{% if usb_type == "hn" %}echo "admin_network=$admin_network" >>$tmp_config{% endif %}
+	echo "admin_gateway=$headnode_default_gateway" >>$tmp_config
 	echo >>$tmp_config
 fi
 
-echo "headnode_default_gateway=$headnode_default_gateway" >>$tmp_config
-echo >>$tmp_config
+if [[ "$headnode_default_gateway" != "none" ]]; then
+	echo "headnode_default_gateway=$headnode_default_gateway" >>$tmp_config
+	echo >>$tmp_config
+fi
 
 echo "dns_resolvers=$dns_resolver1,$dns_resolver2" >>$tmp_config
 echo "dns_domain=$dns_domain" >>$tmp_config
@@ -1783,6 +1802,15 @@ sed -e "s|^root:[^\:]*:|root:${root_shadow}:|" /etc/shadow > /usbkey/shadow \
 [[ $? -eq 0 ]] || fatal "failed to preserve root password"
 printf "%4s\n" "done"
 
+if [[ ${install_to_hdd} -eq 1 ]]; then
+	printf "%-56s" "Saving /etc/shadow... "
+	sed -e "s|^root:[^\:]*:|root:${root_shadow}:|" ${TMPROOT}/etc/shadow > ${TMPROOT}/etc/shadow.new \
+		&& chmod 400 ${TMPROOT}/etc/shadow.new \
+		&& mv ${TMPROOT}/etc/shadow.new ${TMPROOT}/etc/shadow
+	[[ $? -eq 0 ]] || fatal "failed to set root password"
+	printf "%4s\n" "done"
+fi
+
 printf "%-56s" "Saving /usbkey/ssh... "
 cp -rp /etc/ssh /usbkey/ssh || fatal "failed to set up preserve host keys"
 printf "%4s\n" "done"
@@ -1796,6 +1824,8 @@ if [[ ${install_to_hdd} -eq 1 ]]; then
     echo
     read PAUSE
 fi
+
+######
 
 echo "==> The system will now finish configuration and reboot in 10 seconds."
 echo "==> Please wait..."

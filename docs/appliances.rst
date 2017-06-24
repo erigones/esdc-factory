@@ -99,6 +99,7 @@ Changelog
 ~~~~~
 
 - Built from new `base-64-es`_ with 2016Q4 pkgsrc - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
+- Added binaries: zookeepercli, query_cfgdb - `#50 <https://github.com/erigones/esdc-factory/issues/50>`__
 
 2.5.3
 ~~~~~
