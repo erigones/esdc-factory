@@ -1141,7 +1141,7 @@ create_zpool()
 
 	# If this is not a manual layout, then we've been given
 	# a JSON file describing the desired pool, so use that:
-	mkzpool -f ${rpoolarg} ${pool} ${layout} || \
+	mkzpool -f ${rpoolarg} "${pool}" "${layout}" || \
 	    fatal "failed to create pool ${pool}"
 
 	zfs set atime=off ${pool} || \
@@ -1821,6 +1821,8 @@ if [[ ${install_to_hdd} -eq 1 ]]; then
     echo
     read PAUSE
 fi
+
+######
 
 echo "==> The system will now finish configuration and reboot in 10 seconds."
 echo "==> Please wait..."
