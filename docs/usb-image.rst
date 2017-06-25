@@ -33,6 +33,7 @@ Changelog
     - Added netboot and netboot_install_script boot options to support installation from network - `#37 <https://github.com/erigones/esdc-factory/issues/37>`__
 - Updated zabbix agent to 3.0.9 [monitoring-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 - Updated pkgsrc to 2016Q4 in local archive [local-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
+- Updated SystemRescueCd to version 5.0.2 - commit `83a5edb <https://github.com/erigones/esdc-factory/commit/83a5edb54868220cd6052afd0c04285b8fa2a42e>`__
 
 
 2.5.3 (released on 2017-05-16)
