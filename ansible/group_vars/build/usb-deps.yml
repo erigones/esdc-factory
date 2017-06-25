@@ -23,8 +23,8 @@ builder_archives:
 builder_isos_url: ''
 builder_isos:
   - name: 'rescuecd'
-    version: '4.8.3'
-    url: 'http://downloads.sourceforge.net/project/systemrescuecd/sysresccd-x86/4.8.3/systemrescuecd-x86-4.8.3.iso?use_mirror=netcologne'
+    version: '5.0.2'
+    url: 'http://downloads.sourceforge.net/project/systemrescuecd/sysresccd-x86/5.0.2/systemrescuecd-x86-5.0.2.iso?use_mirror=netcologne'
     link: 'rescuecd-latest'
 
 bootstrap_local_archive: "{{ bootstrap|default(false) }}"
