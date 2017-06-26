@@ -17,6 +17,8 @@
     <property_group name="startd" type="framework">
       <propval name="duration" type="astring" value="contract" />
       <propval name="ignore_error" type="astring" value="core,signal" />
+      <propval name="critical_failure_count" type="count" value="10" />
+      <propval name="critical_failure_period" type="count" value="2" />
     </property_group>
     <property_group name="application" type="application">
       <propval name="config_file" type="astring" value="/opt/local/etc/pdns.conf" />
