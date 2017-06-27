@@ -56,7 +56,7 @@ declare nicsup_done
 # Additional NIC tags definitions
 declare -A nictag_macs
 declare -A nictag_ifaces
-declare -A nictag_IPs
+declare -A nictag_ips
 declare -A nictag_netmasks
 declare -A nictag_vlans
 nictag_list="external internal storage"
@@ -644,11 +644,11 @@ promptnictag_ip()
 	if [[ "${val}" -eq 1 ]]; then
 		valid=0
 		while [ $valid -ne 1 ]; do
-			promptnet "(${ntag}) IP address (or dhcp)" "${nictag_IPs[${ntag}]}"\
+			promptnet "(${ntag}) IP address (or dhcp)" "${nictag_ips[${ntag}]}"\
 				"${ntag}_ip"
-			nictag_IPs["${ntag}"]="$val"
+			nictag_ips["${ntag}"]="$val"
 
-			if [[ "${nictag_IPs[${ntag}]}" != "dhcp" ]]; then
+			if [[ "${nictag_ips[${ntag}]}" != "dhcp" ]]; then
 				# set default value for netmask
 				[[ -z "${nictag_netmasks[${ntag}]}" ]] && \
 					nictag_netmasks[${ntag}]="255.255.255.0"
@@ -659,7 +659,7 @@ promptnictag_ip()
 				nictag_netmasks["${ntag}"]="$val"
 
 				# test netmask validity
-				ip_netmask_to_network "${nictag_IPs[${ntag}]}"\
+				ip_netmask_to_network "${nictag_ips[${ntag}]}"\
 					"${nictag_netmasks[${ntag}]}"
 				[ $IP_NUM -ne $BCAST_ADDR ] && valid=1
 			else
@@ -738,13 +738,13 @@ nicsup()
 	fi
 
 	# create an interface for each nic tag with defined IP address
-	for ntag in "${!nictag_IPs[@]}"; do
+	for ntag in "${!nictag_ips[@]}"; do
 		if [ -n "${nictag_vlans[$ntag]}" ]; then
 			vlan_opts="-v ${nictag_vlans[$ntag]}"
 		fi
 		dladm create-vnic -l ${nictag_ifaces[$ntag]} $vlan_opts "${ntag}0"
 		ifconfig "${ntag}0" plumb
-		ifconfig "${ntag}0" inet "${nictag_IPs[${ntag}]}" netmask "${nictag_netmasks[${ntag}]}" up
+		ifconfig "${ntag}0" inet "${nictag_ips[${ntag}]}" netmask "${nictag_netmasks[${ntag}]}" up
 		vlan_opts=""	# clear for next iteration
 	done
 
@@ -768,7 +768,7 @@ nicsdown()
 	fi
 
 	# delete interface for each nic tag with defined IP address
-	for ntag in "${!nictag_IPs[@]}"; do
+	for ntag in "${!nictag_ips[@]}"; do
 		ifconfig "${ntag}0" inet down unplumb
 		dladm delete-vnic "${ntag}0"
 	done
@@ -1803,7 +1803,7 @@ the system will be set up and all data on the disks will be erased.\n\n"
 			printf "%8s %17s %15s %15s %15s\n" "admin" $admin_nic $admin_ip $admin_netmask $admin_vlan_id
 		fi
 		for ntag in "${!nictag_macs[@]}"; do
-			printf "%8s %17s %15s %15s %15s\n" "$ntag" ${nictag_macs[$ntag]} ${nictag_IPs[$ntag]} ${nictag_netmasks[$ntag]} ${nictag_vlans[$ntag]}
+			printf "%8s %17s %15s %15s %15s\n" "$ntag" ${nictag_macs[$ntag]} ${nictag_ips[$ntag]} ${nictag_netmasks[$ntag]} ${nictag_vlans[$ntag]}
 		done
 		echo
 		printf "DNS Servers: (%s, %s)\n" "$dns_resolver1" "$dns_resolver2"
@@ -1907,9 +1907,9 @@ echo >>$tmp_config
 # add rest of NIC tags
 for ntag in "${!nictag_macs[@]}"; do
 	echo "${ntag}_nic=${nictag_macs[$ntag]}" >>$tmp_config
-	if [[ -n ${nictag_IPs[$ntag]} ]]; then
+	if [[ -n ${nictag_ips[$ntag]} ]]; then
 		echo "${ntag}0_vlan_id=${nictag_vlans[$ntag]}" >>$tmp_config
-		echo "${ntag}0_ip=${nictag_IPs[$ntag]}" >>$tmp_config
+		echo "${ntag}0_ip=${nictag_ips[$ntag]}" >>$tmp_config
 		echo "${ntag}0_netmask=${nictag_netmasks[$ntag]}" >>$tmp_config
 	fi
 done
