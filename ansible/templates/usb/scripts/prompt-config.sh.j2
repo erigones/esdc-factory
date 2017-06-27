@@ -742,7 +742,7 @@ nicsup()
 		if [ -n "${nictag_vlans[$ntag]}" ]; then
 			vlan_opts="-v ${nictag_vlans[$ntag]}"
 		fi
-		dladm create-vnic -l ${nictag_ifaces[$ntag]} $vlan_opts "${ntag}0"
+		dladm create-vnic -l "${nictag_ifaces[$ntag]}" $vlan_opts "${ntag}0"
 		ifconfig "${ntag}0" plumb
 		ifconfig "${ntag}0" inet "${nictag_ips[${ntag}]}" netmask "${nictag_netmasks[${ntag}]}" up
 		vlan_opts=""	# clear for next iteration
