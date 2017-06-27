@@ -1426,7 +1426,7 @@ if [[ $(getanswer "skip_instructions") != "true" ]]; then
 	printf "
 The advanced installation will allow you to customize additional network
 options, such as VLANs, multiple IP addresses, NTP servers, etc.
-Basic installation is suffcient for most installations\n\n\n"
+Basic installation is sufficient for most installations\n\n\n"
 
 	promptbool "Enable advanced installation? (y/n)" "n"
 	advanced_install=${val}
@@ -1440,7 +1440,7 @@ while [ /usr/bin/true ]; do
 {% if usb_type == "hn" %}
 	printheader "Datacenter Information"
 	message="
-The following questions will ask a few information about your datacenter
+The following questions will ask some information about your datacenter
 and Danube Cloud installation.\n\n"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
@@ -1457,7 +1457,7 @@ To set up networking you must first configure network tags. A network tag
 refers to a physical NIC or an aggregation. Virtual machines will be created on
 top of a network tag. Setup will first create an admin network tag and
 configure a NIC so that you can access the Danube Cloud node. Then you will
-have the option of creating additional network tags and configuring
+have the option to create additional network tags and to configure
 additional NICs for accessing the compute node or virtual machines.
 
 Press [enter] to continue"
@@ -1554,7 +1554,7 @@ The tags can be added or modified also later by editing /usbkey/config file.\n\n
 
 	printheader "Networking - default gateway"
 	message="
-The default gateway will determine which router will be used to connect the
+The default gateway will determine which router will be used to connect
 this compute node to other networks. This will almost certainly be the router
 connected to your 'admin' network. Use 'none' if you have no gateway
 or you rely only on the dhcp.\n\n"
@@ -1745,8 +1745,8 @@ install an additional compute node into your data center.
 PLEASE KEEP THIS PASSWORD SAFE AND CONFIDENTIAL!\n\n"
 {% else %}
 	message="
-Please enter the Configuration master password that was used when
-installing the first compute node.\n\n"
+Please enter the Configuration master password that was used during
+the first compute node installation.\n\n"
 {% endif %}
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
