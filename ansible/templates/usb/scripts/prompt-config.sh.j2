@@ -59,9 +59,9 @@ declare -A nictag_ifaces
 declare -A nictag_IPs
 declare -A nictag_netmasks
 declare -A nictag_vlans
+nictag_list="external internal storage"
 
-ADVANCED_INSTALL=1
-
+advanced_install=1
 nicsup_done=0
 
 fatal()
@@ -634,6 +634,45 @@ promptpw()
 	trap sig_doshell SIGINT
 }
 {% endraw %}
+
+promptnictag_ip()
+{
+	val=""
+	ntag="$1"
+
+	promptbool "Add IP address on ${ntag} interface? (y/n)" "n" "${ntag}_addIP"
+	if [[ "${val}" -eq 1 ]]; then
+		valid=0
+		while [ $valid -ne 1 ]; do
+			promptnet "(${ntag}) IP address (or dhcp)" "${nictag_IPs[${ntag}]}"\
+				"${ntag}_ip"
+			nictag_IPs["${ntag}"]="$val"
+
+			if [[ "${nictag_IPs[${ntag}]}" != "dhcp" ]]; then
+				# set default value for netmask
+				[[ -z "${nictag_netmasks[${ntag}]}" ]] && \
+					nictag_netmasks[${ntag}]="255.255.255.0"
+				# prompt user value for netmask (with default suggestion)
+				promptnet "(${ntag}) Netmask" "${nictag_netmasks[${ntag}]}"\
+					"${ntag}_netmask"
+				# save user value for netmask
+				nictag_netmasks["${ntag}"]="$val"
+
+				# test netmask validity
+				ip_netmask_to_network "${nictag_IPs[${ntag}]}"\
+					"${nictag_netmasks[${ntag}]}"
+				[ $IP_NUM -ne $BCAST_ADDR ] && valid=1
+			else
+				# DHCP will provide netmask
+				nictag_netmasks["${ntag}"]="N/A"
+				valid=1
+			fi
+			promptvlan "(${ntag}) VLAN ID" "${nictag_vlans[${ntag}]}" "${ntag}_vlan_id"
+			nictag_vlans[${ntag}]="$val"
+		done
+	fi
+}
+
 
 updatenicstates()
 {
@@ -1362,18 +1401,6 @@ console=$(getanswer "config_console")
 # prompt:
 if [[ -z ${console} || $(tty) != "/dev/console" ]]; then
 	read continue;
-	# automatic installation is always advanced
-	printheader "Advanced installation"
-	printf "
-The advanced installation will allow you to customize additional network
-options, such as VLANs, multiple IP addresses, NTP servers, etc.
-Basic installation is suffcient for most installations\n\n"
-	promptbool "\nEnable advanced installation? (y/n)" "n"
-	if [[ "${val}" -eq 1 ]]; then
-		ADVANCED_INSTALL=1
-	else
-		ADVANCED_INSTALL=0
-	fi
 fi
 
 if [ -f /tmp/config_in_progress ]; then
@@ -1391,6 +1418,19 @@ touch /tmp/config_in_progress
 printheader "EULA"
 printeula
 prompteula
+
+
+if [[ $(getanswer "skip_instructions") != "true" ]]; then
+	# automatic installation is always advanced
+	printheader "Advanced Installation"
+	printf "
+The advanced installation will allow you to customize additional network
+options, such as VLANs, multiple IP addresses, NTP servers, etc.
+Basic installation is suffcient for most installations\n\n\n"
+
+	promptbool "Enable advanced installation? (y/n)" "n"
+	advanced_install=${val}
+fi
 
 #
 # Main loop to prompt for user input
@@ -1442,7 +1482,7 @@ The configured NIC will be used to access the compute node.\n\n"
 	admin_nic="$val"
 	admin_iface="$nic_val"
 
-	if [[ $nic_cnt -eq 1 ]]; then
+	if [[ "${nic_cnt}" -eq 1 ]]; then
 		printf "\nAutoselected NIC ${admin_iface}\n\n"
 	fi
 
@@ -1464,7 +1504,7 @@ The configured NIC will be used to access the compute node.\n\n"
 		fi
 	done
 
-	if [[ $ADVANCED_INSTALL -eq 1 ]]; then
+	if [[ ${advanced_install} -eq 1 ]]; then
 		promptvlan "(admin) VLAN ID" "$admin_vlan_id" "admin_vlan_id"
 		admin_vlan_id="$val"
 	else
@@ -1475,51 +1515,37 @@ The configured NIC will be used to access the compute node.\n\n"
 	message="
 By using additional network tags, you can easily identify multiple physical
 network interconnections between compute nodes.
-There are 3 configurable network tags: external, internal and storage.
-One physical NIC can have multiple network tags.\n\n"
+There are $(echo $nictag_list | wc -w) configurable network tags:
+$nictag_list
+
+One physical NIC can have multiple network tags.
+The tags can be added or modified also later by editing /usbkey/config file.\n\n"
+
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
 		printf "$message"
 	fi
 
 	# don't repeat selecting nic tags if they already have been defined in previous run
 	if [[ -z "${!nictag_macs[@]}" ]]; then
-		promptbool "\nAdd another network tag? (y/n)" "y"
+		promptbool "\nAdd another network tag? (y/n)" "y" "add_nictags"
 		printf "\n"
+
 		if [[ "${val}" -eq 1 ]]; then
-			for ntag in external internal storage; do
-				promptbool "Add tag \"${ntag}\"? (y/n)" "n"
+			for ntag in $nictag_list; do
+				promptbool "Add tag \"${ntag}\"? (y/n)" "n" "${ntag}_addtag"
 				if [[ "${val}" -eq 1 ]]; then
 					promptnic "'${ntag}'"
 					nictag_macs[${ntag}]="$val"
 					nictag_ifaces[${ntag}]="$nic_val"
+
 					if [[ $nic_cnt -eq 1 ]]; then
+						# just print info (we have only one NIC)
 						printf "\nAutoselected NIC ${nic_val}\n\n"
 					fi
-					if [[ $ADVANCED_INSTALL -eq 1 ]]; then
-						promptbool "Add IP address on ${ntag} interface? (y/n)" "n" "${ntag}_create"
-						if [[ "${val}" -eq 1 ]]; then
-							valid=0
-							while [ $valid -ne 1 ]; do
-								promptnet "(${ntag}) IP address (or dhcp)" "${nictag_IPs[${ntag}]}"\
-									"${ntag}_ip"
-								nictag_IPs["${ntag}"]="$val"
-								if [[ "${nictag_IPs[${ntag}]}" != "dhcp" ]]; then
-									[[ -z "${nictag_netmasks[${ntag}]}" ]] && \
-										nictag_netmasks[${ntag}]="255.255.255.0"
-									promptnet "(${ntag}) Netmask" "${nictag_netmasks[${ntag}]}"\
-										"${ntag}_netmask"
-									nictag_netmasks["${ntag}"]="$val"
-									ip_netmask_to_network "${nictag_IPs[${ntag}]}"\
-										"${nictag_netmasks[${ntag}]}"
-									[ $IP_NUM -ne $BCAST_ADDR ] && valid=1
-								else
-									nictag_netmasks["${ntag}"]="N/A"
-									valid=1
-								fi
-								promptvlan "(${ntag}) VLAN ID" "${nictag_vlans[${ntag}]}" "${ntag}_vlan_id"
-								nictag_vlans[${ntag}]="$val"
-							done
-						fi
+
+					if [[ ${advanced_install} -eq 1 ]]; then
+						# ask if user wants to set IP over the NIC tag
+						promptnictag_ip "${ntag}"
 					fi
 				fi
 			done
@@ -1569,18 +1595,18 @@ you use to create virtual machines through Danube Cloud.\n\n"
 		printf "$message"
 	fi
 
-	if [[ $ADVANCED_INSTALL -eq 1 ]]; then
+	if [[ ${advanced_install} -eq 1 ]]; then
 		prompt_host_ok_val "Enter the Primary DNS server IP" "$dns_resolver1" "dns_resolver1"
 		dns_resolver1="$val"
 		prompt_host_ok_val "Enter the Secondary DNS server IP" "$dns_resolver2" "dns_resolver2"
 		dns_resolver2="$val"
+		promptval "\nDefault DNS search domain" "$dns_domain" "dns_search"
+		dns_domain="$val"
 	else
 		# leaving default settings
 		printf "Setting first DNS server to $dns_resolver1"
 		printf "\nSetting second DNS server to $dns_resolver2"
 	fi
-	promptval "\nDefault DNS search domain" "$dns_domain" "dns_search"
-	dns_domain="$val"
 	cat > /etc/resolv.conf <<EOF
 nameserver $dns_resolver1
 nameserver $dns_resolver2
@@ -1589,7 +1615,7 @@ EOF
 		echo "search ${dns_domain}" >> /etc/resolv.conf
 	fi
 
-	if [[ $ADVANCED_INSTALL -eq 1 ]]; then
+	if [[ ${advanced_install} -eq 1 ]]; then
 		message="
 By default the first compute node acts as an NTP server for the admin network.
 You can set the first compute node to be an NTP client to synchronize to
@@ -1663,8 +1689,10 @@ setting a hostname.\n\n"
 	root_shadow="$val"
 
 {% if usb_type == "hn" %}
+	[[ -z "$hostname" && -z "$dns_domain" ]] && hostname="node01"
 	[[ -z "$hostname" ]] && hostname="node01.$dns_domain"
 {% else %}
+	[[ -z "$hostname" && -z "$dns_domain" ]] && hostname="node02"
 	[[ -z "$hostname" ]] && hostname="node02.$dns_domain"
 {% endif %}
 	promptopt "Enter system hostname" "$hostname" "hostname"
