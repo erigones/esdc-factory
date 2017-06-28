@@ -61,7 +61,7 @@ declare -A nictag_netmasks
 declare -A nictag_vlans
 nictag_list="external internal storage"
 
-advanced_install=1
+advanced_install=0
 nicsup_done=0
 
 fatal()
@@ -1420,17 +1420,17 @@ printeula
 prompteula
 
 
-if [[ $(getanswer "skip_instructions") != "true" ]]; then
-	# automatic installation is always advanced
-	printheader "Advanced Installation"
-	printf "
+printheader "Advanced Installation"
+message="
 The advanced installation will allow you to customize additional network
 options, such as VLANs, multiple IP addresses, NTP servers, etc.
 Basic installation is sufficient for most installations\n\n\n"
 
-	promptbool "Enable advanced installation? (y/n)" "n"
-	advanced_install=${val}
+if [[ $(getanswer "skip_instructions") != "true" ]]; then
+	printf "$message"
 fi
+promptbool "Enable advanced installation? (y/n)" "n" "advanced_install"
+advanced_install=${val}
 
 #
 # Main loop to prompt for user input
@@ -1519,7 +1519,7 @@ There are $(echo $nictag_list | wc -w) configurable network tags:
 $nictag_list
 
 One physical NIC can have multiple network tags.
-The tags can be added or modified also later by editing /usbkey/config file.\n\n"
+The tags can be added or modified also later by nictagadm command.\n\n"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
 		printf "$message"
@@ -1579,12 +1579,8 @@ or you rely only on the dhcp.\n\n"
 
 	# Bring the admin and external nics up now: they need to be for the
 	# connectivity checks in the next section
-	printf "\nBringing up the network interfaces.."
-	if [[ $nicsup_done -eq 1 ]]; then
-		nicsdown
-	fi
+	printf "\nBringing up the network interfaces..\n\n"
 	nicsup
-	printf "\n\n"
 
 	message="
 The DNS servers set here will be used to provide name resolution abilities to
