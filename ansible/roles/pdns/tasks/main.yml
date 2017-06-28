@@ -24,6 +24,10 @@
   command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns.xml
   when: ansible_distribution == "SmartOS"
 
+- name: Disable pdns service
+  command: svcadm disable pdns
+  when: ansible_distribution == "SmartOS"
+
 - name: Create groups
   group: name=pdns
          state=present
