@@ -1745,7 +1745,7 @@ echo "admin_vlan_id=$admin_vlan_id" >>$tmp_config
 echo "admin_ip=$admin_ip" >>$tmp_config
 if [[ "$admin_ip" != "dhcp" ]]; then
 	echo "admin_netmask=$admin_netmask" >>$tmp_config
-	echo "admin_network=$admin_network" >>$tmp_config{% endif %}
+	echo "admin_network=$admin_network" >>$tmp_config
 	echo "admin_gateway=$headnode_default_gateway" >>$tmp_config
 	echo >>$tmp_config
 fi
