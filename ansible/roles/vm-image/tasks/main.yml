@@ -20,11 +20,12 @@
   when: ansible_distribution == "CentOS"
 
 - name: Prepare virtual machine for snapshotting (SmartOS)
-  shell: sm-prepare-image -n
+  shell: sm-prepare-image
   environment:
     yn_start: "y"
     yn_nfs: "y"
     yn_subips: "y"
+    yn_halt: "n"
   when: ansible_distribution == "SmartOS"
 
 - name: Display OS information
