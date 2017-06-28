@@ -644,23 +644,19 @@ promptnictag_ip()
 	if [[ "${val}" -eq 1 ]]; then
 		valid=0
 		while [ $valid -ne 1 ]; do
-			promptnet "(${ntag}) IP address (or dhcp)" "${nictag_ips[${ntag}]}"\
-				"${ntag}_ip"
+			promptnet "(${ntag}) IP address (or dhcp)" "${nictag_ips[${ntag}]}" "${ntag}_ip"
 			nictag_ips["${ntag}"]="$val"
 
 			if [[ "${nictag_ips[${ntag}]}" != "dhcp" ]]; then
 				# set default value for netmask
-				[[ -z "${nictag_netmasks[${ntag}]}" ]] && \
-					nictag_netmasks[${ntag}]="255.255.255.0"
+				[[ -z "${nictag_netmasks[${ntag}]}" ]] && nictag_netmasks[${ntag}]="255.255.255.0"
 				# prompt user value for netmask (with default suggestion)
-				promptnet "(${ntag}) Netmask" "${nictag_netmasks[${ntag}]}"\
-					"${ntag}_netmask"
+				promptnet "(${ntag}) Netmask" "${nictag_netmasks[${ntag}]}" "${ntag}_netmask"
 				# save user value for netmask
 				nictag_netmasks["${ntag}"]="$val"
 
 				# test netmask validity
-				ip_netmask_to_network "${nictag_ips[${ntag}]}"\
-					"${nictag_netmasks[${ntag}]}"
+				ip_netmask_to_network "${nictag_ips[${ntag}]}" "${nictag_netmasks[${ntag}]}"
 				[ $IP_NUM -ne $BCAST_ADDR ] && valid=1
 			else
 				# DHCP will provide netmask
