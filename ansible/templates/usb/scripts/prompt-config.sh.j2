@@ -90,14 +90,14 @@ ip_to_num()
 {
 	IP=$1
 
-	OLDIFS=$IFS
-	IFS=.
+	OLDIFS="$IFS"
+	IFS="."
 	set -- $IP
 	num_a=$(($1 << 24))
 	num_b=$(($2 << 16))
 	num_c=$(($3 << 8))
 	num_d=$4
-	IFS=$OLDIFS
+	IFS="$OLDIFS"
 
 	num=$((num_a + $num_b + $num_c + $num_d))
 }
@@ -200,14 +200,14 @@ is_net()
 {
 	NET=$1
 
-	OLDIFS=$IFS
-	IFS=.
+	OLDIFS="$IFS"
+	IFS="."
 	set -- $NET
 	a=$1
 	b=$2
 	c=$3
 	d=$4
-	IFS=$OLDIFS
+	IFS="$OLDIFS"
 
 	isdigit "$a" || return 1
 	isdigit "$b" || return 1
