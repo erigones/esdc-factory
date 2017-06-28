@@ -8,6 +8,10 @@
   changed_when: "'nothing to do.' not in res.stdout"
   with_items: "{{ pdns_packages }}"
 
+- name: Disable pdns service
+  command: svcadm disable pdns
+  when: ansible_distribution == "SmartOS"
+
 - name: Copy SMF manifests to the remote hosts
   copy: src=pdns.xml
         dest=/opt/local/lib/svc/manifest/pdns.xml
@@ -16,16 +20,9 @@
         mode=0644
   when: ansible_distribution == "SmartOS"
 
-- name: Check if SMF manifests are imported
-  shell: /usr/bin/svcs -Ho state {{ pdns_service }} 2>/dev/null
-  ignore_errors: true
-  register: smf_state
-  changed_when: smf_state.rc != 0
-  when: ansible_distribution == "SmartOS"
-
 - name: Import pdns SMF manifest
   command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns.xml
-  when: smf_state|failed and ansible_distribution == "SmartOS"
+  when: ansible_distribution == "SmartOS"
 
 - name: Create groups
   group: name=pdns
