@@ -1801,6 +1801,7 @@ the system will be set up and all data on the disks will be erased.\n\n"
 		printf "DNS Servers: (%s, %s)\n" "$dns_resolver1" "$dns_resolver2"
 		printf "Search Domain: %s\n" "$dns_domain"
 		printf "Hostname: %s\n" "$hostname"
+		printf "Default gateway: %s\n" "$headnode_default_gateway"
 		printf "NTP server: %s\n" "$ntp_hosts"
 		echo
 		[[ "${install_to_hdd}" -eq 1 ]] && tohdd="Yes" || tohdd="No"
