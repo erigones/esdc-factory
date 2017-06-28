@@ -1704,11 +1704,6 @@ printf "%-56s" "Generating config file... "
 # START: Danube Cloud service VM IPs
 
 {% if usb_type == "hn" %}
-# Calculate admin network
-ip_netmask_to_network "$admin_ip" "$admin_netmask"
-num_to_ip $NET_NUM
-admin_network="$ip_addr"
-
 # Calculate admin network address for every core zone.
 ip_netmask_to_network "$mgmt_admin_ip" "$admin_netmask"
 
@@ -1750,7 +1745,7 @@ echo "admin_vlan_id=$admin_vlan_id" >>$tmp_config
 echo "admin_ip=$admin_ip" >>$tmp_config
 if [[ "$admin_ip" != "dhcp" ]]; then
 	echo "admin_netmask=$admin_netmask" >>$tmp_config
-	{% if usb_type == "hn" %}echo "admin_network=$admin_network" >>$tmp_config{% endif %}
+	echo "admin_network=$admin_network" >>$tmp_config{% endif %}
 	echo "admin_gateway=$headnode_default_gateway" >>$tmp_config
 	echo >>$tmp_config
 fi
