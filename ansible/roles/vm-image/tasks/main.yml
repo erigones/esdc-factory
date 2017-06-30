@@ -16,16 +16,21 @@
   when: ansible_distribution == "SmartOS"
 
 - name: Prepare virtual machine for snapshotting (CentOS)
-  shell: prepare-image
+  shell: |
+    rm -f /root/.ssh/authorized_key
+    prepare-image
   when: ansible_distribution == "CentOS"
 
 - name: Prepare virtual machine for snapshotting (SmartOS)
-  shell: sm-prepare-image -y
+  shell: |
+    rm -f /root/.ssh/authorized_keys
+    export yn_start="y"
+    export yn_nfs="y"
+    export yn_subips="y"
+    export yn_halt="n"
+    sm-prepare-image
   when: ansible_distribution == "SmartOS"
 
 - name: Display OS information
   debug:
     var: os_info
-
-- name: Cleanup /root/.ssh/authorized_keys
-  file: path=/root/.ssh/authorized_keys state=absent

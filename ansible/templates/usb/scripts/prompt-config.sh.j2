@@ -99,14 +99,14 @@ ip_to_num()
 {
 	IP=$1
 
-	OLDIFS=$IFS
-	IFS=.
+	OLDIFS="$IFS"
+	IFS="."
 	set -- $IP
 	num_a=$(($1 << 24))
 	num_b=$(($2 << 16))
 	num_c=$(($3 << 8))
 	num_d=$4
-	IFS=$OLDIFS
+	IFS="$OLDIFS"
 
 	num=$((num_a + $num_b + $num_c + $num_d))
 }
@@ -209,14 +209,14 @@ is_net()
 {
 	NET=$1
 
-	OLDIFS=$IFS
-	IFS=.
+	OLDIFS="$IFS"
+	IFS="."
 	set -- $NET
 	a=$1
 	b=$2
 	c=$3
 	d=$4
-	IFS=$OLDIFS
+	IFS="$OLDIFS"
 
 	isdigit "$a" || return 1
 	isdigit "$b" || return 1
@@ -1191,7 +1191,7 @@ create_zpool()
 
 	# If this is not a manual layout, then we've been given
 	# a JSON file describing the desired pool, so use that:
-	mkzpool -f ${rpoolarg} ${pool} ${layout} || \
+	mkzpool -f ${rpoolarg} "${pool}" "${layout}" || \
 	    fatal "failed to create pool ${pool}"
 
 	zfs set atime=off ${pool} || \
@@ -1832,10 +1832,6 @@ echo "==> Initializing new system..."
 
 printf "%-56s" "Generating config file... "
 # START: Danube Cloud service VM IPs
-# Calculate admin network
-ip_netmask_to_network "$admin_ip" "$admin_netmask"
-num_to_ip $NET_NUM
-admin_network="$ip_addr"
 
 {% if usb_type == "hn" %}
 # Calculate admin network address for every core zone.
@@ -1883,8 +1879,10 @@ if [[ "$admin_ip" != "dhcp" ]]; then
 	echo >>$tmp_config
 fi
 
-echo "headnode_default_gateway=$headnode_default_gateway" >>$tmp_config
-echo >>$tmp_config
+if [[ "$headnode_default_gateway" != "none" ]]; then
+	echo "headnode_default_gateway=$headnode_default_gateway" >>$tmp_config
+	echo >>$tmp_config
+fi
 
 echo "dns_resolvers=$dns_resolver1,$dns_resolver2" >>$tmp_config
 echo "dns_domain=$dns_domain" >>$tmp_config
@@ -1962,8 +1960,10 @@ if [[ ${install_to_hdd} -eq 1 ]]; then
     read PAUSE
 fi
 
-echo "==> The system will now finish configuration and reboot in 10 seconds."
-echo "==> Please wait..."
-
-sleep 10
-reboot 2> /dev/null
+# Do not perform a reboot when netboot_install_script boot parameter is specified
+if ! /bin/bootparams | grep -q "^netboot_install_script="; then
+	echo "==> The system will now finish configuration and reboot in 10 seconds."
+	echo "==> Please wait..."
+	sleep 10
+	reboot 2> /dev/null
+fi
