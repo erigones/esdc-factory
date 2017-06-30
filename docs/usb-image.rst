@@ -24,6 +24,8 @@ Changelog
 
 - Updated to new platform version - 20170624T192838Z from upstream/release-20170622 + backported changes from upstream - `#46 <https://github.com/erigones/esdc-factory/issues/46>`__ `#35 <https://github.com/erigones/esdc-factory/issues/35>`__
     - Updated installer (prompt-config), which now supports custom NTP configuration - `#31 <https://github.com/erigones/esdc-factory/issues/31>`__
+    - Updated installer to support configuring network tags - `#31 <https://github.com/erigones/esdc-factory/issues/53>`__
+    - Added advanced install option
     - Added support for admin_vlan_id into installer
     - Improved cfgdb availability check during installation
     - Added /esdc/settings/dc tree into cfgdb
