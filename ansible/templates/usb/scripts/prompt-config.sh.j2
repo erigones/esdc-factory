@@ -376,6 +376,18 @@ promptbool()
 	done
 }
 
+prompt_hostname() {
+	while [ /usr/bin/true ]; do
+		promptval "${@}"
+
+		if [[ "${val}" == *"."* ]]; then
+			break
+		fi
+
+		echo "A valid fully qualified domain name must be provided."
+	done
+}
+
 prompt_host_ok_val()
 {
 	val=""
@@ -1528,7 +1540,7 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 
 		if [[ "${val}" -eq 1 ]]; then
 			for ntag in $nictag_list; do
-				promptbool "Add tag \"${ntag}\"? (y/n)" "n" "${ntag}_addtag"
+				promptbool "Add NIC tag \"${ntag}\"? (y/n)" "n" "${ntag}_addtag"
 				if [[ "${val}" -eq 1 ]]; then
 					promptnic "'${ntag}'"
 					nictag_macs[${ntag}]="$val"
@@ -1575,8 +1587,11 @@ or you rely only on the dhcp.\n\n"
 
 	# Bring the admin and external nics up now: they need to be for the
 	# connectivity checks in the next section
-	printf "\nBringing up the network interfaces..\n\n"
+	printf "\nBringing up the network interfaces...\n\n"
 	nicsup
+	# We need to slowdown here because if we jump too fast to the next section
+	# the network checks below may fail (true story)
+	sleep 3
 
 	message="
 The DNS servers set here will be used to provide name resolution abilities to
@@ -1617,8 +1632,7 @@ another NTP server.\n"
 			printf "$message"
 		fi
 
-		prompt_host_ok_val \
-			"Enter an NTP server IP address or hostname" "$ntp_hosts" "ntp_host"
+		prompt_host_ok_val "Enter an NTP server IP address or hostname" "$ntp_hosts" "ntp_host"
 		ntp_hosts="$val"
 	else
 		# leaving default settings
@@ -1627,7 +1641,7 @@ another NTP server.\n"
 
 	skip_ntp=$(getanswer "skip_ntp_check")
 	if [[ -z ${skip_ntp} || ${skip_ntp} != "true" ]]; then
-			printf "Updating node time..\n"
+			printf "Synchronizing time...\n"
 			ntpdate -b $ntp_hosts >/dev/null 2>&1
 			[ $? != 0 ] && print_warning "NTP failure setting date and time"
 	fi
@@ -1687,8 +1701,7 @@ setting a hostname.\n\n"
 	[[ -z "$hostname" && -z "$dns_domain" ]] && hostname="node02.local"
 	[[ -z "$hostname" ]] && hostname="node02.$dns_domain"
 {% endif %}
-	# FIXME: We must check the hostname to be a FQDN, else sendmail fails
-	promptopt "Enter system hostname" "$hostname" "hostname"
+	prompt_hostname "Enter system hostname" "$hostname" "hostname"
 	hostname="$val"
 
 
@@ -1969,5 +1982,5 @@ if ! /bin/bootparams | grep -q "^netboot_install_script="; then
 	echo "==> The system will now finish configuration and reboot in 10 seconds."
 	echo "==> Please wait..."
 	sleep 10
-	reboot 2> /dev/null
+	reboot > /dev/null 2> /dev/null
 fi
