@@ -43,6 +43,7 @@ mail_to="root@localhost"
 ntp_hosts="0.smartos.pool.ntp.org"
 dns_resolver1="8.8.8.8"
 dns_resolver2="8.8.4.4"
+dns_domain="local"
 
 # Globals
 declare -a states
@@ -1613,6 +1614,7 @@ you use to create virtual machines through Danube Cloud.\n\n"
 		# leaving default settings
 		printf "Setting first DNS server to $dns_resolver1\n"
 		printf "Setting second DNS server to $dns_resolver2\n"
+		printf "Setting DNS search domain to $dns_domain\n"
 	fi
 	cat > /etc/resolv.conf <<EOF
 nameserver $dns_resolver1
