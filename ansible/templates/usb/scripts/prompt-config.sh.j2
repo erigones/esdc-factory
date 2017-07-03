@@ -1420,7 +1420,7 @@ printheader "Advanced Installation"
 message="
 The advanced installation will allow you to customize additional network
 options, such as VLANs, multiple IP addresses, NTP servers, etc.
-Basic installation is sufficient for most installations\n\n\n"
+Basic installation is sufficient for most installations.\n\n"
 
 if [[ $(getanswer "skip_instructions") != "true" ]]; then
 	printf "$message"
@@ -1479,7 +1479,7 @@ The configured NIC will be used to access the compute node.\n\n"
 	admin_iface="$nic_val"
 
 	if [[ "${nic_cnt}" -eq 1 ]]; then
-		printf "\nAutoselected NIC ${admin_iface}\n\n"
+		printf "Autoselected NIC: ${admin_iface}\n\n"
 	fi
 
 	valid=0
@@ -1511,11 +1511,11 @@ The configured NIC will be used to access the compute node.\n\n"
 	message="
 By using additional network tags, you can easily identify multiple physical
 network interconnections between compute nodes.
-There are $(echo $nictag_list | wc -w) configurable network tags:
+There are $(echo $nictag_list | wc -w | tr -d "[:space:]") configurable network tags:
 $nictag_list
 
 One physical NIC can have multiple network tags.
-The tags can be added or modified also later by nictagadm command.\n\n"
+The tags can be added or modified also later by the nictagadm command.\n\n"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
 		printf "$message"
@@ -1523,7 +1523,7 @@ The tags can be added or modified also later by nictagadm command.\n\n"
 
 	# don't repeat selecting nic tags if they already have been defined in previous run
 	if [[ -z "${!nictag_macs[@]}" ]]; then
-		promptbool "\nAdd another network tag? (y/n)" "y" "add_nictags"
+		promptbool "Add another network tag? (y/n)" "y" "add_nictags"
 		printf "\n"
 
 		if [[ "${val}" -eq 1 ]]; then
@@ -1596,8 +1596,8 @@ you use to create virtual machines through Danube Cloud.\n\n"
 		dns_domain="$val"
 	else
 		# leaving default settings
-		printf "Setting first DNS server to $dns_resolver1"
-		printf "\nSetting second DNS server to $dns_resolver2"
+		printf "Setting first DNS server to $dns_resolver1\n"
+		printf "Setting second DNS server to $dns_resolver2\n"
 	fi
 	cat > /etc/resolv.conf <<EOF
 nameserver $dns_resolver1
@@ -1622,12 +1622,12 @@ another NTP server.\n"
 		ntp_hosts="$val"
 	else
 		# leaving default settings
-		printf "\nSetting NTP server to $ntp_hosts"
+		printf "Setting NTP server to $ntp_hosts\n"
 	fi
 
 	skip_ntp=$(getanswer "skip_ntp_check")
 	if [[ -z ${skip_ntp} || ${skip_ntp} != "true" ]]; then
-			printf "\nUpdating node time..\n"
+			printf "Updating node time..\n"
 			ntpdate -b $ntp_hosts >/dev/null 2>&1
 			[ $? != 0 ] && print_warning "NTP failure setting date and time"
 	fi
@@ -1681,12 +1681,13 @@ setting a hostname.\n\n"
 	root_shadow="$val"
 
 {% if usb_type == "hn" %}
-	[[ -z "$hostname" && -z "$dns_domain" ]] && hostname="node01"
+	[[ -z "$hostname" && -z "$dns_domain" ]] && hostname="node01.local"
 	[[ -z "$hostname" ]] && hostname="node01.$dns_domain"
 {% else %}
-	[[ -z "$hostname" && -z "$dns_domain" ]] && hostname="node02"
+	[[ -z "$hostname" && -z "$dns_domain" ]] && hostname="node02.local"
 	[[ -z "$hostname" ]] && hostname="node02.$dns_domain"
 {% endif %}
+	# FIXME: We must check the hostname to be a FQDN, else sendmail fails
 	promptopt "Enter system hostname" "$hostname" "hostname"
 	hostname="$val"
 
