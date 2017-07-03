@@ -2,7 +2,7 @@ SECRET_KEY = """{{ secret_key.stdout }}"""
 
 DATABASES = {
     'esdc': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'transaction_hooks.backends.postgresql_psycopg2',
         'NAME': '{{ pgsql_esdc.name }}',
         'USER': '{{ pgsql_esdc.user }}',
         'PASSWORD': '{{ pgsql_esdc.password }}',
@@ -10,7 +10,7 @@ DATABASES = {
         'PORT': '{{ pgsql_esdc.port }}',
     },
     'pdns': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'transaction_hooks.backends.postgresql_psycopg2',
         'NAME': '{{ pgsql_pdns.name }}',
         'USER': '{{ pgsql_esdc.user }}',
         'PASSWORD': '{{ pgsql_esdc.password }}',
