@@ -226,12 +226,15 @@ function random_string() {
 	openssl rand -base64 "${length}" | tr -dc _A-Z-a-z-0-9
 }
 
-function reload_smf_manifests() {
-	printf_log "\r%-64s" "Reloading SMF manifests... "
+function import_smf_manifests() {
+	printf_log "%-64s" "Importing SMF manifests... "
+
+	for manifest in /opt/custom/smf/*; do
+		svccfg validate "${manifest}" || fatal "Failed to validate SMF manifest at ${manifest}"
+		svccfg import "${manifest}"
+	done
+
 	printf_log "%4s\n" "done"
-	# This will make the output to look nicer/aligned
-	svcadm disable -s svc:/system/manifest-import:default
-	svcadm enable -s svc:/system/manifest-import:default
 }
 
 #
@@ -253,7 +256,7 @@ configure_erigonesd
 configure_zabbix
 
 install_isos
-reload_smf_manifests
+import_smf_manifests
 create_setup_file
 inform_user
 
