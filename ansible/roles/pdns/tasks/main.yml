@@ -1,4 +1,7 @@
 ---
+- fail: msg="Invalid OS; Only SmartOS is supported."
+  when: ansible_distribution != "SmartOS"
+
 - name: Include OS-specific variables
   include_vars: ../defaults/{{ ansible_distribution }}.yml
 
@@ -10,7 +13,6 @@
 
 - name: Disable pdns service
   command: svcadm disable pdns
-  when: ansible_distribution == "SmartOS"
 
 - name: Copy SMF manifests to the remote hosts
   copy: src=pdns.xml
@@ -18,20 +20,16 @@
         owner=root
         group=root
         mode=0644
-  when: ansible_distribution == "SmartOS"
 
 - name: Import pdns SMF manifest
   command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns.xml
-  when: ansible_distribution == "SmartOS"
 
 - name: Disable pdns service
   command: svcadm disable pdns
-  when: ansible_distribution == "SmartOS"
 
 - name: Create groups
   group: name=pdns
          state=present
-  when: ansible_distribution == "SmartOS"
 
 - name: Create pdns user
   user: name={{ pdns_setuid }}
@@ -39,7 +37,6 @@
         shell=/usr/bin/false
         comment="PowerDNS daemon user"
         state=present
-  when: ansible_distribution == "SmartOS"
 
 - name: Create pdns configuration file
   template: src=pdns.conf.j2
@@ -49,10 +46,5 @@
             mode=0640
   notify: restart pdns
 
-- name: Enable pdns service
-  service: name={{ pdns_service }} state=started enabled=yes
-  when: ansible_distribution != "SmartOS"
-
-- name: Disable pdns service (SmartOS)
+- name: Disable pdns service
   service: name={{ pdns_service }} state=stopped enabled=no
-  when: ansible_distribution == "SmartOS"
