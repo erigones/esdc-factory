@@ -190,6 +190,7 @@ function _build_vmmanifest() {
 				-e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
 				-e "s|@PGSQL_PDNS_PASSWORD@|${PGSQL_PDNS_PASSWORD}|" \
+				-e "s|@PDNS_RECURSOR_FORWARDERS@|.=${DNS_RESOLVERS/,/;}|"
 				"${template}" > "${manifest}"
 		;;
 
@@ -551,6 +552,7 @@ ZABBIX_ESDC_PASSWORD="$(random_string)"
 ZABBIX_ADMIN_USERNAME="Admin"
 ZABBIX_ADMIN_PASSWORD="$(random_string 9)"
 ZABBIX_ADMIN_EMAIL="${CONFIG_admin_email:-""}"
+DNS_RESOLVERS="${CONFIG_dns_resolvers}"
 domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
 [[ -z "${domainname}" ]] && domainname="example.com"
 ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"monitoring@${domainname}"}"

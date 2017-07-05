@@ -8,6 +8,9 @@ pdns_db_user: "@PGSQL_USER@"
 pdns_db_password: "@PGSQL_PASSWORD@"
 pdns_allow_recursion: "0.0.0.0/0"
 
+recursor_forward_zones_recurse:
+  - "@PDNS_RECURSOR_FORWARDERS@"
+
 zbx_agent_Server: "@SERVER@"
 zbx_agent_UserParameter:
   - "smf.maintenance,/usr/bin/svcs -x | grep -c svc:/"

@@ -161,6 +161,7 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 * **org.erigones:pgsql_user**: ``gpgsql-user`` parameter in pdns.conf.
 * **org.erigones:pgsql_password**: ``gpgsql-password`` parameter in pdns.conf.
 * **org.erigones:pgsql_dbname**: ``gpgsql-dbname`` parameter in pdns.conf.
+* **org.erigones:recursor_forwarders**: sets the ``forward-zones-recurse=.=<metadata-value>`` parameter in recursor.conf.
 
 Changelog
 ---------

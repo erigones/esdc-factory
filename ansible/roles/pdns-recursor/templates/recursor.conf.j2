@@ -88,6 +88,7 @@ config-dir={{ recursor_config_dir }}
 # forward-zones	Zones for which we forward queries, comma separated domain=ip pairs
 #
 # forward-zones=
+{% if recursor_forward_zones %}forward-zones={{ recursor_forward_zones | join(',') }}{% endif %}
 
 #################################
 # forward-zones-file	File with (+)domain=ip pairs for forwarding
@@ -98,6 +99,7 @@ config-dir={{ recursor_config_dir }}
 # forward-zones-recurse	Zones for which we forward queries with recursion bit, comma separated domain=ip pairs
 #
 # forward-zones-recurse=
+{% if recursor_forward_zones_recurse %}forward-zones={{ recursor_forward_zones_recurse | join(',') }}{% endif %}
 
 #################################
 # hint-file	If set, load root hints from this file
