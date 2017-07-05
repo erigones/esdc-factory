@@ -171,6 +171,7 @@ Changelog
 
 - Built from new `base-64-es`_ with 2016Q4 pkgsrc - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 - Fixed problem where the pdns service goes to maintenance state when DB is not reachable - `#48 <https://github.com/erigones/esdc-factory/issues/48>`__
+- Added new metadata parameter: `org.erigones:recursor_forwarders` - `#60 <https://github.com/erigones/esdc-factory/issues/60>`__
 
 2.5.3
 ~~~~~

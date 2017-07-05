@@ -36,6 +36,7 @@ Changelog
 - Updated zabbix agent to 3.0.9 [monitoring-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 - Updated pkgsrc to 2016Q4 in local archive [local-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 - Updated SystemRescueCd to version 5.0.2 - commit `83a5edb <https://github.com/erigones/esdc-factory/commit/83a5edb54868220cd6052afd0c04285b8fa2a42e>`__
+- Updated first compute node installer to set recursion forwarders in esdc-dns according to DNS resolvers - `#60 <https://github.com/erigones/esdc-factory/issues/60>`__
 
 
 2.5.3 (released on 2017-05-16)
