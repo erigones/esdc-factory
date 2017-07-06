@@ -3,7 +3,7 @@
 
 echo -n '{"data":['
 
-for line in $(zoneadm -z $1 list -p | grep joyent | cut -d: -f2,4); do
+for line in $(zoneadm -z $1 list -p | egrep ":joyent:|:lx:" | cut -d: -f2,4); do
         UUID=$(echo $line | cut -d: -f1)
         ZONEROOT=$(echo $line | cut -d: -f2)
 
