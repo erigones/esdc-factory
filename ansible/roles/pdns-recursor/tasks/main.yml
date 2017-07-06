@@ -47,4 +47,4 @@
   notify: restart pdns-recursor
 
 - name: Disable pdns-recursor service
-  service: name={{ recursor_service }} state=stopped enabled=yes
+  service: name={{ recursor_service }} state=stopped enabled=no
