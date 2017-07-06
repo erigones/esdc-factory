@@ -44,7 +44,3 @@
             owner=root
             group={{ pdns_setuid }}
             mode=0640
-  notify: restart pdns
-
-- name: Disable pdns service
-  service: name={{ pdns_service }} state=stopped enabled=no

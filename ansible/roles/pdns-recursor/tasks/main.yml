@@ -44,7 +44,3 @@
             owner=root
             group={{ recursor_setgid }}
             mode=0640
-  notify: restart pdns-recursor
-
-- name: Disable pdns-recursor service
-  service: name={{ recursor_service }} state=stopped enabled=no
