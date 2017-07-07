@@ -736,6 +736,7 @@ nicsup()
 		dladm create-vnic -l ${admin_iface} -v ${admin_vlan_id} ${admin_iface_active}
 		ifconfig ${admin_iface_active} plumb
 	else
+		ifconfig ${admin_iface} plumb 2> /dev/null
 		admin_iface_active="${admin_iface}"
 	fi
 
@@ -1751,9 +1752,7 @@ web management.\n\n"
 	message="
 Please choose a password that will protect your Danube Cloud data center
 configuration settings. This password will be required whenever you
-install an additional compute node into your data center.
-
-PLEASE KEEP THIS PASSWORD SAFE AND CONFIDENTIAL!\n\n"
+install an additional compute node into your data center.\n\n"
 {% else %}
 	message="
 Please enter the Configuration master password that was used during
