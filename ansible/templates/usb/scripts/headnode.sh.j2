@@ -42,6 +42,7 @@ function errexit() {
 
 function cr_once() {
 	if [[ -z "${did_cr_once}" ]]; then
+		printf '\033c' >&${CONSOLE_FD}
 		# This is to move us to the beginning of the line with the login: prompt
 		printf "\r" >&${CONSOLE_FD}
 		did_cr_once=1
