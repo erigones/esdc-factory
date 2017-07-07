@@ -191,7 +191,7 @@ function _build_vmmanifest() {
 				-e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
 				-e "s|@PGSQL_PDNS_PASSWORD@|${PGSQL_PDNS_PASSWORD}|" \
-				-e "s|@PDNS_RECURSOR_FORWARDERS@|.=${DNS_RESOLVERS/,/;}|"
+				-e "s|@PDNS_RECURSOR_FORWARDERS@|.=${DNS_RESOLVERS/,/;}|" \
 				"${template}" > "${manifest}"
 		;;
 

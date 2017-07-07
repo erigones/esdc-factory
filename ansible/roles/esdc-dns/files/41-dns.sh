@@ -13,7 +13,7 @@ declare -A PDNS_MDATA=(
 )
 
 declare -A PDNS_RECURSOR_MDATA=(
-	[recursor_forwarders]="forward-zones-recurse=."
+	[recursor_forwarders]="forward-zones-recurse"
 )
 
 update_config() {
