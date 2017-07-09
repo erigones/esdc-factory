@@ -7,12 +7,12 @@
 
 - name: Register OS information (CentOS)
   shell: cat /etc/redhat-release
-  register: os_info
+  register: os_info_centos
   when: ansible_distribution == "CentOS"
 
 - name: Register OS information (SmartOS)
   shell: cat /etc/pkgsrc_version
-  register: os_info
+  register: os_info_smartos
   when: ansible_distribution == "SmartOS"
 
 - name: Prepare virtual machine for snapshotting (CentOS)
@@ -31,6 +31,12 @@
     sm-prepare-image
   when: ansible_distribution == "SmartOS"
 
-- name: Display OS information
+- name: Display OS information (CentOS)
   debug:
-    var: os_info
+    var: os_info_centos
+  when: ansible_distribution == "CentOS"
+
+- name: Display OS information (SmartOS)
+  debug:
+    var: os_info_smartos
+  when: ansible_distribution == "SmartOS"
