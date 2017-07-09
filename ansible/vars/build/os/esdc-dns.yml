@@ -6,7 +6,7 @@ pdns_db_host: "@PGSQL_HOST@"
 pdns_db_port: "@PGSQL_PORT@"
 pdns_db_user: "@PGSQL_USER@"
 pdns_db_password: "@PGSQL_PASSWORD@"
-pdns_allow_recursion: "0.0.0.0/0"
+pdns_allow_recursion: "127.0.0.0/8, ::1/128, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16"
 
 zbx_agent_Server: "@SERVER@"
 zbx_agent_UserParameter:
