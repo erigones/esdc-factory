@@ -21,6 +21,7 @@ update_config() {
 	local config_var="${2}"
 	local config_file="${3}"
 	local mdata_value
+	local config_value
 
 	log "reading metadata key: \"${mdata_key}\""
 	mdata_value=$(mdata-get "${mdata_key}" 2>/dev/null)
@@ -28,7 +29,13 @@ update_config() {
 	# shellcheck disable=SC2181
 	if [[ $? -eq 0 ]]; then
 		log "found metadata key: \"${mdata_key}\" value: \"${mdata_value}\""
-		if gsed -i "/^${config_var}=/s/${config_var}.*/${config_var}=${mdata_value}/" "${config_file}"; then
+		if [[ -z "${mdata_value}" ]]; then
+			log "empty metadata value for key \"${mdata_key}\" -> commenting out \"${config_var}\"!"
+			config_value="#${config_var}="
+		else
+			config_value="${config_var}=${mdata_value}"
+		fi
+		if gsed -i "/^${config_var}=/s/${config_var}.*/${config_value}/" "${config_file}"; then
 			log "set ${config_var}=${mdata_value} in ${config_file}"
 		else
 			log "failed to set ${config_var}=${mdata_value} in ${config_file}"
