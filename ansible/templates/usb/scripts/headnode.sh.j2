@@ -183,7 +183,7 @@ function _build_vmmanifest() {
 		;;
 
 		esdc-dns)
-			if [[ "${DNS_RESOLVERS}" =~ 8\.8\.[48]\.[48] ]]; then
+			if [[ "${DNS_RESOLVERS}" == "8.8.8.8,8.8.4.4" ]]; then
 				pdns_recursor_forwarders=""
 			else
 				pdns_recursor_forwarders=".=${DNS_RESOLVERS/,/;}"
