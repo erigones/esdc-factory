@@ -16,3 +16,6 @@ recursor_packetcache_ttl: 3600
 
 recursor_local_address: "127.0.0.1"
 recursor_local_port: "5353"
+
+recursor_forward_zones: []
+recursor_forward_zones_recurse: []
