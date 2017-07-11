@@ -1,0 +1,1 @@
+../../../files/usb/scripts/cfgdb_discovery.py
