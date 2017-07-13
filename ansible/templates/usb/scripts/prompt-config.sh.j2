@@ -147,6 +147,49 @@ ip_netmask_to_network()
 	BCAST_ADDR=$(($NET_NUM + $bcasthost))
 }
 
+# check if specified IP belongs to the subnet
+ip_from_subnet() {
+	local myip="$1"
+	local net="$2"
+	local mask="$3"
+
+	if [[ ${myip} == "none" ]]; then
+		# consider no IP as from the subnet
+		# (because it is a valid value)
+		return 0
+	fi
+	ip_netmask_to_network "$net" "$mask"
+	ip_to_num "$myip"
+
+	if [[ "$num" -gt "$NET_NUM" && "$num" -lt "$BCAST_ADDR" ]]; then
+		# $myip is from the subnet
+		return 0
+	else
+		# not from subnet
+		return 1
+	fi
+}
+
+prompt_ip_from_subnet() {
+	local msg="$1"
+	local default="$2"
+	local response_key="$3"
+	local net="$4"
+	local mask="$5"
+
+	while true; do
+		echo
+		promptnet "${msg}" "${default}" "${response_key}"
+		if ip_from_subnet "${val}" "${net}" "${mask}"; then
+			# $val contains the correct response
+			break
+		else
+			val=
+			echo "Entered address does not belong to the ${net}/${mask} network!"
+		fi
+	done
+}
+
 # Sets two variables, USE_LO and USE_HI, which are the usable IP addrs for the
 # largest block of available host addresses on the subnet, based on the two
 # addrs the user has chosen for the GW and External Host IP.
@@ -532,17 +575,19 @@ promptnic()
 	printnics
 	num=0
 	while [ /usr/bin/true ]; do
-		prmpt_str="Enter the number of the NIC for the $1 interface: "
+		prmpt_str="Enter the number of the NIC for the ${tag} interface: "
 		printf "$prmpt_str"
 		read num
 		if ! [[ "$num" =~ ^[0-9]+$ ]] ; then
 				echo ""
-		elif [ $num -ge 1 -a $num -le $nic_cnt ]; then
+		elif [[ $num -ge 1 && $num -le $nic_cnt ]]; then
 				mac_addr="${macs[$num]}"
+				clear_assigned_nictag "${tag}"
+
 				if [[ "${assigned[$num]}" == "-" ]]; then
-					assigned[$num]=$1
+					assigned[$num]="${tag}"
 				else
-					assigned[$num]="${assigned[$num]},$1"
+					assigned[$num]="${assigned[$num]},${tag}"
 				fi
 				nic_val=${nics[$num]}
 				break
@@ -553,6 +598,17 @@ promptnic()
 	done
 
 	val=$mac_addr
+}
+
+# remove specified nic tag from all interfaces
+clear_assigned_nictag() {
+	tag="$1"
+	for ifnum in $(seq 1 $nic_cnt); do
+		assigned[$ifnum]="$(echo "${assigned[$ifnum]}" | sed -re "s/,?$tag//" -e 's/^,|,$//')"
+		if [[ -z "${assigned[$ifnum]}" ]]; then
+			assigned[$ifnum]="-"
+		fi
+	done
 }
 
 promptvlan()
@@ -658,7 +714,7 @@ promptnictag_ip()
 		valid=0
 		while [ $valid -ne 1 ]; do
 			promptnet "(${ntag}) IP address (or dhcp)" "${nictag_ips[${ntag}]}" "${ntag}_ip"
-			nictag_ips["${ntag}"]="$val"
+			nictag_ips["${ntag}"]="${val}"
 
 			if [[ "${nictag_ips[${ntag}]}" != "dhcp" ]]; then
 				# set default value for netmask
@@ -666,7 +722,7 @@ promptnictag_ip()
 				# prompt user value for netmask (with default suggestion)
 				promptnet "(${ntag}) Netmask" "${nictag_netmasks[${ntag}]}" "${ntag}_netmask"
 				# save user value for netmask
-				nictag_netmasks["${ntag}"]="$val"
+				nictag_netmasks["${ntag}"]="${val}"
 
 				# test netmask validity
 				ip_netmask_to_network "${nictag_ips[${ntag}]}" "${nictag_netmasks[${ntag}]}"
@@ -677,8 +733,13 @@ promptnictag_ip()
 				valid=1
 			fi
 			promptvlan "(${ntag}) VLAN ID" "${nictag_vlans[${ntag}]}" "${ntag}_vlan_id"
-			nictag_vlans[${ntag}]="$val"
+			nictag_vlans[${ntag}]="${val}"
 		done
+	else
+		# clear IP from ntag
+		unset nictag_ips["${ntag}"]
+		unset nictag_netmasks["${ntag}"]
+		unset nictag_vlans["${ntag}"]
 	fi
 }
 
@@ -753,9 +814,16 @@ nicsup()
 			vlan_opts="-v ${nictag_vlans[$ntag]}"
 		fi
 		dladm create-vnic -l "${nictag_ifaces[$ntag]}" $vlan_opts "${ntag}0"
-		ifconfig "${ntag}0" plumb
-		ifconfig "${ntag}0" inet "${nictag_ips[${ntag}]}" netmask "${nictag_netmasks[${ntag}]}" up
-		vlan_opts=""	# clear for next iteration
+
+		if [[ "${nictag_ips[${ntag}]}" == "dhcp" ]]; then
+			ifconfig "${ntag}0" plumb
+			ifconfig "${ntag}0" up
+			ifconfig "${ntag}0" dhcp
+		else
+			ifconfig "${ntag}0" plumb
+			ifconfig "${ntag}0" inet "${nictag_ips[${ntag}]}" netmask "${nictag_netmasks[${ntag}]}" up
+			vlan_opts=""	# clear for next iteration
+		fi
 	done
 
 	if [[ -n ${headnode_default_gateway}
@@ -1538,28 +1606,39 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 	# don't repeat selecting nic tags if they already have been defined in previous run
 	if [[ -z "${!nictag_macs[@]}" ]]; then
 		promptbool "Add another network tag? (y/n)" "y" "add_nictags"
+	else
+		promptbool "Modify network tags? (y/n)" "n" "add_nictags"
+	fi
 		printf "\n"
 
-		if [[ "${val}" -eq 1 ]]; then
-			for ntag in $nictag_list; do
-				promptbool "Add NIC tag \"${ntag}\"? (y/n)" "n" "${ntag}_addtag"
-				if [[ "${val}" -eq 1 ]]; then
-					promptnic "'${ntag}'"
-					nictag_macs[${ntag}]="$val"
-					nictag_ifaces[${ntag}]="$nic_val"
+	if [[ "${val}" -eq 1 ]]; then
+		for ntag in $nictag_list; do
+			promptbool "Add NIC tag \"${ntag}\"? (y/n)" "n" "${ntag}_addtag"
+			if [[ "${val}" -eq 1 ]]; then
+				promptnic "'${ntag}'"
+				nictag_macs[${ntag}]="${val}"
+				nictag_ifaces[${ntag}]="$nic_val"
 
-					if [[ $nic_cnt -eq 1 ]]; then
-						# just print info (we have only one NIC)
-						printf "\nAutoselected NIC ${nic_val}\n\n"
-					fi
-
-					if [[ ${advanced_install} -eq 1 ]]; then
-						# ask if user wants to set IP over the NIC tag
-						promptnictag_ip "${ntag}"
-					fi
+				if [[ $nic_cnt -eq 1 ]]; then
+					# just print info (we have only one NIC)
+					printf "\nAutoselected NIC ${nic_val}\n\n"
 				fi
-			done
-		fi
+
+				if [[ ${advanced_install} -eq 1 ]]; then
+					# ask if user wants to set IP over the NIC tag
+					promptnictag_ip "${ntag}"
+				fi
+			else
+				# clear ${ntag}
+				unset nictag_macs["${ntag}"]
+				unset nictag_ifaces["${ntag}"]
+				unset nictag_ips["${ntag}"]
+				unset nictag_netmasks["${ntag}"]
+				unset nictag_vlans["${ntag}"]
+				# clear assigned nictag from the list
+				clear_assigned_nictag "$ntag"
+			fi
+		done
 	fi
 
 	printheader "Networking - default gateway"
@@ -1585,7 +1664,20 @@ or you rely only on the dhcp.\n\n"
 		headnode_default_gateway="none"
 
 	promptnet "Enter the default gateway IP" "$headnode_default_gateway" "headnode_default_gateway"
-	headnode_default_gateway="$val"
+	headnode_default_gateway="${val}"
+	# if headnode_default_gateway is outside the admin subnet,
+	# we need to ask for the admin gw
+	if ip_from_subnet "$headnode_default_gateway" "$admin_ip" "$admin_netmask"; then
+		admin_gateway="$headnode_default_gateway"
+	else
+		if [[ -z "$admin_gateway" ]]; then
+			# set default value
+			admin_gateway=$(num_to_ip $(($NET_NUM + 1)) && echo $ip_addr)
+		fi
+		prompt_ip_from_subnet "Enter the default gateway of the admin network"\
+			"$admin_gateway" admin_gateway "$admin_ip" "$admin_netmask"
+		admin_gateway="${val}"
+	fi
 
 	# Bring the admin and external nics up now: they need to be for the
 	# connectivity checks in the next section
@@ -1905,6 +1997,7 @@ if [[ "$admin_ip" != "dhcp" ]]; then
 fi
 
 if [[ "$headnode_default_gateway" != "none" ]]; then
+	echo "admin_gateway=$admin_gateway" >>$tmp_config
 	echo "headnode_default_gateway=$headnode_default_gateway" >>$tmp_config
 	echo >>$tmp_config
 fi
@@ -1926,7 +2019,9 @@ for ntag in "${!nictag_macs[@]}"; do
 	if [[ -n ${nictag_ips[$ntag]} ]]; then
 		echo "${ntag}0_vlan_id=${nictag_vlans[$ntag]}" >>$tmp_config
 		echo "${ntag}0_ip=${nictag_ips[$ntag]}" >>$tmp_config
-		echo "${ntag}0_netmask=${nictag_netmasks[$ntag]}" >>$tmp_config
+		if [[ "${nictag_ips[$ntag]}" != "dhcp" ]]; then
+			echo "${ntag}0_netmask=${nictag_netmasks[$ntag]}" >>$tmp_config
+		fi
 	fi
 done
 
