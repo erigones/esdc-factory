@@ -33,6 +33,7 @@ Changelog
     - Added creation of zones/backups/manifests - `esdc-ce#155 <https://github.com/erigones/esdc-ce/issues/155>`__
     - Changed Headnode to Compute node - we want to remove the headnode concept - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
     - Added netboot and netboot_install_script boot options to support installation from network - `#37 <https://github.com/erigones/esdc-factory/issues/37>`__
+- Updated zabbix scripts [monitoring-2016Q4-20170713] - `esdc-ce#129 <https://github.com/erigones/esdc-ce/issues/129>`__ (`#49 <https://github.com/erigones/esdc-factory/issues/49>`__), `esdc-ce#183 <https://github.com/erigones/esdc-ce/issues/183>`__ (`#58 <https://github.com/erigones/esdc-factory/issues/58>`__)
 - Updated zabbix agent to 3.0.9 [monitoring-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 - Updated pkgsrc to 2016Q4 in local archive [local-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 - Updated SystemRescueCd to version 5.0.2 - commit `83a5edb <https://github.com/erigones/esdc-factory/commit/83a5edb54868220cd6052afd0c04285b8fa2a42e>`__
