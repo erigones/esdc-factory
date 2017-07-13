@@ -542,7 +542,7 @@ generate_ssh_keys
 # Metatada for VMs
 ROOT_AUTHORIZED_KEYS="$(cat "/root/.ssh/${CONFIG_ssh_public_key_file}")"
 ADMIN_NETMASK="${CONFIG_admin_netmask}"
-ADMIN_GATEWAY="${CONFIG_headnode_default_gateway}"
+ADMIN_GATEWAY="${CONFIG_admin_gateway}"
 ADMIN_VLAN_ID="${CONFIG_admin_vlan_id:-0}"
 MGMT_IP="${CONFIG_mgmt_admin_ip}"
 MON_IP="${CONFIG_mon_admin_ip}"
