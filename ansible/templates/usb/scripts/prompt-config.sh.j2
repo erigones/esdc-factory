@@ -149,9 +149,9 @@ ip_netmask_to_network()
 
 # check if specified IP belongs to the subnet
 ip_from_subnet() {
-	MYIP="$1"
-	NET="$2"
-	MASK="$3"
+	local MYIP="$1"
+	local NET="$2"
+	local MASK="$3"
 
 	ip_netmask_to_network "$NET" "$MASK"
 	ip_to_num "$MYIP"
@@ -163,6 +163,26 @@ ip_from_subnet() {
 		# not from subnet
 		return 1
 	fi
+}
+
+prompt_ip_from_subnet() {
+	local MSG="$1"
+	local DEFAULT="$2"
+	local RESPONSE_KEY="$3"
+	local NET="$4"
+	local MASK="$5"
+
+	while true; do
+		echo
+		promptnet "${MSG}" "${DEFAULT}" "${RESPONSE_KEY}"
+		if ip_from_subnet "${val}" "${NET}" "${MASK}"; then
+			# $val contains the correct response
+			break
+		else
+			val=
+			echo "Entered address does not belong to the ${NET}/${MASK} network!"
+		fi
+	done
 }
 
 # Sets two variables, USE_LO and USE_HI, which are the usable IP addrs for the
@@ -1640,16 +1660,9 @@ or you rely only on the dhcp.\n\n"
 			# set default value
 			admin_gateway=$(num_to_ip $(($NET_NUM + 1)) && echo $ip_addr)
 		fi
-		while true; do
-			echo
-			promptnet "Enter the default gateway of the admin network" "$admin_gateway" admin_gateway
-			if ip_from_subnet "$val" "$admin_ip" "$admin_netmask"; then
-				admin_gateway="$val"
-				break
-			else
-				echo "Entered address does not belong to the admin network!"
-			fi
-		done
+		prompt_ip_from_subnet "Enter the default gateway of the admin network"\
+			"$admin_gateway" admin_gateway "$admin_ip" "$admin_netmask"
+		admin_gateway="${val}"
 	else
 		admin_gateway="$headnode_default_gateway"
 	fi
