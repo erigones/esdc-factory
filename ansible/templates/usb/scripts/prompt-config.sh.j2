@@ -156,7 +156,7 @@ ip_from_subnet() {
 	ip_netmask_to_network "$NET" "$MASK"
 	ip_to_num "$MYIP"
 
-	if [ "$num" -gt "$NET_NUM" ] && [ "$num" -lt "$BCAST_ADDR" ]; then
+	if [[ "$num" -gt "$NET_NUM" && "$num" -lt "$BCAST_ADDR" ]]; then
 		# $MYIP is from the subnet
 		return 0
 	else
@@ -550,19 +550,19 @@ promptnic()
 	printnics
 	num=0
 	while [ /usr/bin/true ]; do
-		prmpt_str="Enter the number of the NIC for the $tag interface: "
+		prmpt_str="Enter the number of the NIC for the ${tag} interface: "
 		printf "$prmpt_str"
 		read num
 		if ! [[ "$num" =~ ^[0-9]+$ ]] ; then
 				echo ""
-		elif [ $num -ge 1 -a $num -le $nic_cnt ]; then
+		elif [[ $num -ge 1 && $num -le $nic_cnt ]]; then
 				mac_addr="${macs[$num]}"
-				clear_assigned_nictag "$tag"
+				clear_assigned_nictag "${tag}"
 
 				if [[ "${assigned[$num]}" == "-" ]]; then
-					assigned[$num]=$tag
+					assigned[$num]="${tag}"
 				else
-					assigned[$num]="${assigned[$num]},$tag"
+					assigned[$num]="${assigned[$num]},${tag}"
 				fi
 				nic_val=${nics[$num]}
 				break
@@ -689,7 +689,7 @@ promptnictag_ip()
 		valid=0
 		while [ $valid -ne 1 ]; do
 			promptnet "(${ntag}) IP address (or dhcp)" "${nictag_ips[${ntag}]}" "${ntag}_ip"
-			nictag_ips["${ntag}"]="$val"
+			nictag_ips["${ntag}"]="${val}"
 
 			if [[ "${nictag_ips[${ntag}]}" != "dhcp" ]]; then
 				# set default value for netmask
@@ -697,7 +697,7 @@ promptnictag_ip()
 				# prompt user value for netmask (with default suggestion)
 				promptnet "(${ntag}) Netmask" "${nictag_netmasks[${ntag}]}" "${ntag}_netmask"
 				# save user value for netmask
-				nictag_netmasks["${ntag}"]="$val"
+				nictag_netmasks["${ntag}"]="${val}"
 
 				# test netmask validity
 				ip_netmask_to_network "${nictag_ips[${ntag}]}" "${nictag_netmasks[${ntag}]}"
@@ -708,7 +708,7 @@ promptnictag_ip()
 				valid=1
 			fi
 			promptvlan "(${ntag}) VLAN ID" "${nictag_vlans[${ntag}]}" "${ntag}_vlan_id"
-			nictag_vlans[${ntag}]="$val"
+			nictag_vlans[${ntag}]="${val}"
 		done
 	else
 		# clear IP from ntag
@@ -1584,7 +1584,7 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 			promptbool "Add NIC tag \"${ntag}\"? (y/n)" "n" "${ntag}_addtag"
 			if [[ "${val}" -eq 1 ]]; then
 				promptnic "'${ntag}'"
-				nictag_macs[${ntag}]="$val"
+				nictag_macs[${ntag}]="${val}"
 				nictag_ifaces[${ntag}]="$nic_val"
 
 				if [[ $nic_cnt -eq 1 ]]; then
@@ -1632,7 +1632,7 @@ or you rely only on the dhcp.\n\n"
 		headnode_default_gateway="none"
 
 	promptnet "Enter the default gateway IP" "$headnode_default_gateway" "headnode_default_gateway"
-	headnode_default_gateway="$val"
+	headnode_default_gateway="${val}"
 	# if headnode_default_gateway is outside the admin subnet,
 	# we need to ask for the admin gw
 	if ! ip_from_subnet "$headnode_default_gateway" "$admin_ip" "$admin_netmask"; then
