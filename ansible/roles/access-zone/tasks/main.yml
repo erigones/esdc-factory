@@ -1,0 +1,24 @@
+---
+- name: Create firewall configuration
+  copy: src="{{ item }}"
+        dest="/etc/ipf/{{ item }}"
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+      - ipf.conf
+      - ipnat.conf
+
+- name: Create ipnat.conf configuration file
+  copy: src=ipnat.conf
+        dest=/etc/ipf/ipnat.conf
+        owner=root
+        group=root
+        mode=0644
+
+- name: Enable firewall service
+  service: name=ipfilter enabled=yes state=started
+
+- name: Enable packet forwarding
+  command: /usr/sbin/routeadm -e ipv4-forwarding
+

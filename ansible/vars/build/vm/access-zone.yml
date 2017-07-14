@@ -1,0 +1,22 @@
+#Dependencies: base.yml, zone.yml
+image_name: access-zone
+image_desc: "Dedicated router zone"
+image_homepage: "{{ image_base_homepage }}#access-zone"
+remove_base_image: true
+builder_dir: "{{ builder.appliance.dir }}/access-zone"
+zone_brand: joyent
+zone_dns_domain: local
+zone_uuid: 4cb74eb8-8f37-4a0d-aa37-7d8f50083970
+zone_image_uuid: "{{ (lookup('pipe', 'curl -s {{ builder_base_zone_imgmanifest_url }}') | from_json)['uuid'] }}"
+zone_hostname: access-zone
+zone_nic_0_ip: "{{ build_ips.esdc_dns | default(build_ip) }}"
+zone_delegate_dataset: false
+zone_zfs_root_recsize: 131072
+zone_zfs_data_recsize: 16384
+zone_zfs_root_compression: "{{ build_disk_compression | default('lz4') }}"
+zone_zfs_data_compression: "{{ build_disk_compression | default('lz4') }}"
+zone_customer_metadata:
+  - key: user-script
+    value: "/usr/sbin/mdata-get root_authorized_keys > /root/.ssh/authorized_keys ;"
+  - key: root_authorized_keys
+    value: "{{ builder_ssh_key }}"
