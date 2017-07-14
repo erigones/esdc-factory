@@ -7,7 +7,7 @@
 - name: Create virtual machine
   hosts: buildnode
   vars_files:
-    - vars/build/vm/contrib-access-zone.yml
+    - vars/build/vm/access-zone.yml
   pre_tasks:
     - include: tasks/build/cleanup.yml
     - include: tasks/build/prepare-base-image.yml
@@ -15,13 +15,13 @@
     - smartos-vm
   tasks:
     - include: tasks/build/zone/register-host.yml
-        hostname=contrib-access-zone
+        hostname=access-zone
 
 - name: Install and configure appliance
-  hosts: contrib-access-zone
+  hosts: access-zone
   gather_facts: true
   vars_files:
-    - vars/build/os/contrib-access-zone.yml
+    - vars/build/os/access-zone.yml
   roles:
     - esdc-common
     - zabbix-agent
@@ -31,7 +31,7 @@
 - name: Create and save image
   hosts: buildnode
   vars_files:
-    - vars/build/vm/contrib-access-zone.yml
+    - vars/build/vm/access-zone.yml
   vars:
     image_tags: {internal: true, resize: true, deploy: false}
   tasks:
