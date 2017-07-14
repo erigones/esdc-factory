@@ -9,13 +9,6 @@
       - ipf.conf
       - ipnat.conf
 
-- name: Create ipnat.conf configuration file
-  copy: src=ipnat.conf
-        dest=/etc/ipf/ipnat.conf
-        owner=root
-        group=root
-        mode=0644
-
 - name: Enable firewall service
   service: name=ipfilter enabled=yes state=started
 
