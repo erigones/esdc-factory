@@ -19,8 +19,8 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.6.0 (unreleased)
-==================
+2.6.0 (released on 2017-07-21)
+==============================
 
 - Updated to new platform version - 20170624T192838Z from upstream/release-20170622 + backported changes from upstream - `#46 <https://github.com/erigones/esdc-factory/issues/46>`__ `#35 <https://github.com/erigones/esdc-factory/issues/35>`__
     - Updated installer (prompt-config), which now supports custom NTP configuration - `#31 <https://github.com/erigones/esdc-factory/issues/31>`__
