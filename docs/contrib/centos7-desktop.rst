@@ -24,6 +24,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+20170724
+~~~~~~~~
+
+- Version bump.
+
 20170324
 ~~~~~~~~
 
