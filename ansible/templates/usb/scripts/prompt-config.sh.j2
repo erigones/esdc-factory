@@ -1297,7 +1297,7 @@ discover_cfgdb()
 	local cfgdb_disco="${USBMNT}/scripts/cfgdb_discovery.py"
 	local cfgdb_ip
 
-	cfgdb_ip=$("${cfgdb_disco}" 2> /dev/null)
+	cfgdb_ip=$("${cfgdb_disco}" 2>&4)
 
 	[[ ${?} -ne 0 ]] && cfgdb_ip=""
 
