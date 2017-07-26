@@ -22,6 +22,8 @@ Changelog
 2.6.1 (unreleased)
 ==================
 
+- Added automatic discovery of configuration database IP address during installation - `#64 <https://github.com/erigones/esdc-factory/issues/64>`__
+
 
 2.6.0 (released on 2017-07-21)
 ==============================

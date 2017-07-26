@@ -103,7 +103,7 @@ Changelog
 2.6.1
 ~~~~~
 
-- Version bump.
+- Added discovery service for purposes of the compute node installer - `#64 <https://github.com/erigones/esdc-factory/issues/64>`__
 
 2.6.0
 ~~~~~
