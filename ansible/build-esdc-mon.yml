@@ -28,6 +28,7 @@
     - postgresql
     - pgbouncer
     - zabbix-server
+    - zabbix-server-partitioning
     - zabbix-agent
     - cloud-init
     - rc-scripts
