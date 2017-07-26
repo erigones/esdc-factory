@@ -1,5 +1,5 @@
 ---
-- name: Copy cfgd server initilization script
+- name: Copy cfgdb server initilization script
   copy: src=40-cfgdb.sh
         dest=/var/zoneinit/includes/40-cfgdb.sh
         owner=root
@@ -19,3 +19,17 @@
         owner=root
         group=root
         mode=0755
+
+- name: Copy cfgdb_disco_server.py script
+  copy: src=cfgdb_disco_server.py
+        dest=/usr/local/bin/cfgdb_disco_server.py
+        owner=root
+        group=root
+        mode=0755
+
+- name: Copy cfgdb-disco SMF manifest
+  copy: src=cfgdb-disco.xml
+        dest=/opt/local/lib/svc/manifest/cfgdb-disco.xml
+
+- name: Import cfgdb-disco SMF manifest
+  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/cfgdb-disco.xml

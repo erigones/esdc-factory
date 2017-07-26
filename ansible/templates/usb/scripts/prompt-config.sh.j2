@@ -1359,6 +1359,18 @@ query_cfgdb()
 	trap sig_doshell SIGINT
 	return "${ec}"
 }
+{% else %}
+discover_cfgdb()
+{
+	local cfgdb_disco="${USBMNT}/scripts/cfgdb_discovery.py"
+	local cfgdb_ip
+
+	cfgdb_ip=$("${cfgdb_disco}" 2>&4)
+
+	[[ ${?} -ne 0 ]] && cfgdb_ip=""
+
+	printf "%s" "${cfgdb_ip}"
+}
 {% endif %}
 
 # EULA
@@ -1832,6 +1844,7 @@ web management.\n\n"
 	promptnet "Management portal IP address" "${mgmt_admin_ip}" "mgmt_admin_ip"
 	mgmt_admin_ip="${val}"
 {% else %}
+	[[ -z "${cfgdb_admin_ip}" ]] && cfgdb_admin_ip="$(discover_cfgdb)"
 	prompt_host_ok_val "Configuration database IP address" "${cfgdb_admin_ip}" "cfgdb_admin_ip"
 	cfgdb_admin_ip="${val}"
 	skip_cfgdb_check=$(getanswer "skip_cfgdb_check")
