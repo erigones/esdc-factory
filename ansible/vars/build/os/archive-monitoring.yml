@@ -7,4 +7,4 @@ pkg_ext: ".tar.gz"
 pkg_link: "{{ pkg_base_name }}-latest"
 pkg_link_exts:
   - "{{ pkg_ext }}"
-zabbix_agent_version: 3.0.9
+zabbix_agent_version: 3.0.10
