@@ -28,7 +28,7 @@ Changelog
 2.6.1
 ~~~~~
 
-- Version bump.
+- Updated zabbix agent to 3.0.10 - commit `9211f83 <https://github.com/erigones/esdc-factory/commit/9211f8360003d6268ff1643b556b5e1420845ffe>`__
 
 2.6.0
 ~~~~~
