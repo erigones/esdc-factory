@@ -107,9 +107,6 @@
   environment:
     PATH: "/usr/pgsql-{{ pg_version }}/bin:{{ ansible_env.PATH }}"
 
-- name: Remove unnecessary Danube Cloud dependencies
-  shell: /opt/erigones/bin/ctl.sh pip_uninstall
-
 # Fix permissions
 - name: Modify /opt/erigones directory permissions
   file: path=/opt/erigones owner=root group=erigones mode=0755

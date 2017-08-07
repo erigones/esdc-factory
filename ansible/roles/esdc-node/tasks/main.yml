@@ -43,9 +43,6 @@
   environment:
     PATH: "{{ ansible_env.PATH }}:/opt/local/gcc49/bin"
 
-- name: Remove unnecessary esDC dependencies
-  shell: /opt/erigones/bin/ctl.sh pip_uninstall
-
 - name: Cleanup esDC virtualenvs
   shell: /opt/erigones/bin/ctl.sh clean_envs
 
