@@ -19,8 +19,8 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.6.1 (unreleased)
-==================
+2.6.1 (released on 2017-08-07)
+==============================
 
 - Added automatic discovery of configuration database IP address during installation - `#64 <https://github.com/erigones/esdc-factory/issues/64>`__
 - Updated zabbix agent to 3.0.10 [monitoring-2016Q4-20170731] - commit `b9e16b5 <https://github.com/erigones/esdc-factory/commit/b9e16b542838418e9a4b0b10b71b9e3a298fc2ec>`__
