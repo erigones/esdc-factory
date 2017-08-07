@@ -24,6 +24,7 @@ Changelog
 
 - Added automatic discovery of configuration database IP address during installation - `#64 <https://github.com/erigones/esdc-factory/issues/64>`__
 - Updated zabbix agent to 3.0.10 [monitoring-2016Q4-20170731] - commit `b9e16b5 <https://github.com/erigones/esdc-factory/commit/b9e16b542838418e9a4b0b10b71b9e3a298fc2ec>`__
+- Fixed network configuration when installed on HDD - `#65 <https://github.com/erigones/esdc-factory/issues/65>`__
 
 
 2.6.0 (released on 2017-07-21)
