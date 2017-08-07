@@ -1,15 +1,15 @@
 #Dependencies: base.yml, zone.yml
 image_name: access-zone
-image_desc: "Dedicated router zone"
-image_homepage: "{{ image_base_homepage }}#access-zone"
+image_desc: "Dedicated router/NAT/VPN zone container"
+image_homepage: "{{ image_network_homepage }}/access-zone.rst"
 remove_base_image: true
-builder_dir: "{{ builder.appliance.dir }}/access-zone"
+builder_dir: "{{ builder.appliance.dir }}/network-access-zone"
 zone_brand: joyent
 zone_dns_domain: local
 zone_uuid: 4cb74eb8-8f37-4a0d-aa37-7d8f50083970
 zone_image_uuid: "{{ (lookup('pipe', 'curl -s {{ builder_base_zone_imgmanifest_url }}') | from_json)['uuid'] }}"
 zone_hostname: access-zone
-zone_nic_0_ip: "{{ build_ips.esdc_dns | default(build_ip) }}"
+zone_nic_0_ip: "{{ build_ips.network_access_zone | default(build_ip) }}"
 zone_delegate_dataset: false
 zone_zfs_root_recsize: 131072
 zone_zfs_data_recsize: 16384

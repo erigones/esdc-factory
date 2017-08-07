@@ -3,12 +3,17 @@ Danube Cloud :: Factory :: Appliances :: Access Zone
 
 `Dedicated router image for `Danube Cloud <https://danubecloud.org>`__.
 
-This is a SunOS zone image with enabled routing, firewall and NAT. It supports initialization through `Cloud-init <https://cloudinit.readthedocs.io/>`__.
+This is a SunOS zone image with enabled packet forwarding, firewall and NAT. It supports initialization through `Zoneinit <https://github.com/joyent/zoneinit>`__.
+
+Firewall configuration can be altered here:
+* Filter: ``/etc/ipf/ipf.conf``
+* NAT and port mapper: ``/etc/ipf/ipnat.conf``
+
 In order to use it, you should create a VM in a following way:
 * The net0 network interface (the first one) has to be a WAN interface (all outgoing traffic from this interface will be masqueraded)
 * All other network interfaces need to have the *Allow IP Spoofing* option enabled (otherwise all routed packets will be dropped)
 
-.. note:: A virtual machine using this image requires at least 1 GB of RAM.
+.. note:: A virtual machine using this image requires at least 256 MB of RAM.
 
 The image supports following metadata:
 
@@ -20,8 +25,8 @@ The image supports following metadata:
 Changelog
 ---------
 
-20170714
-~~~~~~~~
+2.6.1
+~~~~~
 
 - Image created
 

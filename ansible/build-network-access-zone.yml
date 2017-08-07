@@ -7,7 +7,7 @@
 - name: Create virtual machine
   hosts: buildnode
   vars_files:
-    - vars/build/vm/access-zone.yml
+    - vars/build/vm/network-access-zone.yml
   pre_tasks:
     - include: tasks/build/cleanup.yml
     - include: tasks/build/prepare-base-image.yml
@@ -21,18 +21,18 @@
   hosts: access-zone
   gather_facts: true
   vars_files:
-    - vars/build/os/access-zone.yml
+    - vars/build/os/network-access-zone.yml
   roles:
     - esdc-common
     - zabbix-agent
-    - access-zone
+    - network-access-zone
     - vm-image
 
 - name: Create and save image
   hosts: buildnode
   vars_files:
-    - vars/build/vm/access-zone.yml
+    - vars/build/vm/network-access-zone.yml
   vars:
-    image_tags: {internal: true, resize: true, deploy: false}
+    image_tags: {internal: false, resize: true, deploy: false}
   tasks:
     - include: tasks/build/zone/create-image.yml

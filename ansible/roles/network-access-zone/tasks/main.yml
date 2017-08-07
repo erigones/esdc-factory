@@ -15,3 +15,10 @@
 - name: Enable packet forwarding
   command: /usr/sbin/routeadm -e ipv4-forwarding
 
+      ---
+- name: Copy firewall/portmap initilization script
+  copy: src=31-firewall.sh
+      dest=/var/zoneinit/includes/31-firewall.sh
+      owner=root
+      group=root
+      mode=0755
