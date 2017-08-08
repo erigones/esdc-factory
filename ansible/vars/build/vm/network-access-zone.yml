@@ -1,5 +1,5 @@
 #Dependencies: base.yml, zone.yml
-image_name: access-zone
+image_name: network-access-zone
 image_desc: "Dedicated router/NAT/VPN zone container"
 image_homepage: "{{ image_network_homepage }}/access-zone.rst"
 remove_base_image: true
