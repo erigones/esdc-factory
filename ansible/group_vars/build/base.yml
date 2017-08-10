@@ -58,6 +58,7 @@ image_tags:
 
 image_base_homepage: "https://github.com/erigones/esdc-factory/blob/master/docs/appliances.rst"
 image_contrib_homepage: "https://github.com/erigones/esdc-factory/blob/master/docs/contrib"
+image_network_homepage: "https://github.com/erigones/esdc-factory/blob/master/docs/network"
 
 release_type: nightly
 release_version: latest
