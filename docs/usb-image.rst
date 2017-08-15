@@ -22,6 +22,8 @@ Changelog
 2.6.3 (unreleased)
 ==================
 
+- Fixed storage configuration question when installing on disk - `#68 <https://github.com/erigones/esdc-factory/issues/68>`__
+
 
 2.6.2 (released on 2017-08-09)
 ==============================
