@@ -1400,7 +1400,7 @@ query_cfgdb()
 	trap sig_doshell SIGINT
 	return "${ec}"
 }
-{% else %}
+
 discover_cfgdb()
 {
 	local cfgdb_disco="${USBMNT}/scripts/cfgdb_discovery.py"
