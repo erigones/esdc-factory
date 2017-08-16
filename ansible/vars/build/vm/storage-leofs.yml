@@ -7,7 +7,7 @@ builder_dir: "{{ builder.appliance.dir }}/storage-leofs"
 zone_brand: joyent
 zone_dns_domain: local
 zone_uuid: 06b95faf-e370-466d-8841-d0f5a8aa7211
-zone_image_uuid: XXX # base-64-lts 15.4.1
+zone_image_uuid: 088b97b0-e1a1-11e5-b895-9baa2086eb33 # base-64-lts 15.4.1
 zone_hostname: storage-leofs
 zone_nic_0_ip: "{{ build_ips.storage_leofs | default(build_ip) }}"
 zone_delegate_dataset: false
