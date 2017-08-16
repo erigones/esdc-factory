@@ -1,6 +1,6 @@
 ---
 - name: Install LeoFS packages
-  command: pkgin install -y leofs_storage leofs_gateway leofs_manager
+  command: pkgin install -y leo_storage leo_gateway leo_manager
 
 - name: Copy LeoFS initialization script
   copy: src=35-leofs.sh
