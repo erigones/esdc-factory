@@ -10,7 +10,7 @@ BUILD_TARGETS =	base-centos-6 \
 				contrib-centos-6 \
 				contrib-centos-7 \
 				contrib-gitlab-ce \
-				contrib-centos7-desktop
+				contrib-centos7-desktop \
 				network-access-zone
 
 define newline
