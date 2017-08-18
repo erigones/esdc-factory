@@ -19,6 +19,7 @@ The image supports following metadata:
 * **root_authorized_keys**: content for ``/root/.ssh/authorized_keys``.
 * **cloud-init** modules: growpart, resizefs, ssh, set-passwords.
 * **org.erigones:zabbix_ip**: ``Server`` and ``ServerActive`` parameters zabbix_agentd.conf.
+* **cloud-init modules**: : growpart, resizefs, ssh, set-passwords
 
 
 Changelog
