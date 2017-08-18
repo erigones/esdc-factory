@@ -1886,7 +1886,6 @@ web management.\n\n"
 
 	promptnet "Management portal IP address" "${mgmt_admin_ip}" "mgmt_admin_ip"
 	mgmt_admin_ip="${val}"
-
 {% else %}
 	[[ -z "${cfgdb_admin_ip}" ]] && cfgdb_admin_ip="$(discover_cfgdb)"
 	prompt_host_ok_val "Configuration database IP address" "${cfgdb_admin_ip}" "cfgdb_admin_ip"
@@ -2042,8 +2041,6 @@ echo "admin_nic=$admin_nic" >>$tmp_config
 echo "admin_vlan_id=$admin_vlan_id" >>$tmp_config
 echo "admin_ip=$admin_ip" >>$tmp_config
 
-# on headnode, we have to have admin_netmask set even with dhcp
-echo "admin_netmask=$admin_netmask" >>$tmp_config
 if [[ "$admin_ip" != "dhcp" ]]; then
 	echo "admin_netmask=$admin_netmask" >>$tmp_config
 	{% if usb_type == "hn" %}
