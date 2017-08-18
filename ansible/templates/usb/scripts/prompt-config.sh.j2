@@ -1887,13 +1887,6 @@ web management.\n\n"
 	promptnet "Management portal IP address" "${mgmt_admin_ip}" "mgmt_admin_ip"
 	mgmt_admin_ip="${val}"
 
-	if [[ "${admin_ip}" == "dhcp" ]]; then
-		# if the node IP addr is from dhcp,
-		# we have to find out the netmask for mgmt VMs
-		[[ -z "$admin_netmask" ]] && admin_netmask="255.255.255.0"
-		promptnet "Management portal netmask" "$admin_netmask" "admin_netmask"
-		admin_netmask="$val"
-	fi
 {% else %}
 	[[ -z "${cfgdb_admin_ip}" ]] && cfgdb_admin_ip="$(discover_cfgdb)"
 	prompt_host_ok_val "Configuration database IP address" "${cfgdb_admin_ip}" "cfgdb_admin_ip"
@@ -2049,23 +2042,19 @@ echo "admin_nic=$admin_nic" >>$tmp_config
 echo "admin_vlan_id=$admin_vlan_id" >>$tmp_config
 echo "admin_ip=$admin_ip" >>$tmp_config
 
-{% if usb_type == "hn" %}
 # on headnode, we have to have admin_netmask set even with dhcp
 echo "admin_netmask=$admin_netmask" >>$tmp_config
 if [[ "$admin_ip" != "dhcp" ]]; then
+	echo "admin_netmask=$admin_netmask" >>$tmp_config
+	{% if usb_type == "hn" %}
 	# Calculate admin network
 	ip_netmask_to_network "$admin_ip" "$admin_netmask"
 	num_to_ip $NET_NUM
 	admin_network="$ip_addr"
 	echo "admin_network=$admin_network" >>$tmp_config
+	{% endif %}
 	echo >>$tmp_config
 fi
-{% else %}
-if [[ "$admin_ip" != "dhcp" ]]; then
-	echo "admin_netmask=$admin_netmask" >>$tmp_config
-	echo >>$tmp_config
-fi
-{% endif %}
 
 if [[ "$headnode_default_gateway" != "none" ]]; then
 	echo "admin_gateway=$admin_gateway" >>$tmp_config
