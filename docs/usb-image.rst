@@ -19,6 +19,12 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
+2.6.3 (not yet released)
+==============================
+
+- rewritten cfgdb_discovery script from python to C due to lack of python interpreter in the installation image - `#67 <https://github.com/erigones/esdc-factory/issues/67>`__
+
+
 2.6.2 (released on 2017-08-09)
 ==============================
 
