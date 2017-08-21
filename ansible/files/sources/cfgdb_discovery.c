@@ -88,23 +88,24 @@ int main(void)
         if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1)
         {
             if(errno == EAGAIN) {
-                // timeout reached
-                close(s);
-                exit(0);
+                // timeout reached, exitting..
+				break;
             }
             else
                 die("recvfrom()");
         }
 
-    // ignore everything not starting with REPLY_STRING
-    if(!strncmp(REPLY_STRING, buf, strnlen(REPLY_STRING, BUFLEN))) {
-        // cfgdb found on IP:
-        printf("%s\n", inet_ntoa(si_other.sin_addr));
-        close(s);
-        exit(0);
-    }
+        // ignore everything not starting with REPLY_STRING
+        if(!strncmp(REPLY_STRING, buf, strnlen(REPLY_STRING, BUFLEN))) {
+            // cfgdb found on IP:
+            printf("%s\n", inet_ntoa(si_other.sin_addr));
+            close(s);
+            exit(0);
+        }
     }
  
+    // no cfgdb reply found..
+    // exit with non-zero
     close(s);
-    return 0;
+    return 1;
 }
