@@ -22,6 +22,8 @@ Changelog
 2.6.4 (unreleased)
 ==================
 
+- Fixed first compute node installation when admin network is on DHCP - `#70 <https://github.com/erigones/esdc-factory/issues/70>`__
+
 
 2.6.3 (released on 2017-08-21)
 ==============================
