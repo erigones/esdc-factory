@@ -226,6 +226,7 @@ function _build_vmmanifest() {
 				-e "s|@REDIS_PASSWORD@|${REDIS_PASSWORD}|" \
 				-e "s|@PGSQL_ESDC_PASSWORD@|${PGSQL_ESDC_PASSWORD}|" \
 				-e "s|@PGSQL_PDNS_PASSWORD@|${PGSQL_PDNS_PASSWORD}|" \
+				-e "s|@PGSQL_MGMT_MON_PASSWORD@|${PGSQL_MGMT_MON_PASSWORD}|" \
 				-e "s|@ESDC_ADMIN_EMAIL@|${ZABBIX_ADMIN_EMAIL}|" \
 				"${template}" > "${manifest}"
 		;;
@@ -554,6 +555,7 @@ RABBITMQ_PASSWORD="$(random_string)"
 REDIS_PASSWORD="$(random_string)"
 PGSQL_ESDC_PASSWORD="$(random_string)"
 PGSQL_PDNS_PASSWORD="$(random_string)"
+PGSQL_MGMT_MON_PASSWORD="$(random_string)"
 ZABBIX_ESDC_USERNAME="{{ esdc_mgmt.zabbix_api.username }}"
 ZABBIX_ESDC_PASSWORD="$(random_string)"
 ZABBIX_ADMIN_USERNAME="Admin"
