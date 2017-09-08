@@ -35,15 +35,13 @@ image_server:
 usb_images:
   - name: base-64-es
     version: latest
-  - name: esdc-mon
-    version: "{{ release_version }}"
-
-usb_images_ee:
   - name: esdc-cfgdb
     version: "{{ release_version }}"
   - name: esdc-dns
     version: "{{ release_version }}"
   - name: esdc-img
+    version: "{{ release_version }}"
+  - name: esdc-mon
     version: "{{ release_version }}"
   - name: esdc-mgmt
     version: "{{ release_version }}"

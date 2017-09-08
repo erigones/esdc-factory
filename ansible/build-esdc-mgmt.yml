@@ -43,6 +43,6 @@
   vars_files:
     - vars/build/vm/esdc-mgmt.yml
   vars:
-    image_tags: {internal: true, resize: true, deploy: false}
+    image_tags: {internal: false, resize: true, deploy: false}
   tasks:
     - include: tasks/build/centos/create-image.yml
