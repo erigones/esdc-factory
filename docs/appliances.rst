@@ -377,6 +377,7 @@ The image supports following metadata:
 * **org.erigones:redis_password**: esDC Redis password.
 * **org.erigones:pgsql_esdc_password**: esDC PostgreSQL password.
 * **org.erigones:pgsql_pdns_password**: esDC PostgreSQL password for PowerDNS.
+* **org.erigones:pgsql_mgmt_mon_password**: esDC PostgreSQL password for Zabbix agent (optional).
 * **org.erigones:zabbix_server**: MON_ZABBIX_SERVER in esDC. If not set, monitoring support will be disabled.
 * **org.erigones:zabbix_esdc_username**: MON_ZABBIX_USERNAME in esDC.
 * **org.erigones:zabbix_esdc_password**: MON_ZABBIX_PASSWORD in esDC.
@@ -388,7 +389,7 @@ Changelog
 2.6.4
 ~~~~~
 
-- Version bump.
+- Added `org.erigones:pgsql_mgmt_mon_password` metadata parameter - `#72 <https://github.com/erigones/esdc-factory/issues/72>`__
 
 2.6.3
 ~~~~~

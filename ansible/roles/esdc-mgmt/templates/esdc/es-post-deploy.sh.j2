@@ -120,7 +120,10 @@ PGSQL_ESDC_PASSWORD="$(mdata-get org.erigones:pgsql_esdc_password 2> /dev/null)"
 PGSQL_PDNS_USERNAME="{{ pgsql_pdns.user }}"
 PGSQL_PDNS_PASSWORD="$(mdata-get org.erigones:pgsql_pdns_password 2> /dev/null)"
 PGSQL_MON_USERNAME="{{ pgsql_monitoring.user }}"
-PGSQL_MON_PASSWORD="$(openssl rand -base64 30 | tr -dc _A-Z-a-z-0-9)"
+PGSQL_MON_PASSWORD="$(mdata-get org.erigones:pgsql_mgmt_mon_password 2> /dev/null)"
+# fallback if mon pwd not in mdata:
+[[ -z "${PGSQL_MON_PASSWORD}" ]] && PGSQL_MON_PASSWORD="$(openssl rand -base64 30 | tr -dc _A-Z-a-z-0-9)"
+
 log "Metadata key org.erigones:pgsql_esdc_password value=${PGSQL_ESDC_PASSWORD}"
 log "Metadata key org.erigones:pgsql_pdns_password value=${PGSQL_PDNS_PASSWORD}"
 if [[ -n "${PGSQL_ESDC_PASSWORD}" ]]; then
