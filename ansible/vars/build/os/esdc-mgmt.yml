@@ -111,6 +111,6 @@ zbx_agent_UserParameter:
   - "pgbouncer.avg.qdur[*],/usr/bin/psql -h 127.0.0.1 -p 6432 -U {{ postgresql_users.monitoring.name }} -d pgbouncer -tc 'show stats' | awk '$$1 ~ /$1/ {print $$17}'"
   - "pgbouncer.pool.cl_active[*],/usr/bin/psql -h 127.0.0.1 -p 6432 -U {{ postgresql_users.monitoring.name }} -d pgbouncer -tc 'show pools' | awk '$$1 ~ /$1/ {print $$5}' | awk '{s+=$$1} END {print s}'"
   - "pgsql.ha.connected_slaves[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U {{ postgresql_users.monitoring.name }} -d postgres -At -c \"SELECT count(*) FROM pg_stat_replication\""
-  - "pgsql.ha.is_in_recovery[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U {{ postgresql_users.monitoring.name }} -d postgres -At -c \"SELECT CASE WHEN pg_is_in_recovery() = 't' THEN 1 ELSE 0 END AS in_recovery;\""
+  - "pgsql.ha.is_slave[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U {{ postgresql_users.monitoring.name }} -d postgres -At -c \"SELECT CASE WHEN pg_is_in_recovery() = 't' THEN 1 ELSE 0 END AS in_recovery;\""
 
 selinux_permissive_domains: [ zabbix_agent_t ]
