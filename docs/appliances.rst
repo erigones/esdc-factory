@@ -390,6 +390,7 @@ Changelog
 ~~~~~
 
 - Added `org.erigones:pgsql_mgmt_mon_password` metadata parameter - `#72 <https://github.com/erigones/esdc-factory/issues/72>`__
+- Added bash-completion package - commit `420d304 <https://github.com/erigones/esdc-factory/commit/420d3042044db9b5557051ad21d66cf6ea66f882>`__
 
 2.6.3
 ~~~~~
@@ -484,7 +485,7 @@ Changelog
 2.6.4
 ~~~~~
 
-- Version bump.
+- Added bash-completion package - commit `420d304 <https://github.com/erigones/esdc-factory/commit/420d3042044db9b5557051ad21d66cf6ea66f882>`__
 
 2.6.3
 ~~~~~
