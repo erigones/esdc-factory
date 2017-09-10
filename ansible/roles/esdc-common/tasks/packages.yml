@@ -9,4 +9,5 @@
     - openssh-clients
     - strace
     - vim-enhanced
+    - bash-completion
   when: ansible_distribution == "CentOS"
