@@ -7,6 +7,7 @@
   archive-<pkg>  build a tarball for the hypervisor, one of:
     local        /opt/local on the hypervisor
     monitoring   /opt/zabbix on the hypervisor
+    opt-custom   /opt/custom on the hypervisor
     esdc-node    /opt/erigones on the hypervior
   archives       download hypervisor OS archives
   isos           download iso images
@@ -34,6 +35,7 @@
     contrib-centos-7
     contrib-gitlab-ce
     contrib-centos7-desktop
+    network-access-zone
 
     NOTE: The build order is rather important.
 
@@ -47,4 +49,3 @@
     - esdc_source_repo=https://github.com/erigones/esdc-ce.git
     - esdc_prod_repo=
     - image_debug={false,true}  (default: false)
-
