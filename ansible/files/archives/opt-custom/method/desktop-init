@@ -24,7 +24,7 @@ create_xuser() {
 
 update_VM_IP() {
   # print first matching UUID of the VM whose alias matches DESKTOP_NAME_REGEX and is in state 'running'
-  UUID="$(/usr/sbin/vmadm list -H -p -o uuid,state,alias | grep :running: | /usr/bin/awk -F: "\$3 ~ /${DESKTOP_NAME_REGEX}/ {print \$1, exit 0}")"
+  UUID="$(/usr/sbin/vmadm list -H -p -o uuid,state,alias | grep :running: | /usr/bin/awk -F: "\$3 ~ /${DESKTOP_NAME_REGEX}/ {print \$1; exit 0}")"
   if [[ -z "${UUID}" ]]; then
     DESKTOP_IP=""
   else
