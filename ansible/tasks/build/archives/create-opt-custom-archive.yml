@@ -2,12 +2,12 @@
   file: state=absent path="{{ builder_tmp_dir }}/opt-custom-archive"
 
 - name: Bootstrap empty /opt/custom archive
-  file: state=directory path="{{ builder_tmp_dir }}/opt-custom-archive/opt"
+  file: state=directory path="{{ builder_tmp_dir }}/opt-custom-archive/opt/custom"
 
 - name: Copy new content
   copy:
-    src=files/archives/opt-custom
-    dest="{{ builder_tmp_dir }}/opt-custom-archive/opt/custom"
+    src=files/archives/opt-custom/
+    dest="{{ builder_tmp_dir }}/opt-custom-archive/opt/custom/"
     owner=root
     group=root
     mode=0644
