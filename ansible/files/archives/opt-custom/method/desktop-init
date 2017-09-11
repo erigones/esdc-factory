@@ -3,9 +3,6 @@
 # source config vars
 . /opt/custom/etc/desktop.conf
 
-# replace first ^ (match beginning) to space because the vmadm ALIAS column is not the first one
-DESKTOP_NAME_REGEX="$(echo ${DESKTOP_NAME_REGEX} | sed -e 's/^\^/ /')"
-
 
 ##### FUNCTIONS #####
 
@@ -26,7 +23,8 @@ create_xuser() {
 }
 
 update_VM_IP() {
-  UUID="$(/usr/sbin/vmadm list | /usr/bin/awk "/running.*${DESKTOP_NAME_REGEX}/ {print \$1}" | head -1)"
+  # print first matching UUID of the VM whose alias matches DESKTOP_NAME_REGEX and is in state 'running'
+  UUID="$(/usr/sbin/vmadm list -H -p -o uuid,state,alias | grep :running: | /usr/bin/awk -F: "\$3 ~ /${DESKTOP_NAME_REGEX}/ {print \$1, exit 0}")"
   if [[ -z "${UUID}" ]]; then
     DESKTOP_IP=""
   else
