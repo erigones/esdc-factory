@@ -1,13 +1,13 @@
 - name: Clean old /opt/custom archive
-  file: state=absent path=/var/tmp/opt-custom-archive
+  file: state=absent path="{{ builder_tmp_dir }}/opt-custom-archive"
 
 - name: Bootstrap empty /opt/custom archive
-  file: state=directory path=/var/tmp/opt-custom-archive/opt
+  file: state=directory path="{{ builder_tmp_dir }}/opt-custom-archive/opt"
 
 - name: Copy new content
   copy:
     src=files/archives/opt-custom
-    dest=/var/tmp/opt-custom-archive/opt/custom
+    dest="{{ builder_tmp_dir }}/opt-custom-archive/opt/custom"
     owner=root
     group=root
     mode=0644
@@ -15,14 +15,14 @@
     follow=no
 
 - name: Mark SMF methods executable
-  shell: chmod -R 755 /var/tmp/opt-custom-archive/opt/custom/method/
+  shell: chmod -R 755 "{{ builder_tmp_dir }}/opt-custom-archive/opt/custom/method/"
 
 - name: Create opt-src tarball {{ pkg_name }}{{ pkg_ext }}
-  shell: chdir=/var/tmp/opt-custom-archive gtar -czvf "/var/tmp/{{ pkg_name }}{{ pkg_ext }}" opt
+  shell: chdir="{{ builder_tmp_dir }}/opt-custom-archive" tar -czvf "/var/tmp/{{ pkg_name }}{{ pkg_ext }}" opt
 
 - name: Save monitoring tarball {{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}
   fetch: src="/var/tmp/{{ pkg_name }}{{ pkg_ext }}" dest="{{ save_dir }}/" flat=yes fail_on_missing=yes validate_checksum=yes
 
 - name: Clean old /opt/custom archive
-  file: state=absent path=/var/tmp/opt-custom-archive
+  file: state=absent path="{{ builder_tmp_dir }}/opt-custom-archive"
 
