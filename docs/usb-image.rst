@@ -19,8 +19,8 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.6.4 (unreleased)
-==================
+2.6.4 (released on 2017-09-11)
+==============================
 
 - Updated all internal service VM images (appliances) to be imported into the image server and available from the mgmt system - `esdc-ce#244 <https://github.com/erigones/esdc-ce/issues/244>`__
 - Added support for redirecting selected VM's graphical output to node's screen - `esdc-ce#258 <https://github.com/erigones/esdc-ce/issues/258>`__
