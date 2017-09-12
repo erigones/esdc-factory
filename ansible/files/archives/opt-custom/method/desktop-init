@@ -56,7 +56,7 @@ while true; do
   if /opt/local/bin/timeout 1 /usr/bin/nc -z "${DESKTOP_IP}" "${RDP_PORT}" > /dev/null; then
     echo "exec /opt/local/bin/rdesktop -f ${RDP_CONNECT_OPTIONS} -u '${RDP_DEFAULT_USER}' '${DESKTOP_IP}:${RDP_PORT}'" \
         > "/opt/${XUSER}/.xinitrc"
-    /usr/bin/su - "${XUSER}" -c /opt/custom/bin/desktop-rdp
+    /usr/bin/su - "${XUSER}" -c /opt/custom/method/desktop-rdp
   fi
   # try X server
   if /opt/local/bin/timeout 1 /usr/bin/nc -z "${DESKTOP_IP}" "${XSESSION_PORT}" > /dev/null; then
