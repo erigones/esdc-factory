@@ -369,7 +369,7 @@ get_mgmt_ssh_key() {
 function import_smf_manifests() {
 	printf_log "%-64s" "Importing SMF manifests... "
 
-	for manifest in /opt/custom/smf/*; do
+	for manifest in /opt/custom/smf/*.xml; do
 		svccfg validate "${manifest}" || fatal "Failed to validate SMF manifest at ${manifest}"
 		svccfg import "${manifest}"
 	done
