@@ -151,7 +151,7 @@ cat << 'RCLOCAL' > /etc/rc.d/rc.local
 # You can put your own initialization stuff in here if you don't
 # want to do the full Sys V style init stuff.
 
-interfaces="$(ifconfig -a | grep ^eth | awk -F: '{print $1}')"
+interfaces="$(ifconfig -a | grep -E '^eth|^net' | awk -F: '{print $1}')"
 
 for iface in ${interfaces[@]}; do
     config="/etc/sysconfig/network-scripts/ifcfg-${iface}"
@@ -177,6 +177,8 @@ done
 
 touch /var/lock/subsys/local
 RCLOCAL
+
+chmod +x /etc/rc.d/rc.local
 
 # Disable zeroconf
 echo NETWORKING=yes >> /etc/sysconfig/network
