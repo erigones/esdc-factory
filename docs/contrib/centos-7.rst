@@ -12,6 +12,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+20170915
+~~~~~~~~
+
+- Version bump to CentOS 7.4 (1708).
+
 20170724
 ~~~~~~~~
 
