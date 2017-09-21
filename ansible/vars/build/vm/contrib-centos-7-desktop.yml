@@ -1,11 +1,11 @@
 # Dependencies: base.yml, zone.yml
-image_name: centos7-desktop
+image_name: centos-7-desktop
 image_desc: "CentOS 7 with preinstalled full Gnome desktop environment"
-image_homepage: "{{ image_contrib_homepage }}/centos7-desktop.rst"
+image_homepage: "{{ image_contrib_homepage }}/centos-7-desktop.rst"
 image_requirements:
   min_ram: 1024
 remove_base_image: true
-builder_dir: "{{ builder.appliance.dir }}/contrib-centos7-desktop"
+builder_dir: "{{ builder.appliance.dir }}/contrib-centos-7-desktop"
 base_centos_imgmanifest: "{{ lookup('pipe', 'curl -s {{ builder_base_centos_imgmanifest_url }}') | from_json }}"
 zone_brand: kvm
 zone_memory: 1536  # Because we need more tmpfs space

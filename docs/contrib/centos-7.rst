@@ -12,10 +12,11 @@ The image supports following metadata:
 Changelog
 ---------
 
-20170915
+20170922
 ~~~~~~~~
 
 - Version bump to CentOS 7.4 (1708).
+- Fixed critical NIC naming problem, which could lead to `network being down in VMs after update of cloud-init or CentOS <https://github.com/erigones/esdc-ce/wiki/Known-Issues#network-down-in-vms-after-update-of-cloud-init-or-centos>`__.
 
 20170724
 ~~~~~~~~
