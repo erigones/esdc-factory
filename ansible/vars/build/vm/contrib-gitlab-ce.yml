@@ -8,7 +8,7 @@ remove_base_image: true
 builder_dir: "{{ builder.appliance.dir }}/contrib-gitlab-ce"
 base_centos_imgmanifest: "{{ lookup('pipe', 'curl -s {{ builder_base_centos_imgmanifest_url }}') | from_json }}"
 zone_brand: kvm
-zone_memory: 1536  # Because we need more tmpfs space
+zone_memory: 2048  # Because we need more tmpfs space
 zone_vnc_port: "{{ build_vnc_ports.contrib_gitlab_ce | default(build_vnc_port) | mandatory }}"
 zone_uuid: 632a5889-eb72-4b8e-8241-1e61946aef1c
 zone_hostname: "{{ image_name }}"
