@@ -61,15 +61,15 @@ firewall_allowed_tcp_ports:
   - port: 80
   - port: 443
   - port: 22
-    iface: eth0
+    iface: net0
   - port: 5672
-    iface: eth0
+    iface: net0
   - port: 6379
-    iface: eth0
+    iface: net0
   - port: 6432
-    iface: eth0
+    iface: net0
   - port: 10050
-    iface: eth0
+    iface: net0
 
 sudo_users:
   - user: erigones
