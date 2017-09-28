@@ -511,7 +511,7 @@ Changelog
 2.6.5
 ~~~~~
 
-- Version bump.
+- Added t_svc-db-ha template for monitoring HA status of the PostgreSQL cluster - `#79 <https://github.com/erigones/esdc-factory/issues/79>`__
 
 2.6.4
 ~~~~~
