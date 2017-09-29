@@ -111,6 +111,12 @@ ONBOOT=yes
 NAME=loopback
 EOF
 
+cat > /etc/sysconfig/network-scripts/ifcfg-net0 << EOF
+DEVICE="net0"
+ONBOOT="yes"
+BOOTPROTO="dhcp"
+EOF
+
   info "cleaning up package cache"
   yum clean all >/dev/null
 }

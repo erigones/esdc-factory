@@ -170,7 +170,7 @@ for iface in ${interfaces[@]}; do
 
     ifup ${iface}
 
-    ipaddr="$(ifconfig ${iface} | grep 'inet addr:' | cut -d: -f2 | cut -d ' ' -f1)"
+    ipaddr="$(ifconfig ${iface} | grep inet | head -n1 | awk '{print $2}')"
 
     /sbin/arping -q -c 2 -A -I ${iface} ${ipaddr}
 done
