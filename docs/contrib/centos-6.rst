@@ -11,10 +11,11 @@ The image supports following metadata:
 Changelog
 ---------
 
-20170922
+20170930
 ~~~~~~~~
 
 - Version bump.
+- Disabled cloud-init network configuration - `#80 <https://github.com/erigones/esdc-factory/issues/80>`__
 
 20170724
 ~~~~~~~~

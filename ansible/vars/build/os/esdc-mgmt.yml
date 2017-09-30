@@ -70,16 +70,6 @@ firewall_allowed_tcp_ports:
     iface: eth0
   - port: 10050
     iface: eth0
-  - port: 22
-    iface: net0
-  - port: 5672
-    iface: net0
-  - port: 6379
-    iface: net0
-  - port: 6432
-    iface: net0
-  - port: 10050
-    iface: net0
 
 sudo_users:
   - user: erigones

@@ -145,6 +145,7 @@ for iface in ${interfaces[@]}; do
     ifdown ${iface}
 
     echo "DEVICE=\"${iface}\"" > ${config}
+    echo "TYPE=\"Ethernet\"" >> ${config
     echo "ONBOOT=\"yes\"" >> ${config}
     echo "BOOTPROTO=\"dhcp\"" >> ${config}
 

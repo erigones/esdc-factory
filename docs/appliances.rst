@@ -409,7 +409,7 @@ Changelog
 2.6.5
 ~~~~~
 
-- Version bump.
+- Disabled cloud-init network configuration - `#80 <https://github.com/erigones/esdc-factory/issues/80>`__
 
 2.6.4
 ~~~~~
@@ -512,6 +512,7 @@ Changelog
 ~~~~~
 
 - Added t_svc-db-ha template for monitoring HA status of the PostgreSQL cluster - `#79 <https://github.com/erigones/esdc-factory/issues/79>`__
+- Disabled cloud-init network configuration - `#80 <https://github.com/erigones/esdc-factory/issues/80>`__
 
 2.6.4
 ~~~~~
