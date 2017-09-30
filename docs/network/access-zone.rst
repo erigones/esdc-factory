@@ -4,7 +4,7 @@ Danube Cloud :: Factory :: Appliances :: Access Zone
 `Dedicated router image for `Danube Cloud <https://danubecloud.org>`__.
 
 This is a lightweight SunOS zone image with enabled packet forwarding, firewall and NAT. It supports initialization through `Zoneinit <https://github.com/joyent/zoneinit>`__.
-The *network-access-zone* appliance is based on the `base-64-es<https://github.com/erigones/esdc-factory/blob/master/docs/appliances.rst#base-64-es>`__ image.
+The *network-access-zone* appliance is based on the `base-64-es <https://github.com/erigones/esdc-factory/blob/master/docs/appliances.rst#base-64-es>`__ image.
 
 In order to use it, create a SunOS zone in a following way:
 * The net0 network interface (the first one) has to be a WAN interface (all outgoing traffic from this interface will be masqueraded)
