@@ -22,6 +22,7 @@ Changelog
 2.6.5 (unreleased)
 ==================
 
+- Updated zabbix agent to 3.0.11 [monitoring-2016Q4-20170930] - `#81 <https://github.com/erigones/esdc-factory/issues/81>`__
 
 
 2.6.4 (released on 2017-09-11)
