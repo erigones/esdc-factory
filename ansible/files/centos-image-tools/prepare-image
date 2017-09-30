@@ -113,6 +113,7 @@ EOF
 
 cat > /etc/sysconfig/network-scripts/ifcfg-net0 << EOF
 DEVICE="net0"
+DEVICETYPE="eth"
 ONBOOT="yes"
 BOOTPROTO="dhcp"
 EOF
