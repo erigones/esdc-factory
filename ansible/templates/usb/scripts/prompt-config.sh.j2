@@ -2135,7 +2135,7 @@ fi
 
 # Do not perform a reboot when netboot_install_script boot parameter is specified
 if ! /bin/bootparams | grep -q "^netboot_install_script="; then
-	echo "==> The system will now finish configuration and reboot in 10 seconds."
+	echo "==> The system will now finish configuration and reboot."
 	echo "==> Please wait..."
 	sleep 10
 	reboot > /dev/null 2> /dev/null
