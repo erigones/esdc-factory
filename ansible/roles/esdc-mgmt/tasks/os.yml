@@ -5,4 +5,7 @@
   yum: name="http://rpms.famillecollet.com/enterprise/remi-release-7.rpm" state=present
 
 - name: Enable Remi RPM repository
-  yum_repository: name=remi enabled=yes exclude="redis"
+  shell: yum-config-manager --enable remi
+
+- name: Disable redis package from remi
+  shell: yum-config-manager --setopt=remi.exclude=redis --save remi
