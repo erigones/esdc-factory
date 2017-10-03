@@ -1,7 +1,7 @@
 ---
 
-- name: Stop rabbitmq-server before database cleanup
-  service: name=rabbitmq-server state=stopped
+- name: Stop and disable rabbitmq-server before database cleanup
+  service: name=rabbitmq-server state=stopped enabled=no
 
 - name: Delete rabbitmq-server database and config before creating image
   file: path="{{ item }}" state=absent

@@ -4,7 +4,6 @@ hostname: "{{ esdc_mgmt.hostname | default('mgmt01.local') }}"
 
 rc_scripts_after:
   - redis.service
-  - rabbitmq-server.service
   - tomcat.service
   - guacd.service
   - zabbix-agent.service

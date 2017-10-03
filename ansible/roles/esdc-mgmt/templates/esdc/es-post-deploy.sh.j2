@@ -71,6 +71,12 @@ chmod 600 /etc/pki/tls/certs/server.key
 log "Restaring haproxy"
 systemctl restart haproxy
 
+# RabbitMQ service is disabled by default (hostname issue)
+log "Starting rabbitmq-server"
+systemctl enable rabbitmq-server
+systemctl start rabbitmq-server
+sleep 15
+
 # RabbitMQ
 RABBITMQ_HOST="{{ rabbitmq.host }}"
 RABBITMQ_PORT="{{ rabbitmq.port }}"
