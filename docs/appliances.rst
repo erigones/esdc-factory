@@ -25,6 +25,11 @@ base-64-es
 Changelog
 ---------
 
+2.6.6
+~~~~~
+
+- Version bump.
+
 2.6.5
 ~~~~~
 
@@ -119,6 +124,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 
 Changelog
 ---------
+
+2.6.6
+~~~~~
+
+- Version bump.
 
 2.6.5
 ~~~~~
@@ -216,6 +226,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.6.6
+~~~~~
+
+- Version bump.
+
 2.6.5
 ~~~~~
 
@@ -305,6 +320,11 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 
 Changelog
 ---------
+
+2.6.6
+~~~~~
+
+- Version bump.
 
 2.6.5
 ~~~~~
@@ -405,6 +425,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.6.6
+~~~~~
+
+- Version bump.
 
 2.6.5
 ~~~~~
@@ -507,6 +532,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+2.6.6
+~~~~~
+
+- Version bump.
 
 2.6.5
 ~~~~~

@@ -19,6 +19,10 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
+2.6.6 (unreleased)
+==================
+
+
 2.6.5 (released on 2017-10-04)
 ==============================
 
