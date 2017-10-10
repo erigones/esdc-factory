@@ -19,10 +19,25 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.6.4 (unreleased)
+2.6.6 (unreleased)
 ==================
 
-- Fixed first compute node installation when admin network is on DHCP - `#70 <https://github.com/erigones/esdc-factory/issues/70>`__
+- Added support for unattended installation via answer file - `#82 <https://github.com/erigones/esdc-factory/issues/82>`__
+- Dropped DHCP support during first compute node install - `#70 <https://github.com/erigones/esdc-factory/issues/70>`__
+
+
+2.6.5 (released on 2017-10-04)
+==============================
+
+- Updated zabbix agent to 3.0.11 [monitoring-2016Q4-20170930] - `#81 <https://github.com/erigones/esdc-factory/issues/81>`__
+
+
+2.6.4 (released on 2017-09-11)
+==============================
+
+- Updated all internal service VM images (appliances) to be imported into the image server and available from the mgmt system - `esdc-ce#244 <https://github.com/erigones/esdc-ce/issues/244>`__
+- Added support for redirecting selected VM's graphical output to node's screen - `esdc-ce#258 <https://github.com/erigones/esdc-ce/issues/258>`__
+- Added the *opt-custom* archive [opt-custom-2016Q4-20170911] and updated *local* archive [local-2016Q4-20170911] - `#77 <https://github.com/erigones/esdc-factory/issues/77>`__
 
 
 2.6.3 (released on 2017-08-21)
