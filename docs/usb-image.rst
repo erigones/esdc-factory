@@ -22,6 +22,8 @@ Changelog
 2.6.6 (unreleased)
 ==================
 
+- Added support for unattended installation via answer file - `#82 <https://github.com/erigones/esdc-factory/issues/82>`__
+
 
 2.6.5 (released on 2017-10-04)
 ==============================
