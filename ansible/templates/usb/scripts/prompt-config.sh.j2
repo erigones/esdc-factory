@@ -1653,14 +1653,17 @@ The configured NIC will be used to access the compute node.\n\n"
 
 	valid=0
 	while [ $valid -ne 1 ]; do
-		promptnet "(admin) IP address (or dhcp)" "$admin_ip" "admin_ip"
-		admin_ip="$val"
 		{% if usb_type == "hn" %}
+		promptnet "(admin) IP address" "$admin_ip" "admin_ip"
+		admin_ip="$val"
 		# we disallow DHCP on HN install
 		if [ "${admin_ip}" == "dhcp" ]; then
 			echo "The first node cannot have a dynamic admin address during install."
 			continue
 		fi
+		{% else %}
+		promptnet "(admin) IP address (or dhcp)" "$admin_ip" "admin_ip"
+		admin_ip="$val"
 		{% endif %}
 
 		if [[ "$admin_ip" != "dhcp" ]]; then
