@@ -10,7 +10,7 @@ BUILD_TARGETS =	base-centos-6 \
 				contrib-centos-6 \
 				contrib-centos-7 \
 				contrib-gitlab-ce \
-				contrib-centos7-desktop \
+				contrib-centos-7-desktop \
 				network-access-zone
 
 define newline
@@ -35,6 +35,7 @@ define HELP_TEXT
   archive-<pkg>  build a tarball for the hypervisor, one of:
     local        /opt/local on the hypervisor
     monitoring   /opt/zabbix on the hypervisor
+    opt-custom   /opt/custom on the hypervisor
     esdc-node    /opt/erigones on the hypervior
   archives       download hypervisor OS archives
   isos           download iso images
@@ -107,6 +108,9 @@ archive-local local-archive:
 
 archive-monitoring monitoring-archive:
 	@bin/ansible.sh build-archive-monitoring
+
+archive-opt-custom opt-custom-archive:
+	@bin/ansible.sh build-archive-opt-custom
 
 archive-esdc-node esdc-node-archive:
 	@bin/ansible.sh build-archive-esdc-node

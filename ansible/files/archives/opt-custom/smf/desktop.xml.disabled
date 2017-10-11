@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+
+<service_bundle type='manifest' name='application:desktop'>
+<service
+        name='application/desktop'
+        type='service'
+        version='1'>
+
+        <create_default_instance enabled='true' />
+
+        <single_instance />
+
+        <dependency
+                name='vmadmd'
+                grouping='require_all'
+                restart_on='none'
+                type='service'>
+                <service_fmri value='svc:/system/smartdc/vmadmd' />
+        </dependency>
+
+        <dependency
+                name='zones'
+                grouping='require_all'
+                restart_on='none'
+                type='service'>
+                <service_fmri value='svc:/system/zones' />
+        </dependency>
+
+        <exec_method
+                type='method'
+                name='start'
+                exec='/opt/custom/method/desktop-init &amp;'
+                timeout_seconds='0'>
+                <!--<method_context working_directory="/opt/xuser">
+                          <method_credential user="xuser" group="other"/>
+                          <method_environment>
+                                      <envvar name="PATH" value="/bin:/usr/bin:/smartdc/bin:/opt/local/bin" />
+                          </method_environment>
+               </method_context> -->
+        </exec_method>
+
+        <exec_method
+                type='method'
+                name='stop'
+                exec=':kill'
+                timeout_seconds='0'>
+        </exec_method>
+
+        <stability value='Unstable' />
+
+</service>
+</service_bundle>

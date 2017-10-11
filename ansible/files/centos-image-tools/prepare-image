@@ -111,8 +111,12 @@ ONBOOT=yes
 NAME=loopback
 EOF
 
+# Although there is an automatic NIC configuration script in rc.local,
+# this network script is required to ensure that the main NIC is up ASAP
+# (This is important for esdc-mgmt and usually VMs have at least one NIC)
 cat > /etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
 DEVICE="eth0"
+DEVICETYPE="eth"
 ONBOOT="yes"
 BOOTPROTO="dhcp"
 EOF

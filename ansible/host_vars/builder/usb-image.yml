@@ -35,21 +35,23 @@ image_server:
 usb_images:
   - name: base-64-es
     version: latest
-  - name: esdc-mon
-    version: "{{ release_version }}"
-
-usb_images_ee:
   - name: esdc-cfgdb
     version: "{{ release_version }}"
   - name: esdc-dns
     version: "{{ release_version }}"
   - name: esdc-img
     version: "{{ release_version }}"
+  - name: esdc-mon
+    version: "{{ release_version }}"
   - name: esdc-mgmt
     version: "{{ release_version }}"
     edition: "-{{ release_edition }}"
 
 usb_archives:
+  # opt-custom must be before monitoring because monitoring adds SMF manifests into /opt/custom
+  - name: opt-custom
+    version: latest
+    target: /opt/custom
   - name: monitoring
     version: latest
     target: /opt/zabbix

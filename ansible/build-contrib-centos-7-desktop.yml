@@ -7,7 +7,7 @@
 - name: Create virtual machine
   hosts: buildnode
   vars_files:
-    - vars/build/vm/contrib-centos7-desktop.yml
+    - vars/build/vm/contrib-centos-7-desktop.yml
   pre_tasks:
     - include: tasks/build/cleanup.yml
     - include: tasks/build/prepare-base-image.yml
@@ -15,13 +15,13 @@
     - smartos-vm
   tasks:
     - include: tasks/build/centos/register-host.yml
-        hostname=contrib-centos7-desktop
+        hostname=contrib-centos-7-desktop
 
 - name: Install and configure appliance
-  hosts: contrib-centos7-desktop
+  hosts: contrib-centos-7-desktop
   gather_facts: true
   vars_files:
-    - vars/build/os/contrib-centos7-desktop.yml
+    - vars/build/os/contrib-centos-7-desktop.yml
   roles:
     - selinux
     - zabbix-agent
@@ -30,14 +30,14 @@
     - mdata-client
     - qemu-guest-agent
     - passwords
-    - contrib-centos7-desktop
+    - contrib-centos-7-desktop
     - vm-image
 
 - name: Create and save image
   hosts: buildnode
   vars_files:
-    - vars/build/vm/contrib-centos7-desktop.yml
-    - vars/build/os/contrib-centos7-desktop.yml
+    - vars/build/vm/contrib-centos-7-desktop.yml
+    - vars/build/os/contrib-centos-7-desktop.yml
   vars:
     image_tags: {internal: false, resize: true, deploy: false}
   tasks:

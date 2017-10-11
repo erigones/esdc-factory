@@ -10,8 +10,25 @@
               state=present
               create=yes
 
-- name: Start rabbitmq-server and enable at boot
-  service: name=rabbitmq-server enabled=yes state=started
+- name: Create systemd rabbitmq-server directory for custom configs
+  file: path=/etc/systemd/system/rabbitmq-server.service.d
+        owner=root
+        group=root
+        mode=0755
+        state=directory
+
+- name: Copy custom rabbitmq-server config file to /etc/systemd/system/rabbitmq-server.service.d
+  copy: src=rabbitmq/custom.conf
+        dest=/etc/systemd/system/rabbitmq-server.service.d/custom.conf
+        owner=root
+        group=root
+        mode=0644
+
+- name: Reload systemd configuration files
+  shell: systemctl daemon-reload
+
+- name: Start rabbitmq-server
+  service: name=rabbitmq-server enabled=no state=started
 
 - name: Remove default guest user
   rabbitmq_user: user=guest state=absent

@@ -1,0 +1,68 @@
+#!/bin/sh
+
+# source config vars
+. /opt/custom/etc/desktop.conf
+
+
+##### FUNCTIONS #####
+
+create_xuser() {
+  # Recreate X user if necessary (his home in /opt/xuser is persistent)
+  mkdir -p "/opt/${XUSER}"
+  
+  if ! /usr/bin/grep -q "^${XUSER}:" /etc/passwd; then
+    echo "${XUSER}:x:${XUSERID}:1::/opt/${XUSER}:/usr/bin/bash"   >> /etc/passwd
+  fi
+  
+  # Verify shadow separately because it can be loop-mounted /usbkey/shadow
+  if ! /usr/bin/grep -q "^${XUSER}:" /etc/shadow; then
+    echo "${XUSER}:*LK*:::::::"                                   >> /etc/shadow
+  fi
+  
+  chown -R "${XUSER}" "/opt/${XUSER}"
+}
+
+update_VM_IP() {
+  # print first matching UUID of the VM whose alias matches DESKTOP_NAME_REGEX and is in state 'running'
+  UUID="$(/usr/sbin/vmadm list -H -p -o uuid,state,alias | grep :running: | /usr/bin/awk -F: "\$3 ~ /${DESKTOP_NAME_REGEX}/ {print \$1; exit 0}")"
+  if [[ -z "${UUID}" ]]; then
+    DESKTOP_IP=""
+  else
+    DESKTOP_IP="$(/usr/sbin/vmadm get "${UUID}" | /usr/bin/json nics.0.ip)"
+  fi
+}
+
+wait_for_desktop_VM() {
+  while true; do
+    update_VM_IP
+    if [[ -z "$DESKTOP_IP" ]]; then
+      echo "Local desktop VM not found yet. Waiting..."
+      sleep 20
+    else
+      return 0
+    fi
+  done
+}
+
+
+##### MAIN #####
+
+create_xuser
+
+DESKTOP_IP=""
+while true; do
+  wait_for_desktop_VM
+  # try remote desktop
+  if /opt/local/bin/timeout 1 /usr/bin/nc -z "${DESKTOP_IP}" "${RDP_PORT}" > /dev/null; then
+    echo "exec /opt/local/bin/rdesktop -f ${RDP_CONNECT_OPTIONS} -u '${RDP_DEFAULT_USER}' '${DESKTOP_IP}:${RDP_PORT}'" \
+        > "/opt/${XUSER}/.xinitrc"
+    /usr/bin/su - "${XUSER}" -c /opt/custom/method/desktop-rdp
+  fi
+  # try X server
+  if /opt/local/bin/timeout 1 /usr/bin/nc -z "${DESKTOP_IP}" "${XSESSION_PORT}" > /dev/null; then
+    /opt/local/bin/Xorg -terminate -query "${DESKTOP_IP}" :1 
+  fi
+  # server not connectable or just disconnected
+  # wait and try again
+  sleep 5
+done

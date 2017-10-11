@@ -1,5 +1,13 @@
 ---
-- name: Install common packages
+- name: Update packages (CentOS)
+  shell: yum update --security
+  when: ansible_distribution == "CentOS"
+
+- name: Update packages (SmartOS)
+  shell: pkgin -f update && pkgin -y upgrade
+  when: ansible_distribution == "SmartOS"
+
+- name: Install common packages (CentOS)
   yum: name={{ item }} state=latest
   with_items:
     - libselinux-python
@@ -9,4 +17,5 @@
     - openssh-clients
     - strace
     - vim-enhanced
+    - bash-completion
   when: ansible_distribution == "CentOS"

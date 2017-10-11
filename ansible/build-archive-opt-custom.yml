@@ -1,0 +1,21 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create /opt/custom archive
+  hosts: builder
+  gather_facts: false
+  vars_files:
+      - vars/build/os/archive-opt-custom.yml
+  tasks:
+      - include: tasks/build/archives/create-opt-custom-archive.yml
+
+- name: /opt/custom archive post-build tasks
+  hosts: builder
+  vars_files:
+    - vars/build/os/archive-opt-custom.yml
+  tasks:
+    - include: tasks/build/save-package.yml
+

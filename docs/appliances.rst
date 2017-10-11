@@ -25,6 +25,16 @@ base-64-es
 Changelog
 ---------
 
+2.6.6
+~~~~~
+
+- Version bump.
+
+2.6.5
+~~~~~
+
+- Version bump.
+
 2.6.4
 ~~~~~
 
@@ -114,6 +124,16 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 
 Changelog
 ---------
+
+2.6.6
+~~~~~
+
+- Version bump.
+
+2.6.5
+~~~~~
+
+- Version bump.
 
 2.6.4
 ~~~~~
@@ -206,6 +226,16 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+2.6.6
+~~~~~
+
+- Version bump.
+
+2.6.5
+~~~~~
+
+- Version bump.
+
 2.6.4
 ~~~~~
 
@@ -290,6 +320,16 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 
 Changelog
 ---------
+
+2.6.6
+~~~~~
+
+- Version bump.
+
+2.6.5
+~~~~~
+
+- Version bump.
 
 2.6.4
 ~~~~~
@@ -377,6 +417,7 @@ The image supports following metadata:
 * **org.erigones:redis_password**: esDC Redis password.
 * **org.erigones:pgsql_esdc_password**: esDC PostgreSQL password.
 * **org.erigones:pgsql_pdns_password**: esDC PostgreSQL password for PowerDNS.
+* **org.erigones:pgsql_mgmt_mon_password**: esDC PostgreSQL password for Zabbix agent (optional).
 * **org.erigones:zabbix_server**: MON_ZABBIX_SERVER in esDC. If not set, monitoring support will be disabled.
 * **org.erigones:zabbix_esdc_username**: MON_ZABBIX_USERNAME in esDC.
 * **org.erigones:zabbix_esdc_password**: MON_ZABBIX_PASSWORD in esDC.
@@ -385,10 +426,22 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.6.4
+2.6.6
 ~~~~~
 
 - Version bump.
+
+2.6.5
+~~~~~
+
+- Disabled cloud-init network configuration - `#80 <https://github.com/erigones/esdc-factory/issues/80>`__
+
+2.6.4
+~~~~~
+
+- Added `org.erigones:pgsql_mgmt_mon_password` metadata parameter - `#72 <https://github.com/erigones/esdc-factory/issues/72>`__
+- Added bash-completion package - commit `420d304 <https://github.com/erigones/esdc-factory/commit/420d3042044db9b5557051ad21d66cf6ea66f882>`__
+- Modified rabbitmq-server.service to be restarted upon failure - `#71 <https://github.com/erigones/esdc-factory/issues/71>`__
 
 2.6.3
 ~~~~~
@@ -480,10 +533,21 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.6.4
+2.6.6
 ~~~~~
 
 - Version bump.
+
+2.6.5
+~~~~~
+
+- Added t_svc-db-ha template for monitoring HA status of the PostgreSQL cluster - `#79 <https://github.com/erigones/esdc-factory/issues/79>`__
+- Disabled cloud-init network configuration - `#80 <https://github.com/erigones/esdc-factory/issues/80>`__
+
+2.6.4
+~~~~~
+
+- Added bash-completion package - commit `420d304 <https://github.com/erigones/esdc-factory/commit/420d3042044db9b5557051ad21d66cf6ea66f882>`__
 
 2.6.3
 ~~~~~

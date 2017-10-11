@@ -1,0 +1,6 @@
+#!/bin/sh
+# This script has to be runnable by xuser.
+# Recommended permissions: 755
+
+export PATH=/usr/bin:/usr/sbin:/smartdc/bin:/opt/local/bin:/opt/local/sbin
+startx

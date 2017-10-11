@@ -405,11 +405,11 @@ promptbool()
 		val=$(echo "${val}" | tr '[:upper:]' '[:lower:]')
 
 		case "${val}" in
-			"y"|"yes")
+			"y"|"yes"|"true")
 				val=1
 				break
 			;;
-			"n"|"no")
+			"n"|"no"|"false")
 				val=0
 				break
 			;;
@@ -916,7 +916,25 @@ printdisklayout()
 promptpool()
 {
 	local layout=""
+	local layout_answer="$(getanswer "disk_layout")"
 	local disks=
+
+	case "${layout_answer}" in
+		raidz)
+			layout="raidz1"
+		;;
+		single|mirror|raidz[1-3])
+			layout="${layout_answer}"
+		;;
+		"<default>"|"default"|"yes")
+			layout=""
+		;;
+		*)
+			layout=""
+			layout_answer=""
+		;;
+	esac
+
 	while [[ /usr/bin/true ]]; do
 		# Skip USB devices and the VMware boot image by default.
 		diskinfo -Hp | nawk '
@@ -958,6 +976,7 @@ promptpool()
 			if ! grep -q 'no primary storage disks' /var/tmp/disklayout.json; then
 				cat /var/tmp/disklayout.json
 				layout=""
+				layout_answer=""
 				continue
 			fi
 			cat >&2 <<EOF
@@ -980,9 +999,22 @@ EOF
 			printheader "Storage"
 			continue
 		fi
-		json error < /var/tmp/disklayout.json 2>/dev/null | grep . && layout="" && continue
+
+		if json error < /var/tmp/disklayout.json 2>/dev/null | grep .; then
+			layout=""
+			layout_answer=""
+			continue
+		fi
+
 		prmpt_str="$(printdisklayout /var/tmp/disklayout.json)\n\n"
 		[[ -z "$layout" ]] && layout="default"
+
+		if [[ -n "${layout_answer}" ]]; then
+			prmpt_str+="This storage configuration will be used automatically.\n\n"
+			DISK_LAYOUT=/var/tmp/disklayout.json
+			return
+		fi
+
 		prmpt_str+="This is the '${layout}' storage configuration.  To use it, type 'yes'.\n"
 		prmpt_str+=" To see a different configuration, type: 'default', 'single', 'mirror'"
 		if [[ "${install_to_hdd}" -eq 1 ]]; then
@@ -1547,9 +1579,11 @@ fi
 touch /tmp/config_in_progress
 
 printheader "EULA"
-printeula
-prompteula
 
+if [[ $(getanswer "accept_eula") != "true" ]]; then
+	printeula
+	prompteula
+fi
 
 printheader "Advanced Installation"
 message="
@@ -2138,7 +2172,7 @@ fi
 
 # Do not perform a reboot when netboot_install_script boot parameter is specified
 if ! /bin/bootparams | grep -q "^netboot_install_script="; then
-	echo "==> The system will now finish configuration and reboot in 10 seconds."
+	echo "==> The system will now finish configuration and reboot."
 	echo "==> Please wait..."
 	sleep 10
 	reboot > /dev/null 2> /dev/null

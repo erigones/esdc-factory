@@ -6,3 +6,6 @@
 
 - name: Enable Remi RPM repository
   shell: yum-config-manager --enable remi
+
+- name: Disable redis package from remi
+  shell: yum-config-manager --setopt=remi.exclude=redis --save remi
