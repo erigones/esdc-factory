@@ -1657,8 +1657,9 @@ The configured NIC will be used to access the compute node.\n\n"
 		promptnet "(admin) IP address" "$admin_ip" "admin_ip"
 		admin_ip="$val"
 		# we disallow DHCP on HN install
-		if [ "${admin_ip}" == "dhcp" ]; then
-			echo "The first node cannot have a dynamic admin address during install."
+		if [[ "${admin_ip}" == "dhcp" ]]; then
+			echo "The first compute node cannot have a dynamic admin IP address during install."
+			admin_ip=""
 			continue
 		fi
 		{% else %}
