@@ -19,8 +19,8 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.6.6 (unreleased)
-==================
+2.6.6 (released on 2017-10-17)
+==============================
 
 - Added support for unattended installation via answer file - `#82 <https://github.com/erigones/esdc-factory/issues/82>`__
 - Dropped DHCP support during first compute node install - `#70 <https://github.com/erigones/esdc-factory/issues/70>`__
