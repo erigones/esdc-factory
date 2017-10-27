@@ -22,6 +22,7 @@ Changelog
 2.6.7 (unreleased)
 ==================
 
+- Fixed DNS configuration (resolv.conf) in *dns* and *mon* appliances - `#57 <https://github.com/erigones/esdc-factory/issues/57>`__
 
 
 2.6.6 (released on 2017-10-17)
