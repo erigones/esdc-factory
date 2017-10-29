@@ -530,6 +530,17 @@ promptemail()
 	done
 }
 
+add_etherstub()
+{
+	local stub="$1"
+
+	for i in "${etherstubs[@]}"; do
+		[[ "${i}" == "${stub}" ]] && return
+	done
+
+	etherstubs+=("${stub}")
+}
+
 init_etherstubs()
 {
 	local answer
@@ -547,20 +558,13 @@ init_etherstubs()
 			_etherstubs="$(echo "${answer}" | sed -e "s/,/ /g")"  # comma-separated string
 		fi
 		for stub in ${_etherstubs}; do
-			etherstubs+=("${stub}")
+			if valid_stub_name "${stub}"; then
+				add_etherstub "${stub}"
+			else
+				echo "ERROR: invalid etherstub name: \"${stub}\""
+			fi
 		done
 	fi
-}
-
-add_etherstub()
-{
-	local stub="$1"
-
-	for i in "${etherstubs[@]}"; do
-		[[ "${i}" == "${stub}" ]] && return
-	done
-
-	etherstubs+=("${stub}")
 }
 
 # Input must be a valid network number (see is_net())
