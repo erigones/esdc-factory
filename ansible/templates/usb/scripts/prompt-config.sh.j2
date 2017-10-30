@@ -65,6 +65,7 @@ declare -A nictag_vlans
 declare -A nictag_preserve_mac
 nictag_list="external internal storage"
 
+dns_options="timeout:2 attempts:2"
 advanced_install=0
 nicsup_done=0
 
@@ -1955,10 +1956,12 @@ you use to create virtual machines through Danube Cloud.\n\n"
 	cat > /etc/resolv.conf <<EOF
 nameserver $dns_resolver1
 nameserver $dns_resolver2
-options timeout:2 attempts:2
 EOF
 	if [[ -n "${dns_domain}" ]]; then
 		echo "search ${dns_domain}" >> /etc/resolv.conf
+	fi
+	if [[ -n "${dns_options}" ]]; then
+		echo "options ${dns_options}" >> /etc/resolv.conf
 	fi
 
 	if [[ ${advanced_install} -eq 1 ]]; then
@@ -2281,6 +2284,9 @@ fi
 
 echo "dns_resolvers=$dns_resolver1,$dns_resolver2" >>$tmp_config
 echo "dns_domain=$dns_domain" >>$tmp_config
+if [[ -n "${dns_options}" ]]; then
+	echo "dns_options=${dns_options}" >>$tmp_config
+fi
 echo >>$tmp_config
 
 echo "ntp_hosts=$ntp_hosts" >>$tmp_config
