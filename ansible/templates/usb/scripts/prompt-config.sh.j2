@@ -2285,7 +2285,7 @@ fi
 echo "dns_resolvers=$dns_resolver1,$dns_resolver2" >>$tmp_config
 echo "dns_domain=$dns_domain" >>$tmp_config
 if [[ -n "${dns_options}" ]]; then
-	echo "dns_options=${dns_options}" >>$tmp_config
+	echo "dns_options='${dns_options}'" >>$tmp_config
 fi
 echo >>$tmp_config
 
