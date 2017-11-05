@@ -19,8 +19,8 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.6.7 (unreleased)
-==================
+2.6.7 (released on 2017-11-06)
+==============================
 
 - Fixed DNS configuration (resolv.conf) in *dns* and *mon* appliances - `#57 <https://github.com/erigones/esdc-factory/issues/57>`__
 
