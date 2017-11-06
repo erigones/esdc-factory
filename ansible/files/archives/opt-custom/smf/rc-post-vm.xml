@@ -30,27 +30,27 @@
         <exec_method
                 type='method'
                 name='start'
-				exec='/opt/custom/method/postboot-rc-init start post-vm'
+                exec='/opt/custom/method/postboot-rc-init start post-vm'
                 timeout_seconds='300'>
         </exec_method>
 
         <exec_method
                 type='method'
                 name='stop'
-				exec='/opt/custom/method/postboot-rc-init stop post-vm'
+                exec='/opt/custom/method/postboot-rc-init stop post-vm'
                 timeout_seconds='300'>
         </exec_method>
 
         <exec_method
                 type='method'
                 name='refresh'
-				exec='/opt/custom/method/postboot-rc-init refresh post-vm'
+                exec='/opt/custom/method/postboot-rc-init refresh post-vm'
                 timeout_seconds='300'>
         </exec_method>
 
         <property_group name='startd' type='framework'>
                 <propval name='duration' type='astring' value='transient' />
-				<propval name='critical_failure_count' type='integer' value='1'/>
+                <propval name='critical_failure_count' type='integer' value='1'/>
         </property_group>
 
         <stability value='Unstable' />

@@ -16,7 +16,7 @@
                 grouping='require_all'
                 restart_on='none'
                 type='service'>
-				<service_fmri value='svc:/system/filesystem/local' />
+                <service_fmri value='svc:/system/filesystem/local' />
         </dependency>
 
         <dependency
@@ -24,61 +24,61 @@
                 grouping='require_all'
                 restart_on='none'
                 type='service'>
-				<service_fmri value='svc:/system/filesystem/smartdc' />
+                <service_fmri value='svc:/system/filesystem/smartdc' />
         </dependency>
 
         <dependent
                 name='net-lo'
                 grouping='require_all'
                 restart_on='none' >
-				<service_fmri value='svc:/network/loopback' />
+                <service_fmri value='svc:/network/loopback' />
         </dependent>
 
         <dependent
                 name='net-physical'
                 grouping='require_all'
                 restart_on='none' >
-				<service_fmri value='svc:/network/physical' />
+                <service_fmri value='svc:/network/physical' />
         </dependent>
 
         <dependent
                 name='net-ipf'
                 grouping='require_all'
                 restart_on='none' >
-				<service_fmri value='svc:/network/ipfilter' />
+                <service_fmri value='svc:/network/ipfilter' />
         </dependent>
 
         <dependent
                 name='net-ipsec'
                 grouping='require_all'
                 restart_on='none' >
-				<service_fmri value='svc:/network/ipsec/ipsecalgs' />
+                <service_fmri value='svc:/network/ipsec/ipsecalgs' />
         </dependent>
 
         <exec_method
                 type='method'
                 name='start'
-				exec='/opt/custom/method/postboot-rc-init start pre-net'
+                exec='/opt/custom/method/postboot-rc-init start pre-net'
                 timeout_seconds='300'>
         </exec_method>
 
         <exec_method
                 type='method'
                 name='stop'
-				exec='/opt/custom/method/postboot-rc-init stop pre-net'
+                exec='/opt/custom/method/postboot-rc-init stop pre-net'
                 timeout_seconds='300'>
         </exec_method>
 
         <exec_method
                 type='method'
                 name='refresh'
-				exec='/opt/custom/method/postboot-rc-init refresh pre-net'
+                exec='/opt/custom/method/postboot-rc-init refresh pre-net'
                 timeout_seconds='300'>
         </exec_method>
 
         <property_group name='startd' type='framework'>
                 <propval name='duration' type='astring' value='transient' />
-				<propval name='critical_failure_count' type='integer' value='1'/>
+                <propval name='critical_failure_count' type='integer' value='1'/>
         </property_group>
 
         <stability value='Unstable' />
