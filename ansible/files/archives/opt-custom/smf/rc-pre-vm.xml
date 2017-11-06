@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+
+<service_bundle type='manifest' name='application:pre-vm'>
+<service
+        name='application/rc/pre-vm'
+        type='service'
+        version='1'>
+
+        <create_default_instance enabled='true' />
+
+        <single_instance />
+
+        <dependency
+                name='fs-smartdc'
+                grouping='require_all'
+                restart_on='none'
+                type='service'>
+				<service_fmri value='svc:/system/filesystem/smartdc' />
+        </dependency>
+
+        <dependency
+                name='networing'
+                grouping='require_all'
+                restart_on='none'
+                type='service'>
+                <service_fmri value='svc:/milestone/network' />
+        </dependency>
+
+        <dependent
+                name='vmadmd'
+                grouping='require_all'
+                restart_on='none' >
+                <service_fmri value='svc:/system/smartdc/vmadmd' />
+        </dependent>
+
+        <dependent
+                name='zones'
+                grouping='require_all'
+                restart_on='none' >
+                <service_fmri value='svc:/system/zones' />
+        </dependent>
+
+        <exec_method
+                type='method'
+                name='start'
+				exec='/opt/custom/method/postboot-rc-init start pre-vm'
+                timeout_seconds='300'>
+        </exec_method>
+
+        <exec_method
+                type='method'
+                name='stop'
+				exec='/opt/custom/method/postboot-rc-init stop pre-vm'
+                timeout_seconds='300'>
+        </exec_method>
+
+        <exec_method
+                type='method'
+                name='refresh'
+				exec='/opt/custom/method/postboot-rc-init refresh pre-vm'
+                timeout_seconds='300'>
+        </exec_method>
+
+        <property_group name='startd' type='framework'>
+                <propval name='duration' type='astring' value='transient' />
+				<propval name='critical_failure_count' type='integer' value='1'/>
+        </property_group>
+
+        <stability value='Unstable' />
+
+</service>
+</service_bundle>

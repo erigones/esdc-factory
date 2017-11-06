@@ -1,0 +1,39 @@
+#!/bin/sh
+
+. /lib/svc/share/smf_include.sh
+
+CMD="${1}"
+STAGE="${2}"
+
+if [[ -z "${CMD}" || -z "${STAGE}" ]]; then
+    echo "Usage:   $0 <cmd> <stage>"
+    echo "Example: $0 start pre-network"
+    exit $SMF_EXIT_ERR_CONFIG
+fi
+
+if ! [[ "${CMD}" =~ ^start$|^stop$|^restart$|^refresh$ ]]; then
+    echo "Unknown command: ${CMD}."
+    echo "Allowed commands: start, stop, restart, refresh."
+    exit $SMF_EXIT_ERR_CONFIG
+fi
+
+STAGE_DIR="/opt/custom/method/rc.d-${STAGE}"
+if [[ ! -d "${STAGE_DIR}" ]]; then
+    echo "Directory ${STAGE_DIR} does not exist!. Exiting."
+    exit $SMF_EXIT_ERR_FATAL
+fi
+
+# protect running the script mu
+
+# iterate over all executable files in STAGE_DIR and run CMD over them
+for rcfile in "${STAGE_DIR}"/*.sh; do
+    if [[ -x "${rcfile}" ]]; then
+        echo "Running rc file: ${rcfile}"
+        if ! "${rcfile}" "${CMD}"; then
+            echo "Error running ${rcfile}!"
+        fi
+    fi
+done
+
+exit $SMF_EXIT_OK
+
