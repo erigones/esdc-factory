@@ -18,7 +18,11 @@
 # This script's name must end with ".sh" and it should
 # implement the start, stop and refresh methods
 # (at least dummy ones).
+#
+# During stop command the scripts are called in reverse order (ls -r).
+#
 
+. /lib/svc/share/smf_include.sh
 
 start() {
     echo "Hello from start method!"

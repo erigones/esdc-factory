@@ -23,17 +23,31 @@ if [[ ! -d "${STAGE_DIR}" ]]; then
     exit $SMF_EXIT_ERR_FATAL
 fi
 
-# protect running the script mu
+# run RC files in reverse order if stopping
+if [[ "${CMD}" == "stop" ]]; then
+    REVERSE_LIST="-r"
+else
+    REVERSE_LIST=""
+fi
 
-# iterate over all executable files in STAGE_DIR and run CMD over them
-for rcfile in "${STAGE_DIR}"/*.sh; do
-    if [[ -x "${rcfile}" ]]; then
-        echo "Running rc file: ${rcfile}"
-        if ! "${rcfile}" "${CMD}"; then
-            echo "Error running ${rcfile}!"
+# get list of all .sh files in STAGE_DIR
+FILE_LIST="$(ls -1 ${REVERSE_LIST} ${STAGE_DIR}/*.sh 2> /dev/null)"
+
+if [[ -z "${FILE_LIST}" ]]; then
+    # nothing to do
+    exit $SMF_EXIT_OK
+fi
+
+# verify if a script is executable and run it
+while read runscript; do
+    if [[ -x "${runscript}" ]]; then
+        echo "Running rc file: ${runscript}"
+        if ! "${runscript}" "${CMD}"; then
+            echo "Error running ${runscript}!"
         fi
+    else
+        echo "Script ${runscript} is not executable. Ignoring."
     fi
-done
+done <<< "${FILE_LIST}"
 
 exit $SMF_EXIT_OK
-
