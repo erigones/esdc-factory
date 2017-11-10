@@ -27,12 +27,13 @@ IPF_SERVICE="svc:/network/ipfilter:default"
 
 . /lib/svc/share/smf_include.sh
 
-start() {
+update_fw() {
 	if [[ ! -d "${RULES_DIR}" ]]; then
 		# nothing to do
 		exit $SMF_EXIT_OK
 	fi
 
+	FW_MODIFIED=0
 	for CFGFILE in ${GENERATE_FILES}; do
 		# get list of all conf files in RULES_DIR
 		# that end with requested filename (e.g. ipf.conf*)
@@ -48,31 +49,29 @@ start() {
 
 		echo "Generating firewall rules for ${CFGFILE}"
 		echo "${CONF_LIST}" | xargs cat > "${OUTPUT_DIR}/${CFGFILE}"
+		FW_MODIFIED=1
 	done
-}
 
-refresh() {
-	# generate the rules
-	start
-
-	# refresh firewall if applicable
-	if [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "online" ]]; then
-		/usr/sbin/svcadm refresh "${IPF_SERVICE}"
-	elif [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
-		/usr/sbin/svcadm clear "${IPF_SERVICE}"
+	if [[ ${FW_MODIFIED} -eq 1 ]]; then
+		# refresh firewall if applicable
+		if [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "online" ]]; then
+			/usr/sbin/svcadm refresh "${IPF_SERVICE}"
+		elif [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
+			/usr/sbin/svcadm clear "${IPF_SERVICE}"
+		fi
 	fi
 }
 
 
 case "$1" in
   start)
-    start
+    update_fw
     ;;
   stop)
     exit $SMF_EXIT_OK
     ;;
   refresh)
-    refresh
+    update_fw
     ;;
   *)
     echo "Usage: $0 {start|stop|refresh}"
