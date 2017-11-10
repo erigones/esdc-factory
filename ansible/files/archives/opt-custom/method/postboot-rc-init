@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 . /lib/svc/share/smf_include.sh
 
