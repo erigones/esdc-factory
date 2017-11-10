@@ -1220,6 +1220,8 @@ setup_datasets()
 		fi
 
         if [[ "${install_to_hdd}" -eq 1 ]]; then
+			zfs set "org.opensolaris.libbe:uuid=$(uuidgen)" ${ROOTBE}
+			zfs set canmount=noauto ${ROOTBE}
 			zfs set canmount=noauto ${VARDS}
 		else
 			zfs set mountpoint=legacy ${VARDS}
