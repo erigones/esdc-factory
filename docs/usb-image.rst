@@ -22,6 +22,7 @@ Changelog
 2.7.0 (unreleased)
 ==================
 
+- Fixed root dataset properties when installed to HDD - `#94 <https://github.com/erigones/esdc-factory/issues/94>`__
 - Moved ``net-cleanup`` SMF service into platform image - `#96 <https://github.com/erigones/esdc-factory/issues/96>`__
 
 
