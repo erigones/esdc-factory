@@ -17,7 +17,7 @@ if ! [[ "${CMD}" =~ ^start$|^stop$|^restart$|^refresh$ ]]; then
     exit $SMF_EXIT_ERR_CONFIG
 fi
 
-STAGE_DIR="/opt/custom/method/rc.d-${STAGE}"
+STAGE_DIR="/opt/custom/etc/rc-${STAGE}.d"
 if [[ ! -d "${STAGE_DIR}" ]]; then
     echo "Directory ${STAGE_DIR} does not exist. Exiting."
     exit $SMF_EXIT_ERR_FATAL

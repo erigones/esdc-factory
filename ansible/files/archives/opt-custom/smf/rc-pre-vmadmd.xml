@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
 
-<service_bundle type='manifest' name='application:pre-net'>
+<service_bundle type='manifest' name='system:pre-vmadmd'>
 <service
-        name='application/rc/pre-net'
+        name='system/postboot-rc/pre-vmadmd'
         type='service'
         version='1'>
 
@@ -19,52 +19,46 @@
                 <service_fmri value='svc:/system/filesystem/smartdc' />
         </dependency>
 
+        <dependency
+                name='networing'
+                grouping='require_all'
+                restart_on='none'
+                type='service'>
+                <service_fmri value='svc:/milestone/network' />
+        </dependency>
+
         <dependent
-                name='net-lo'
+                name='vmadmd'
                 grouping='require_all'
                 restart_on='none' >
-                <service_fmri value='svc:/network/loopback' />
+                <service_fmri value='svc:/system/smartdc/vmadmd' />
         </dependent>
 
         <dependent
-                name='net-physical'
+                name='zones'
                 grouping='require_all'
                 restart_on='none' >
-                <service_fmri value='svc:/network/physical' />
-        </dependent>
-
-        <dependent
-                name='net-ipf'
-                grouping='require_all'
-                restart_on='none' >
-                <service_fmri value='svc:/network/ipfilter' />
-        </dependent>
-
-        <dependent
-                name='net-ipsec'
-                grouping='require_all'
-                restart_on='none' >
-                <service_fmri value='svc:/network/ipsec/ipsecalgs' />
+                <service_fmri value='svc:/system/zones' />
         </dependent>
 
         <exec_method
                 type='method'
                 name='start'
-                exec='/opt/custom/method/postboot-rc-init start pre-net'
+                exec='/opt/custom/method/postboot-rc-init start pre-vmadmd'
                 timeout_seconds='300'>
         </exec_method>
 
         <exec_method
                 type='method'
                 name='stop'
-                exec='/opt/custom/method/postboot-rc-init stop pre-net'
+                exec='/opt/custom/method/postboot-rc-init stop pre-vmadmd'
                 timeout_seconds='300'>
         </exec_method>
 
         <exec_method
                 type='method'
                 name='refresh'
-                exec='/opt/custom/method/postboot-rc-init refresh pre-net'
+                exec='/opt/custom/method/postboot-rc-init refresh pre-vmadmd'
                 timeout_seconds='300'>
         </exec_method>
 
