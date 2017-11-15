@@ -49,19 +49,23 @@ dns_domain="local"
 declare -a states
 declare -a nics
 declare -a assigned
+declare -a etherstubs
 declare prmpt_str
 declare admin_iface_active
 declare install_to_hdd
 declare nicsup_done
 
 # Additional NIC tags definitions
+declare -A change_macs
 declare -A nictag_macs
 declare -A nictag_ifaces
 declare -A nictag_ips
 declare -A nictag_netmasks
 declare -A nictag_vlans
+declare -A nictag_preserve_mac
 nictag_list="external internal storage"
 
+dns_options="timeout:2 attempts:2"
 advanced_install=0
 nicsup_done=0
 
@@ -148,7 +152,8 @@ ip_netmask_to_network()
 }
 
 # check if specified IP belongs to the subnet
-ip_from_subnet() {
+ip_from_subnet()
+{
 	local myip="$1"
 	local net="$2"
 	local mask="$3"
@@ -170,7 +175,29 @@ ip_from_subnet() {
 	fi
 }
 
-prompt_ip_from_subnet() {
+generate_mac()
+{
+	hexchars="0123456789abcdef"
+	echo "00:e5:dc$(
+		for i in {1..6}; do
+			echo -n ${hexchars:$(( $RANDOM % 16 )):1}
+		done | sed -e 's/\(..\)/:\1/g'
+	)"
+}
+
+{% raw %}
+valid_stub_name()
+{
+	local n=$1
+	local len=${#n}
+	local re='^[a-zA-Z0-9_]*[0-9]$'
+
+	[[ -n $n ]] && (( len <= 31 )) && [[ $n =~ $re ]]
+}
+{% endraw %}
+
+prompt_ip_from_subnet()
+{
 	local msg="$1"
 	local default="$2"
 	local response_key="$3"
@@ -283,7 +310,8 @@ is_net()
 }
 
 # Tests if input is an email address
-is_email() {
+is_email()
+{
 	regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.?)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
 	ADDRESS=$1
 
@@ -420,7 +448,8 @@ promptbool()
 	done
 }
 
-prompt_hostname() {
+prompt_hostname()
+{
 	while [ /usr/bin/true ]; do
 		promptval "${@}"
 
@@ -502,6 +531,43 @@ promptemail()
 	done
 }
 
+add_etherstub()
+{
+	local stub="$1"
+
+	for i in "${etherstubs[@]}"; do
+		[[ "${i}" == "${stub}" ]] && return
+	done
+
+	etherstubs+=("${stub}")
+}
+
+init_etherstubs()
+{
+	local answer
+	local _etherstubs
+
+	# reset array
+	etherstubs=()
+
+	answer=$(getanswer "etherstubs")
+
+	if [[ -n "${answer}" ]]; then
+		if echo "${answer}" | json --validate; then
+			_etherstubs="$(echo "${answer}" | json -a)"  # array
+		else
+			_etherstubs="$(echo "${answer}" | sed -e "s/,/ /g")"  # comma-separated string
+		fi
+		for stub in ${_etherstubs}; do
+			if valid_stub_name "${stub}"; then
+				add_etherstub "${stub}"
+			else
+				echo "ERROR: invalid etherstub name: \"${stub}\""
+			fi
+		done
+	fi
+}
+
 # Input must be a valid network number (see is_net())
 promptnet()
 {
@@ -538,6 +604,8 @@ promptnet()
 
 printnics()
 {
+	local nic="$1"
+
 	i=1
 	printf "%-6s %-9s %-18s %-7s %-10s\n" "Number" "Link" "MAC Address" \
 	    "State" "Network"
@@ -546,6 +614,10 @@ printnics()
 		    ${macs[$i]} ${states[$i]} ${assigned[i]}
 		((i++))
 	done
+
+	if [[ "${nic}" == "admin" ]]; then
+		printf "%-6d %-9s %-17s %-7s %-10s\n" $i "${nic}stub0" "etherstub" "up" "${assigned[i]}"
+	fi
 }
 
 # Must choose a valid NIC on this system
@@ -563,45 +635,60 @@ promptnic()
 					return
 				fi
 			done
+			if valid_stub_name "${mac}"; then
+				mac_addr="${mac}"
+				val="${mac}"
+				nic_val="etherstub"
+				add_etherstub "${mac_addr}"
+				return
+			fi
 		fi
 	fi
 
-	if [[ $nic_cnt -eq 1 ]]; then
+	if [[ $nic_cnt -eq 1 ]] && [[ "${tag}" != "admin" || "${advanced_install}" -ne 1 ]]; then
 		val="${macs[1]}"
 		nic_val=${nics[1]}
+		printf "Autoselected NIC for ${tag} network: ${nic_val} (${val})\n\n"
 		return
 	fi
 
-	printnics
+	printnics "${tag}"
 	num=0
 	while [ /usr/bin/true ]; do
 		prmpt_str="Enter the number of the NIC for the ${tag} interface: "
 		printf "$prmpt_str"
 		read num
 		if ! [[ "$num" =~ ^[0-9]+$ ]] ; then
-				echo ""
+			echo ""
 		elif [[ $num -ge 1 && $num -le $nic_cnt ]]; then
-				mac_addr="${macs[$num]}"
-				clear_assigned_nictag "${tag}"
+			mac_addr="${macs[$num]}"
+			clear_assigned_nictag "${tag}"
 
-				if [[ "${assigned[$num]}" == "-" ]]; then
-					assigned[$num]="${tag}"
-				else
-					assigned[$num]="${assigned[$num]},${tag}"
-				fi
-				nic_val=${nics[$num]}
-				break
+			if [[ "${assigned[$num]}" == "-" ]]; then
+				assigned[$num]="${tag}"
+			else
+				assigned[$num]="${assigned[$num]},${tag}"
+			fi
+			nic_val=${nics[$num]}
+			break
+		elif [[ "${tag}" == "admin" && $num -eq "$(($nic_cnt + 1))" ]]; then
+			clear_assigned_nictag "${tag}"
+			mac_addr="adminstub0"
+			nic_val="etherstub"
+			add_etherstub "${mac_addr}"
+			break
 		fi
 		# echo "You must choose between 1 and $nic_cnt."
 		updatenicstates
-		printnics
+		printnics "${tag}"
 	done
 
 	val=$mac_addr
 }
 
 # remove specified nic tag from all interfaces
-clear_assigned_nictag() {
+clear_assigned_nictag()
+{
 	tag="$1"
 	for ifnum in $(seq 1 $nic_cnt); do
 		assigned[$ifnum]="$(echo "${assigned[$ifnum]}" | sed -re "s/,?$tag//" -e 's/^,|,$//')"
@@ -709,7 +796,10 @@ promptnictag_ip()
 	val=""
 	ntag="$1"
 
-	promptbool "Add IP address on ${ntag} interface? (y/n)" "n" "${ntag}_addIP"
+	[[ -z "${nictag_ips[${ntag}]}" ]] && default_val="n" || default_val="y"
+
+	promptbool "Add IP address on ${ntag} interface? (y/n)" "${default_val}" "${ntag}_add_ip"
+
 	if [[ "${val}" -eq 1 ]]; then
 		valid=0
 		while [ $valid -ne 1 ]; do
@@ -743,6 +833,28 @@ promptnictag_ip()
 	fi
 }
 
+normalize_mac()
+{
+	# reformat the nic so that it's in the proper 00:00:ab... form not 0:0:ab...
+	printf "%02x:%02x:%02x:%02x:%02x:%02x" $(echo "${1}" | tr ':' ' ' | sed -e "s/\([A-Fa-f0-9]*\)/0x\1/g")
+}
+
+prompt_preserve_mac()
+{
+	val=""
+	ntag="$1"
+	iface="$2"
+
+	[[ -z "${nictag_preserve_mac[${ntag}]}" ]] && default_val="n" || default_val="y"
+
+	promptbool "Preserve MAC address on ${ntag} interface from ${iface}? (y/n)" "${default_val}" "${ntag}_preserve_mac"
+
+	if [[ "${val}" -eq 1 ]]; then
+		nictag_preserve_mac["${ntag}"]="${val}"
+	else
+		unset nictag_preserve_mac["${ntag}"]
+	fi
+}
 
 updatenicstates()
 {
@@ -790,16 +902,30 @@ nicsup()
 {
 	[ $nicsup_done -eq 1 ] && return
 
-	local vlan_opts=""
+	local admin_vnic_opts=""
+	local vnic_opts=""
+	local admin_link="${admin_iface}"
 
-	if [[ -n "${admin_vlan_id}" && "${admin_vlan_id}" -ne 0 ]]; then
+	# Create etherstubs
+	for stub in "${etherstubs[@]}"; do
+		dladm create-etherstub "${stub}"
+	done
+
+	if [[ -n "${admin_vlan_id}" || "${admin_iface}" == "etherstub" ]]; then
+		if [[ "${admin_iface}" == "etherstub" ]]; then
+			admin_link="${admin_nic}"
+		fi
+		if [[ "${admin_vlan_id}" -ne 0 ]]; then
+			admin_vnic_opts="-v ${admin_vlan_id}"
+		fi
+
 		admin_iface_active="admin0"
-		dladm create-vnic -l ${admin_iface} -v ${admin_vlan_id} ${admin_iface_active}
-		ifconfig ${admin_iface_active} plumb
+		dladm create-vnic -l ${admin_link} $admin_vnic_opts ${admin_iface_active}
 	else
-		ifconfig ${admin_iface} plumb 2> /dev/null
 		admin_iface_active="${admin_iface}"
 	fi
+
+	ifconfig ${admin_iface_active} plumb 2> /dev/null
 
 	if [[ "$admin_ip" == "dhcp" ]]; then
 		ifconfig $admin_iface_active up
@@ -810,10 +936,23 @@ nicsup()
 
 	# create an interface for each nic tag with defined IP address
 	for ntag in "${!nictag_ips[@]}"; do
-		if [ -n "${nictag_vlans[$ntag]}" ]; then
-			vlan_opts="-v ${nictag_vlans[$ntag]}"
+		vnic_opts=""
+
+		if [[ -n "${nictag_vlans[$ntag]}" ]]; then
+			vnic_opts="-v ${nictag_vlans[$ntag]}"
 		fi
-		dladm create-vnic -l "${nictag_ifaces[$ntag]}" $vlan_opts "${ntag}0"
+
+		if [[ -n "${nictag_preserve_mac[$ntag]}" ]]; then
+			new_mac_addr="$(generate_mac)"
+			mac_addr="$(normalize_mac "$(dladm show-phys -pmo address "${nictag_ifaces[$ntag]}")")"
+			vnic_opts="-m ${mac_addr} ${vnic_opts}"
+			# change MAC address of physical interface to something random
+			ifconfig "${nictag_ifaces[$ntag]}" ether "${new_mac_addr}"
+			# save MAC address of physical interface for nicsdown()
+			nictag_preserve_mac[${ntag}]="${mac_addr},${new_mac_addr}"
+		fi
+
+		dladm create-vnic -l "${nictag_ifaces[$ntag]}" $vnic_opts "${ntag}0"
 
 		if [[ "${nictag_ips[${ntag}]}" == "dhcp" ]]; then
 			ifconfig "${ntag}0" plumb
@@ -822,7 +961,6 @@ nicsup()
 		else
 			ifconfig "${ntag}0" plumb
 			ifconfig "${ntag}0" inet "${nictag_ips[${ntag}]}" netmask "${nictag_netmasks[${ntag}]}" up
-			vlan_opts=""	# clear for next iteration
 		fi
 	done
 
@@ -841,7 +979,7 @@ nicsdown()
 
 	ifconfig ${admin_iface_active} inet down unplumb
 
-	if [[ -n "${admin_vlan_id}" && "${admin_vlan_id}" -ne 0 ]]; then
+	if [[ -n "${admin_vlan_id}" && "${admin_vlan_id}" -ne 0 ]] || [[ "${admin_iface}" == "etherstub" ]]; then
 		dladm delete-vnic ${admin_iface_active}
 	fi
 
@@ -849,6 +987,17 @@ nicsdown()
 	for ntag in "${!nictag_ips[@]}"; do
 		ifconfig "${ntag}0" inet down unplumb
 		dladm delete-vnic "${ntag}0"
+
+		if [[ -n "${nictag_preserve_mac[$ntag]}" ]]; then
+			old_mac_addr="${nictag_preserve_mac[$ntag]/%,*}"
+			# restore MAC address
+			ifconfig "${nictag_ifaces[$ntag]}" ether "${old_mac_addr}"
+		fi
+	done
+
+	# Delete etherstubs
+	for stub in "${etherstubs[@]}"; do
+		dladm delete-etherstub "${stub}"
 	done
 
 	nicsup_done=0
@@ -1478,10 +1627,7 @@ while IFS=: read -r link addr ; do
 	((nic_cnt++))
 	nics[$nic_cnt]=$link
 	macs[$nic_cnt]=`echo $addr | sed 's/\\\:/:/g'`
-	# reformat the nic so that it's in the proper 00:00:ab... form not 0:0:ab...
-	macs[$nic_cnt]=$(printf "%02x:%02x:%02x:%02x:%02x:%02x" \
-	    $(echo "${macs[${nic_cnt}]}" \
-	    | tr ':' ' ' | sed -e "s/\([A-Fa-f0-9]*\)/0x\1/g"))
+	macs[$nic_cnt]=$(normalize_mac "${macs[${nic_cnt}]}")
 	assigned[$nic_cnt]="-"
 done < <(dladm show-phys -pmo link,address 2>/dev/null)
 
@@ -1603,13 +1749,10 @@ The configured NIC will be used to access the compute node.\n\n"
 		printf "$message"
 	fi
 
+	init_etherstubs
 	promptnic "'admin'"
 	admin_nic="$val"
 	admin_iface="$nic_val"
-
-	if [[ "${nic_cnt}" -eq 1 ]]; then
-		printf "Autoselected NIC: ${admin_iface}\n\n"
-	fi
 
 	valid=0
 	while [ $valid -ne 1 ]; do
@@ -1671,20 +1814,23 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 
 	if [[ "${val}" -eq 1 ]]; then
 		for ntag in $nictag_list; do
-			promptbool "Add NIC tag \"${ntag}\"? (y/n)" "n" "${ntag}_addtag"
+			[[ -z "${nictag_macs[${ntag}]}" ]] && default_val="n" || default_val="y"
+
+			promptbool "Add NIC tag \"${ntag}\"? (y/n)" "${default_val}" "${ntag}_add_nictag"
+
 			if [[ "${val}" -eq 1 ]]; then
 				promptnic "'${ntag}'"
 				nictag_macs[${ntag}]="${val}"
-				nictag_ifaces[${ntag}]="$nic_val"
-
-				if [[ $nic_cnt -eq 1 ]]; then
-					# just print info (we have only one NIC)
-					printf "\nAutoselected NIC ${nic_val}\n\n"
-				fi
+				nictag_ifaces[${ntag}]="${nic_val}"
 
 				if [[ ${advanced_install} -eq 1 ]]; then
 					# ask if user wants to set IP over the NIC tag
 					promptnictag_ip "${ntag}"
+
+					# ask if user wants to use the MAC address of external physical interface for the VNIC
+					if [[ "${ntag}" == "external" ]]; then
+						prompt_preserve_mac "${ntag}" "${nic_val}"
+					fi
 				fi
 			else
 				# clear ${ntag}
@@ -1693,6 +1839,7 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 				unset nictag_ips["${ntag}"]
 				unset nictag_netmasks["${ntag}"]
 				unset nictag_vlans["${ntag}"]
+				unset nictag_preserve_mac["${ntag}"]
 				# clear assigned nictag from the list
 				clear_assigned_nictag "$ntag"
 			fi
@@ -1773,6 +1920,9 @@ nameserver $dns_resolver2
 EOF
 	if [[ -n "${dns_domain}" ]]; then
 		echo "search ${dns_domain}" >> /etc/resolv.conf
+	fi
+	if [[ -n "${dns_options}" ]]; then
+		echo "options ${dns_options}" >> /etc/resolv.conf
 	fi
 
 	if [[ ${advanced_install} -eq 1 ]]; then
@@ -1948,6 +2098,12 @@ monitoring alerts.\n\n"
 	# Bring the admin and external nics down now: we don't need them anymore
 	nicsdown
 
+	# Save MAC address dictionary when changing MACs
+	change_macs=()
+	for mac_pair in "${nictag_preserve_mac[@]}"; do
+		change_macs["${mac_pair%,*}"]="${mac_pair#*,}"
+	done
+
 	printheader "Verify Configuration"
 	message="
 Please verify your Danube Cloud compute node configuration. After this point
@@ -1958,7 +2114,17 @@ the system will be set up and all data on the disks will be erased.\n\n"
 	fi
 
 	if [[ $(getanswer "skip_final_summary") != "true" ]]; then
-		echo
+		if [[ -n "${etherstubs[@]}" ]]; then
+			printf "Etherstubs: %s\n" "$(echo "${etherstubs[@]}" | sed -e "s/\ /, /g")"
+			echo
+		fi
+		if [[ -n "${!nictag_preserve_mac[@]}" ]]; then
+			for ntag in "${!nictag_preserve_mac[@]}"; do
+				mac_pair="${nictag_preserve_mac[${ntag}]}"
+				printf "Change MAC address: %s [%s] -> %s\n" "${mac_pair%,*}" "${ntag}" "${mac_pair#*,}"
+			done
+			echo
+		fi
 		printf "%8s %17s %15s %15s %15s\n" "Net" "MAC" "IP addr." "Netmask" "VLAN ID"
 		if [[ "$admin_ip" == "dhcp" ]]; then
 			printf "%8s %17s %15s %15s %15s\n" "admin" $admin_nic $admin_ip "N/A" $admin_vlan_id
@@ -1966,7 +2132,9 @@ the system will be set up and all data on the disks will be erased.\n\n"
 			printf "%8s %17s %15s %15s %15s\n" "admin" $admin_nic $admin_ip $admin_netmask $admin_vlan_id
 		fi
 		for ntag in "${!nictag_macs[@]}"; do
-			printf "%8s %17s %15s %15s %15s\n" "$ntag" ${nictag_macs[$ntag]} ${nictag_ips[$ntag]} ${nictag_netmasks[$ntag]} ${nictag_vlans[$ntag]}
+			_mac="${nictag_macs[$ntag]}"
+			iface_mac="${change_macs[${_mac}]:-${_mac}}"
+			printf "%8s %17s %15s %15s %15s\n" "$ntag" ${iface_mac} ${nictag_ips[$ntag]} ${nictag_netmasks[$ntag]} ${nictag_vlans[$ntag]}
 		done
 		echo
 		printf "DNS Servers: (%s, %s)\n" "$dns_resolver1" "$dns_resolver2"
@@ -2042,6 +2210,17 @@ echo >>$tmp_config
 platform=$(smbios -t1 | nawk '{if ($1 == "Product:") print $2}')
 [ "$platform" == "VMware" ] && echo "coal=true" >>$tmp_config
 
+# save etherstubs via ethe etherstub config option
+if [[ -n "${etherstubs[@]}" ]]; then
+	echo "etherstub=$(echo "${etherstubs[@]}" | tr " " ",")" >>$tmp_config
+fi
+
+# transfer nictag_preserve_mac to the change_mac config option
+if [[ -n "${!nictag_preserve_mac[@]}" ]]; then
+	echo "change_mac=$(echo "${nictag_preserve_mac[@]}" | tr " " ";")" >>$tmp_config
+fi
+
+echo >>$tmp_config
 echo "admin_nic=$admin_nic" >>$tmp_config
 echo "admin_vlan_id=$admin_vlan_id" >>$tmp_config
 echo "admin_ip=$admin_ip" >>$tmp_config
@@ -2066,6 +2245,9 @@ fi
 
 echo "dns_resolvers=$dns_resolver1,$dns_resolver2" >>$tmp_config
 echo "dns_domain=$dns_domain" >>$tmp_config
+if [[ -n "${dns_options}" ]]; then
+	echo "dns_options='${dns_options}'" >>$tmp_config
+fi
 echo >>$tmp_config
 
 echo "ntp_hosts=$ntp_hosts" >>$tmp_config
@@ -2077,8 +2259,15 @@ echo >>$tmp_config
 
 # add rest of NIC tags
 for ntag in "${!nictag_macs[@]}"; do
-	echo "${ntag}_nic=${nictag_macs[$ntag]}" >>$tmp_config
-	if [[ -n ${nictag_ips[$ntag]} ]]; then
+	phys_nic_mac_addr="${nictag_macs[$ntag]}"
+
+	if [[ -n "${nictag_preserve_mac[$ntag]}" ]]; then
+		echo "${ntag}_nic=${change_macs[${phys_nic_mac_addr}]}" >>$tmp_config
+		echo "${ntag}0_mac=${phys_nic_mac_addr}" >>$tmp_config
+	else
+		echo "${ntag}_nic=${change_macs[${phys_nic_mac_addr}]:-${phys_nic_mac_addr}}" >>$tmp_config
+	fi
+	if [[ -n "${nictag_ips[$ntag]}" ]]; then
 		echo "${ntag}0_vlan_id=${nictag_vlans[$ntag]}" >>$tmp_config
 		echo "${ntag}0_ip=${nictag_ips[$ntag]}" >>$tmp_config
 		if [[ "${nictag_ips[$ntag]}" != "dhcp" ]]; then
