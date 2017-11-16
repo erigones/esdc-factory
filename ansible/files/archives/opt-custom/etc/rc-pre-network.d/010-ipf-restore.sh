@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #
 # This script generates firewall rules from files
 # stored (most likely in) /opt/custom/etc/ipf.d
@@ -25,6 +25,8 @@ GENERATE_FILES="ipf.conf ipnat.conf ipf6.conf"
 OUTPUT_DIR="/etc/ipf"
 IPF_SERVICE="svc:/network/ipfilter:default"
 
+set -e
+
 . /lib/svc/share/smf_include.sh
 
 update_fw() {
@@ -34,12 +36,13 @@ update_fw() {
 	fi
 
 	FW_MODIFIED=0
-	for CFGFILE in ${GENERATE_FILES}; do
+	for cfgfile in ${GENERATE_FILES}; do
 		# get list of all conf files in RULES_DIR
 		# that end with requested filename (e.g. ipf.conf*)
 		# and sort them by name before merging
 		set +e
-		CONF_LIST="$(ls -1 ${RULES_DIR}/${CFGFILE}* 2> /dev/null)"
+		# 'ls' does better job here than shell sort (like 'cat *')
+		CONF_LIST="$(ls -1 ${RULES_DIR}/${cfgfile}* 2> /dev/null)"
 		set -e
 
 		if [[ -z "${CONF_LIST}" ]]; then
@@ -47,8 +50,8 @@ update_fw() {
 			continue
 		fi
 
-		echo "Generating firewall rules for ${CFGFILE}"
-		echo "${CONF_LIST}" | xargs cat > "${OUTPUT_DIR}/${CFGFILE}"
+		echo "Generating firewall rules for ${cfgfile}"
+		echo "${CONF_LIST}" | xargs cat > "${OUTPUT_DIR}/${cfgfile}"
 		FW_MODIFIED=1
 	done
 
@@ -64,18 +67,18 @@ update_fw() {
 
 
 case "$1" in
-  start)
-    update_fw
-    ;;
-  stop)
-    exit $SMF_EXIT_OK
-    ;;
-  refresh)
-    update_fw
-    ;;
-  *)
-    echo "Usage: $0 {start|stop|refresh}"
-    exit $SMF_EXIT_ERR_CONFIG
+	start)
+		update_fw
+		;;
+	stop)
+		exit $SMF_EXIT_OK
+		;;
+	refresh)
+		update_fw
+		;;
+	*)
+		echo "Usage: $0 {start|stop|refresh}"
+		exit $SMF_EXIT_ERR_CONFIG
 esac
 
 exit $SMF_EXIT_OK
