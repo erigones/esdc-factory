@@ -586,7 +586,7 @@ Changelog
 2.7.0
 ~~~~~
 
-- Version bump.
+- Fixed monitoring items of erigonesd mgmt worker - `#98 <https://github.com/erigones/esdc-factory/issues/98>`__
 
 2.6.7
 ~~~~~

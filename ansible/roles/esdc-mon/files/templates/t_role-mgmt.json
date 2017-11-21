@@ -149,7 +149,7 @@
                         "color": "5370B8",
                         "item": {
                             "host": "t_role-mgmt",
-                            "key": "proc.cpu[python -m celery worker -E -n mgmt]"
+                            "key": "proc.cpu[erigonesd.py worker]"
                         },
                         "sortorder": "8",
                         "drawtype": "0",
@@ -253,7 +253,7 @@
                         "color": "5370B8",
                         "item": {
                             "host": "t_role-mgmt",
-                            "key": "proc.rss[python -m celery worker -E -n mgmt]"
+                            "key": "proc.rss[erigonesd.py worker]"
                         },
                         "sortorder": "8",
                         "drawtype": "0",
