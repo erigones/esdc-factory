@@ -1849,9 +1849,9 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 	printheader "Networking - default gateway"
 	message="
 The default gateway will determine which router will be used to connect
-this compute node to other networks. This will almost certainly be the router
-connected to your 'admin' network. Use 'none' if you have no gateway
-or you rely only on the dhcp.\n\n"
+this compute node to other networks. This is probably the router
+connected to your 'admin' or 'external' network.
+Use 'none' if you have no gateway or you rely only on the dhcp.\n\n"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
 		printf "$message"
@@ -2047,7 +2047,6 @@ web management.\n\n"
 	cfgdb_admin_ip="${val}"
 	if [[ ${advanced_install} -eq 1 ]] && ! ip_from_subnet "${cfgdb_admin_ip}" "${admin_ip}" "${admin_netmask}" ; then
 		# the CFGDB IP is outside the subnet
-		# We are probably connecting 
 		echo
 		echo "You have entered an IP address outside the admin subnet."
 		echo "Remote node connects to the central management"
