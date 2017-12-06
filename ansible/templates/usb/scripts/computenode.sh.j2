@@ -80,6 +80,11 @@ if [[ -f /var/lib/setup.json ]]; then
 fi
 
 function configure_erigonesd() {
+	if [[ "${CONFIG_remote_node}" == "1" ]]; then
+		# if this is a remote node, connect always to one IP that was specified during install at cfgdb connect
+		# (this IP is expected to be a proxy for all services)
+		MGMT_IP="${CFGDB_IP}"
+	fi
 	echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
 	echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
 	echo "ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)" >> /opt/erigones/core/celery/local_config.py

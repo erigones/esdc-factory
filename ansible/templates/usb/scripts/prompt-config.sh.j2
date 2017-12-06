@@ -2045,6 +2045,19 @@ web management.\n\n"
 	[[ -z "${cfgdb_admin_ip}" ]] && cfgdb_admin_ip="$(discover_cfgdb)"
 	prompt_host_ok_val "Configuration database IP address" "${cfgdb_admin_ip}" "cfgdb_admin_ip"
 	cfgdb_admin_ip="${val}"
+	if [[ ${advanced_install} -eq 1 ]] && ! ip_from_subnet "${cfgdb_admin_ip}" "${admin_ip}" "${admin_netmask}" ; then
+		# the CFGDB IP is outside the subnet
+		# We are probably connecting 
+		echo
+		echo "You have entered an IP address outside the admin subnet."
+		echo "Remote node connects to the central management"
+		echo "via internet instead using the admin subnet."
+		echo
+		promptbool "Is this a remote node? (y/n)" "y" "remote_node"
+		remote_node=${val}
+	else
+		remote_node=0
+	fi
 	skip_cfgdb_check=$(getanswer "skip_cfgdb_check")
 	[[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]] && check_cfgdb
 {% endif %}
@@ -2075,6 +2088,12 @@ the first compute node installation.\n\n"
 	if [[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]]; then
 		if ! query_cfgdb; then  # This will set the datacenter_name
 			print_warning "Failed to read data from the configuration database"
+		fi
+		if [[ "${remote_node}" == "1" ]]; then
+			datacenter_name="${datacenter_name} remote"
+			echo
+			promptval "Enter remote DC name" "${datacenter_name}" "datacenter_name"
+			datacenter_name="$val"
 		fi
 	fi
 {% endif %}
@@ -2290,6 +2309,7 @@ echo "img_admin_ip=${img_admin_ip}" >>$tmp_config
 echo "cfgdb_admin_ip=${cfgdb_admin_ip}" >>$tmp_config
 echo "esdc_install_password='${esdc_install_password}'" >>$tmp_config
 echo "install_to_hdd=${install_to_hdd}" >>$tmp_config
+echo "remote_node=${remote_node}" >>$tmp_config
 echo  >>$tmp_config
 # END: Danube Cloud settings
 printf "%4s\n" "done"
