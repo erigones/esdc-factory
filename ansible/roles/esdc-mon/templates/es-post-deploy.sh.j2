@@ -59,6 +59,10 @@ chmod 600 /etc/pki/tls/certs/server.key
 log "Restarting httpd"
 systemctl restart httpd
 
+# Sometimes the DB (postgresql/pgbouncer) are not ready yet
+log "Sleeping for 15 seconds"
+sleep 15
+
 ZABBIX_AGENT_CONFIG="/etc/zabbix/zabbix_agentd.conf"
 ZABBIX_IP="$(mdata-get org.erigones:zabbix_ip 2>/dev/null || echo '127.0.0.1')"
 log "Metadata key org.erigones:zabbix_ip value=${ZABBIX_IP}"
