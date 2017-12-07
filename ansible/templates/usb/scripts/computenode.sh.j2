@@ -188,15 +188,14 @@ function query_cfgdb() {
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "false"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/hostname" "${SYSINFO_Hostname}"
 	if [[ -n "${CONFIG_remote_node}" ]]; then
-		_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/remote" "${CONFIG_remote_node}"
+		_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/is_remote" "${CONFIG_remote_node}"
 	else
-		_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/remote" "0"
+		_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/is_remote" "0"
 	fi
 
 	MON_IP=${_mon_ip}
 	RABBITMQ_IP=${_rabbitmq_ip}
 	REDIS_IP=${_redis_ip}
-	[[ -z "${REDIS_IP}" ]] && REDIS_IP=${RABBITMQ_IP}
 	RABBITMQ_PASSWORD=${_rabbitmq_password}
 	REDIS_PASSWORD=${_redis_password}
 
