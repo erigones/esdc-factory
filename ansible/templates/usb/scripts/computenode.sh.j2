@@ -80,13 +80,8 @@ if [[ -f /var/lib/setup.json ]]; then
 fi
 
 function configure_erigonesd() {
-	if [[ "${CONFIG_remote_node}" -eq 1 ]]; then
-		# if this is a remote node, connect always to one IP that was specified during install at cfgdb connect
-		# (this IP is expected to be a proxy for all services)
-		MGMT_IP="${CFGDB_IP}"
-	fi
-	echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
-	echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
+	echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${RABBITMQ_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
+	echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${REDIS_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
 	echo "ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)" >> /opt/erigones/core/celery/local_config.py
 	chown root:root /opt/erigones/core/celery/local_config.py
 	chmod 0600 /opt/erigones/core/celery/local_config.py
@@ -161,12 +156,25 @@ function query_cfgdb() {
 
 	printf_log "\r%-64s" "Retrieving Danube Cloud management configuration from cfgdb... "
 
-	_mgmt_ip=$(_zk get "/esdc/settings/rabbitmq/host")
+	if [[ "${CONFIG_remote_node}" -eq 1 ]]; then
+		# Get the remote IPs. If they do not exist, fill in cfgdb IP that was specified during install
+		# because remote cfgdb is expected to be a proxy to all services
+		# (unless explicitly specified otherwise in /esdc/settings/remote/*).
+
+		_rabbitmq_ip=$(_zk get "/esdc/settings/remote/rabbitmq/host")
+		_redis_ip=$(_zk get "/esdc/settings/remote/redis/host")
+
+		[[ -z "${_rabbitmq_ip}" ]] && _rabbitmq_ip="${CFGDB_IP}"
+		[[ -z "${_redis_ip}" ]] && _redis_ip="${CFGDB_IP}"
+	else
+		_rabbitmq_ip=$(_zk get "/esdc/settings/rabbitmq/host")
+		_redis_ip=$(_zk get "/esdc/settings/redis/host")
+	fi
 	_mon_ip=$(_zk get "/esdc/settings/zabbix/host")
 	_rabbitmq_password=$(_zk get "/esdc/settings/rabbitmq/password")
 	_redis_password=$(_zk get "/esdc/settings/redis/password")
 
-	if [[ -z "${_mgmt_ip}" || -z "${_mon_ip}" || -z "${_rabbitmq_password}" || -z "${_redis_password}" ]]; then
+	if [[ -z "${_rabbitmq_ip}" || -z "${_redis_ip}" || -z "${_mon_ip}" || -z "${_rabbitmq_password}" || -z "${_redis_password}" ]]; then
 		fatal "Incomplete data in configuration database, aborting setup"
 	fi
 
@@ -179,9 +187,16 @@ function query_cfgdb() {
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "false"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/hostname" "${SYSINFO_Hostname}"
+	if [[ -n "${CONFIG_remote_node}" ]]; then
+		_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/remote" "${CONFIG_remote_node}"
+	else
+		_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/remote" "0"
+	fi
 
-	MGMT_IP=${_mgmt_ip}
 	MON_IP=${_mon_ip}
+	RABBITMQ_IP=${_rabbitmq_ip}
+	REDIS_IP=${_redis_ip}
+	[[ -z "${REDIS_IP}" ]] && REDIS_IP=${RABBITMQ_IP}
 	RABBITMQ_PASSWORD=${_rabbitmq_password}
 	REDIS_PASSWORD=${_redis_password}
 
