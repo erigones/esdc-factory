@@ -80,7 +80,7 @@ if [[ -f /var/lib/setup.json ]]; then
 fi
 
 function configure_erigonesd() {
-	if [[ "${CONFIG_remote_node}" == "1" ]]; then
+	if [[ "${CONFIG_remote_node}" -eq 1 ]]; then
 		# if this is a remote node, connect always to one IP that was specified during install at cfgdb connect
 		# (this IP is expected to be a proxy for all services)
 		MGMT_IP="${CFGDB_IP}"
