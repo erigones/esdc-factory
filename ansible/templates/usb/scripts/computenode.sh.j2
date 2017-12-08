@@ -169,22 +169,22 @@ function query_cfgdb() {
 		# (unless explicitly specified otherwise in /esdc/settings/remote/*).
 
 		# if node-specific config is not found, search generic remote configuration
-		[[ -z "${_rabbitmq_ip}" ]] &&	_rabbitmq_ip=$(_zk get "/esdc/settings/remote/rabbitmq/host")
-		[[ -z "${_redis_ip}" ]] &&		_redis_ip=$(_zk get "/esdc/settings/remote/redis/host")
-		[[ -z "${_mon_ip}" ]] &&		_mon_ip=$(_zk get "/esdc/settings/remote/zabbix/host")
+		[[ -z "${_rabbitmq_ip}" ]] &&   _rabbitmq_ip=$(_zk get "/esdc/settings/remote/rabbitmq/host")
+		[[ -z "${_redis_ip}" ]] &&      _redis_ip=$(_zk get "/esdc/settings/remote/redis/host")
+		[[ -z "${_mon_ip}" ]] &&        _mon_ip=$(_zk get "/esdc/settings/remote/zabbix/host")
 
 		# fallback for remote node is cfgdb IP
-		[[ -z "${_rabbitmq_ip}" ]] &&	_rabbitmq_ip="${CFGDB_IP}"
-		[[ -z "${_redis_ip}" ]] &&		_redis_ip="${CFGDB_IP}"
-		[[ -z "${_mon_ip}" ]] &&		_mon_ip="${CFGDB_IP}"
+		[[ -z "${_rabbitmq_ip}" ]] &&   _rabbitmq_ip="${CFGDB_IP}"
+		[[ -z "${_redis_ip}" ]] &&      _redis_ip="${CFGDB_IP}"
+		[[ -z "${_mon_ip}" ]] &&       	_mon_ip="${CFGDB_IP}"
 	fi
 
 	# as a fallback, query global services settings
-	[[ -z "${_rabbitmq_ip}" ]] &&		_rabbitmq_ip=$(_zk get "/esdc/settings/rabbitmq/host")
-	[[ -z "${_redis_ip}" ]] &&			_redis_ip=$(_zk get "/esdc/settings/redis/host")
-	[[ -z "${_mon_ip}" ]] &&			_mon_ip=$(_zk get "/esdc/settings/zabbix/host")
-	[[ -z "${_rabbitmq_password}" ]] &&	_rabbitmq_password=$(_zk get "/esdc/settings/rabbitmq/password")
-	[[ -z "${_redis_password}" ]] &&	_redis_password=$(_zk get "/esdc/settings/redis/password")
+	[[ -z "${_rabbitmq_ip}" ]] &&           _rabbitmq_ip=$(_zk get "/esdc/settings/rabbitmq/host")
+	[[ -z "${_redis_ip}" ]] &&              _redis_ip=$(_zk get "/esdc/settings/redis/host")
+	[[ -z "${_mon_ip}" ]] &&                _mon_ip=$(_zk get "/esdc/settings/zabbix/host")
+	[[ -z "${_rabbitmq_password}" ]] &&     _rabbitmq_password=$(_zk get "/esdc/settings/rabbitmq/password")
+	[[ -z "${_redis_password}" ]] &&        _redis_password=$(_zk get "/esdc/settings/redis/password")
 
 	if [[ -z "${_rabbitmq_ip}" || -z "${_redis_ip}" || -z "${_mon_ip}" || -z "${_rabbitmq_password}" || -z "${_redis_password}" ]]; then
 		fatal "Incomplete data in configuration database, aborting setup"
