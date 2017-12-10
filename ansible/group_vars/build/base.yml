@@ -77,6 +77,7 @@ esdc_mgmt:
     user: 'esdc'
     host: '127.0.0.1'
     port: '5672'
+    port_ssl: '5673'
     password: 'S3cr3tP4ssw0rd'
     vhost: 'esdc'
     cfgdir: '/etc/rabbitmq'
@@ -84,6 +85,7 @@ esdc_mgmt:
   redis:
     host: '127.0.0.1'
     port: '6379'
+    port_ssl: '6380'
     password: 'S3cr3tP4ssw0rd'
   pgsql_esdc:
     name: 'esdc'

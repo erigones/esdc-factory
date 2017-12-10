@@ -23,6 +23,11 @@ exec 4>>/dev/console
 # Time to wait for each VM to setup (in seconds)
 VM_DEPLOY_TIMEOUT=600
 
+OPENSSL_HOME="/opt/local/etc/openssl"
+BASE64="/opt/local/bin/base64"
+OPENSSL="/opt/local/bin/openssl"
+
+
 # Helper functions
 function printf_log() {
 	printf "$@" >&${CONSOLE_FD}
@@ -95,10 +100,48 @@ function configure_imgadm() {
 	fi
 }
 
+function generate_svc_ssl_cert() {
+	SVC_CERT_TMPFILE="/tmp/svc_$$_cert.pem"
+	SVC_KEY_TMPFILE="/tmp/svc_$$_key.pem"
+	SVC_CERT_FILE="${OPENSSL_HOME}/dc-erigonesd.pem"
+
+	UMASK_OLD="$(umask)"
+	umask 0077
+	"${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=*.*/O=Danube Cloud/' -newkey rsa:8192 -keyout "${SVC_KEY_TMPFILE}" -out "${SVC_CERT_TMPFILE}"
+	umask "${UMASK_OLD}"
+
+	if [[ ! -s "${SVC_CERT_TMPFILE}" ]] || [[ ! -s "${SVC_KEY_TMPFILE}" ]]; then
+		echo "Services SSL cert was not generated properly"
+		return 1
+	fi
+
+	SVC_CERT="$(cat "${SVC_CERT_TMPFILE}")"
+	SVC_KEY="$(cat "${SVC_KEY_TMPFILE}")"
+	SVC_CERT_COMBINED_B64="$(cat "${SVC_KEY_TMPFILE}" "${SVC_CERT_TMPFILE}" | "${BASE64}")"
+
+	# save the public cert into openssl trusted certs
+	cp "${SVC_CERT_TMPFILE}" "${SVC_CERT_FILE}"
+	# rehash certificate
+	ln -s "../$(basename "${SVC_CERT_FILE}")" "certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+
+	rm -f "${SVC_KEY_TMPFILE}" "${SVC_CERT_TMPFILE}"
+}
+
 function configure_erigonesd() {
-	echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
-	echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
+	if [[ -f "${SVC_CERT_FILE}" ]]; then
+		# SSL is enabled
+		echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port_ssl }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
+		echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port_ssl }}/0'" >> /opt/erigones/core/celery/local_config.py
+		echo "BROKER_USE_SSL = { 'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }" >> /opt/erigones/core/celery/local_config.py
+		echo "REDIS_BACKEND_USE_SSL = { 'ssl_cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }" >> /opt/erigones/core/celery/local_config.py
+	else
+		# SSL is disabled, connect using plaintext
+		echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
+		echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
+	fi
+
 	echo "ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)" >> /opt/erigones/core/celery/local_config.py
+
 	chown root:root /opt/erigones/core/celery/local_config.py
 	chmod 0600 /opt/erigones/core/celery/local_config.py
 }
@@ -179,6 +222,7 @@ function _build_vmmanifest() {
 				-e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
 				-e "s|@ESDC_INSTALL_PASSWORD@|${ESDC_INSTALL_PASSWORD}|" \
+				-e "s|@ERIGONESD_SSL_CERT@|${SVC_CERT_COMBINED_B64}|" \
 				"${template}" > "${manifest}"
 		;;
 
@@ -228,6 +272,8 @@ function _build_vmmanifest() {
 				-e "s|@PGSQL_PDNS_PASSWORD@|${PGSQL_PDNS_PASSWORD}|" \
 				-e "s|@PGSQL_MGMT_MON_PASSWORD@|${PGSQL_MGMT_MON_PASSWORD}|" \
 				-e "s|@ESDC_ADMIN_EMAIL@|${ZABBIX_ADMIN_EMAIL}|" \
+				-e "s|@ERIGONESD_SSL_CERT@|${SVC_CERT_COMBINED_B64}|" \
+				-e "s|@CFGDB_IP@|${CFGDB_IP}|" \
 				"${template}" > "${manifest}"
 		;;
 
@@ -415,10 +461,12 @@ function configure_cfgdb() {
 	_zk creater /esdc/settings/rabbitmq/password "${RABBITMQ_PASSWORD}"
 	_zk creater /esdc/settings/rabbitmq/host "${MGMT_IP}"
 	_zk creater /esdc/settings/rabbitmq/port "{{ esdc_mgmt.rabbitmq.port }}"
+	_zk creater /esdc/settings/rabbitmq/port_ssl "{{ esdc_mgmt.rabbitmq.port_ssl }}"
 	_zk creater /esdc/settings/rabbitmq/vhost "{{ esdc_mgmt.rabbitmq.vhost }}"
 
 	_zk creater /esdc/settings/redis/host "${MGMT_IP}"
 	_zk creater /esdc/settings/redis/port "{{ esdc_mgmt.redis.port }}"
+	_zk creater /esdc/settings/redis/port_ssl "{{ esdc_mgmt.redis.port_ssl }}"
 	_zk creater /esdc/settings/redis/password "${REDIS_PASSWORD}"
 
 	_zk creater /esdc/settings/pgsql_esdc/host "${MGMT_IP}"
@@ -438,6 +486,8 @@ function configure_cfgdb() {
 	_zk creater /esdc/settings/zabbix/smtp_email "${ZABBIX_SMTP_EMAIL}"
 	_zk creater /esdc/settings/zabbix/esdc_username "${ZABBIX_ESDC_USERNAME}"
 	_zk creater /esdc/settings/zabbix/esdc_password "${ZABBIX_ESDC_PASSWORD}"
+
+	_zk creater /esdc/settings/security/services-ssl-cert "${SVC_CERT}"
 
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "true"
@@ -577,6 +627,7 @@ MGMT_SSH_KEY="$(get_mgmt_ssh_key)"
 
 install_isos
 configure_imgadm
+generate_svc_ssl_cert
 configure_cfgdb
 install_images
 import_smf_manifests
