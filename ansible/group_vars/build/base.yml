@@ -106,3 +106,10 @@ esdc_mgmt:
     enabled: true
     username: "provisioner"
     password: "zabbix"
+
+esdc_cfgdb:
+  zookeeper:
+    port: '2181'
+  zk_rest_api:
+    port: '2182'
+

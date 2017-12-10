@@ -23,9 +23,10 @@ exec 4>>/dev/console
 # Time to wait for each VM to setup (in seconds)
 VM_DEPLOY_TIMEOUT=600
 
-OPENSSL_HOME="/opt/local/etc/openssl"
 BASE64="/opt/local/bin/base64"
 OPENSSL="/opt/local/bin/openssl"
+OPENSSL_HOME="/opt/local/etc/openssl"
+SVC_CERT_FILE="${OPENSSL_HOME}/dc-erigonesd.pem"
 
 
 # Helper functions
@@ -103,7 +104,6 @@ function configure_imgadm() {
 function generate_svc_ssl_cert() {
 	SVC_CERT_TMPFILE="/tmp/svc_$$_cert.pem"
 	SVC_KEY_TMPFILE="/tmp/svc_$$_key.pem"
-	SVC_CERT_FILE="${OPENSSL_HOME}/dc-erigonesd.pem"
 
 	UMASK_OLD="$(umask)"
 	umask 0077
