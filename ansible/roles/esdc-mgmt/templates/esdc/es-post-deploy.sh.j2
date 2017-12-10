@@ -68,6 +68,44 @@ chown root:root /etc/pki/tls/certs/server.pem
 chmod 600 /etc/pki/tls/certs/server.pem
 chmod 600 /etc/pki/tls/certs/server.key
 
+# setup mgmt services SSL proxy
+SVC_CERT_COMBINED_B64="$(mdata-get org.erigones:erigonesd_ssl_cert 2> /dev/null)"
+CFGDB_IP="$(mdata-get org.erigones:cfgdb_ip 2> /dev/null)"
+SVC_CERT_FILE="/etc/pki/tls/certs/dc-erigonesd.pem"
+
+if [[ -n "${SVC_CERT_COMBINED_B64}" ]] && [[ -n "${CFGDB_IP}" ]]; then
+	# certificate exists, configure erigonesd SSL proxy
+	echo "${SVC_CERT_COMBINED_B64}" | /usr/bin/base64 -d > "${SVC_CERT_FILE}"
+	chmod 600 "${SVC_CERT_FILE}"
+
+	cat >> /etc/haproxy/haproxy.cfg << EOF
+# START Danube Cloud admin services proxy
+
+listen rabbitmq
+	mode tcp
+	bind *:{{ esdc_mgmt.rabbitmq.port_ssl }} ssl crt ${SVC_CERT_FILE}
+	server rabbitmq-mgmt 127.0.0.1:{{ esdc_mgmt.rabbitmq.port }}
+
+listen redis
+	mode tcp
+	bind *:{{ esdc_mgmt.redis.port_ssl }} ssl crt ${SVC_CERT_FILE}
+	server redis-mgmt 127.0.0.1:{{ esdc_mgmt.redis.port }}
+
+listen zookeeper
+	mode tcp
+	bind *:{{ esdc_cfgdb.zookeeper.port }}
+	server zookeeper-cfgdb ${CFGDB_IP}:{{ esdc_cfgdb.zookeeper.port }}
+
+listen zk_rest_api
+	mode tcp
+	bind *:{{ esdc_cfgdb.zk_rest_api.port }}
+	server zookeeper-cfgdb ${CFGDB_IP}:{{ esdc_cfgdb.zk_rest_api.port }}
+
+# END Danube Cloud admin services proxy
+
+EOF
+fi
+
 log "Restaring haproxy"
 systemctl restart haproxy
 
