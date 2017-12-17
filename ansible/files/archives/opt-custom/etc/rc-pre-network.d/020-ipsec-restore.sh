@@ -33,6 +33,7 @@ update_file() {
 	local file_dst="${2}"
 
 	if [[ -f "${file_src}" ]] && ! cmp -s "${file_src}" "${file_dst}"; then
+		echo "Updating ${file_src}"
 		cp -a "${file_src}" "${file_dst}"
 		return 0
 	fi
@@ -74,8 +75,12 @@ update_ipsec_conf() {
 		exit $SMF_EXIT_OK
 	fi
 
-	if update_file "${IKE_CONF_SRC}" "${IKE_CONF_DST}" || \
-		update_file "${IKE_PRESHARED_SRC}" "${IKE_PRESHARED_DST}"; then
+	update_file "${IKE_CONF_SRC}" "${IKE_CONF_DST}"
+	rc1="${?}"
+	update_file "${IKE_PRESHARED_SRC}" "${IKE_PRESHARED_DST}"
+	rc2="${?}"
+	if [[ "${rc1}" -eq 0 || "${rc2}" -eq 0 ]]; then
+		# at least one file has been updated
 		reload_svc "${IKE_SERVICE}"
 	else
 		clear_maint "${IKE_SERVICE}"
