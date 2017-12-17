@@ -23,6 +23,12 @@ exec 4>>/dev/console
 # Time to wait for each VM to setup (in seconds)
 VM_DEPLOY_TIMEOUT=600
 
+BASE64="/opt/local/bin/base64"
+OPENSSL="/opt/local/bin/openssl"
+OPENSSL_HOME="/opt/local/etc/openssl"
+SVC_CERT_FILE="${OPENSSL_HOME}/dc-erigonesd.pem"
+
+
 # Helper functions
 function printf_log() {
 	printf "$@" >&${CONSOLE_FD}
@@ -134,6 +140,16 @@ function _zk() {
 	fi
 }
 
+function setup_svc_ssl_cert() {
+	# download SSL cert
+	SVC_CERT=
+
+	# save the public cert into openssl trusted certs
+	echo "${SVC_CERT}" > "${SVC_CERT_FILE}"
+	# rehash certificate
+	ln -s "../$(basename "${SVC_CERT_FILE}")" "certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+}
+
 function wait_for_cfgdb() {
 	set +e
 	while true; do
@@ -150,7 +166,7 @@ function wait_for_cfgdb() {
 	set -e
 }
 
-function query_cfgdb() {
+function pull_cfgdb_data() {
 	# Wait for configuration database availability
 	wait_for_cfgdb
 
@@ -283,7 +299,7 @@ generate_ssh_keys
 CFGDB_IP="${CONFIG_cfgdb_admin_ip}"
 ESDC_INSTALL_PASSWORD="${CONFIG_esdc_install_password}"
 
-query_cfgdb
+pull_cfgdb_data
 configure_erigonesd
 configure_zabbix
 
