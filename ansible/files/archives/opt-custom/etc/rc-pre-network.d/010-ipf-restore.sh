@@ -20,7 +20,7 @@
 # config is not touched.
 #
 
-RULES_DIR="$(realpath "$(dirname $0)/../../etc/ipf.d")"
+RULES_DIR="/opt/custom/etc/ipf.d"
 GENERATE_FILES="ipf.conf ipnat.conf ipf6.conf"
 OUTPUT_DIR="/etc/ipf"
 IPF_SERVICE="svc:/network/ipfilter:default"
@@ -55,13 +55,14 @@ update_fw() {
 		FW_MODIFIED=1
 	done
 
-	if [[ ${FW_MODIFIED} -eq 1 ]]; then
-		# refresh firewall if applicable
-		if [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "online" ]]; then
-			/usr/sbin/svcadm refresh "${IPF_SERVICE}"
-		elif [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
-			/usr/sbin/svcadm clear "${IPF_SERVICE}"
-		fi
+	# refresh firewall if applicable
+	if [[ ${FW_MODIFIED} -eq 1 && "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "online" ]]; then
+		/usr/sbin/svcadm refresh "${IPF_SERVICE}"
+	fi
+
+	# clear maintenance if necessary
+	if [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
+		/usr/sbin/svcadm clear "${IPF_SERVICE}"
 	fi
 }
 
