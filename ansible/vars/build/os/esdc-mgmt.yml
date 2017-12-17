@@ -63,8 +63,11 @@ firewall_allowed_tcp_ports:
     iface: eth0
   - port: 5672
     iface: eth0
+  - port: 15672
   - port: 6379
     iface: eth0
+  - port: 16379
+  - port: 12181
   - port: 6432
     iface: eth0
   - port: 10050
