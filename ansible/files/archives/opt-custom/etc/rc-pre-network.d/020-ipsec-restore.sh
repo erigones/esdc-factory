@@ -23,7 +23,6 @@ IKE_PRESHARED_DST="/etc/inet/secret/ike.preshared"
 IPSECINIT_CONF_SRC="${IPSEC_DIR}/ipsecinit.conf"
 IPSECINIT_CONF_DST="/etc/inet/ipsecinit.conf"
 
-set -e
 
 . /lib/svc/share/smf_include.sh
 
