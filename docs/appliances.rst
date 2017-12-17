@@ -587,6 +587,7 @@ Changelog
 ~~~~~
 
 - Fixed monitoring items of erigonesd mgmt worker - `#98 <https://github.com/erigones/esdc-factory/issues/98>`__
+- Fixed timezone of the Zabbix frontend - `#106 <https://github.com/erigones/esdc-factory/issues/106>`__
 
 2.6.7
 ~~~~~
