@@ -23,10 +23,18 @@ exec 4>>/dev/console
 # Time to wait for each VM to setup (in seconds)
 VM_DEPLOY_TIMEOUT=600
 
+# global vars
+ERIGONES_HOME="/opt/erigones"
 BASE64="/opt/local/bin/base64"
 OPENSSL="/opt/local/bin/openssl"
 OPENSSL_HOME="/opt/local/etc/openssl"
 SVC_CERT_FILE="${OPENSSL_HOME}/dc-erigonesd.pem"
+QUERY_CFGDB="${ERIGONES_HOME}/bin/query_cfgdb"
+
+# certificate for DC internal services 
+SVC_CERT=
+SVC_KEY=
+SVC_CERT_COMBINED_B64=
 
 
 # Helper functions
@@ -620,15 +628,6 @@ DNS_RESOLVERS="${CONFIG_dns_resolvers}"
 domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
 [[ -z "${domainname}" ]] && domainname="example.com"
 ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"monitoring@${domainname}"}"
-
-# global vars
-ERIGONES_HOME="/opt/erigones"
-QUERY_CFGDB="${ERIGONES_HOME}/bin/query_cfgdb"
-
-# DC internal services certificate
-SVC_CERT=
-SVC_KEY=
-SVC_CERT_COMBINED_B64=
 
 configure_erigonesd
 configure_zabbix
