@@ -102,29 +102,29 @@ function configure_imgadm() {
 }
 
 function generate_svc_ssl_cert() {
-	SVC_CERT_TMPFILE="/tmp/svc_$$_cert.pem"
-	SVC_KEY_TMPFILE="/tmp/svc_$$_key.pem"
+	local svc_cert_tmpfile="/tmp/svc_$$_cert.pem"
+	local svc_key_tmpfile="/tmp/svc_$$_key.pem"
 
 	UMASK_OLD="$(umask)"
 	umask 0077
-	"${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=*.*/O=Danube Cloud/' -newkey rsa:8192 -keyout "${SVC_KEY_TMPFILE}" -out "${SVC_CERT_TMPFILE}"
+	"${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=*.*/O=Danube Cloud/' -newkey rsa:8192 -keyout "${svc_key_tmpfile}" -out "${svc_cert_tmpfile}"
 	umask "${UMASK_OLD}"
 
-	if [[ ! -s "${SVC_CERT_TMPFILE}" ]] || [[ ! -s "${SVC_KEY_TMPFILE}" ]]; then
+	if [[ ! -s "${svc_cert_tmpfile}" ]] || [[ ! -s "${svc_key_tmpfile}" ]]; then
 		echo "Services SSL cert was not generated properly"
 		return 1
 	fi
 
-	SVC_CERT="$(cat "${SVC_CERT_TMPFILE}")"
-	SVC_KEY="$(cat "${SVC_KEY_TMPFILE}")"
-	SVC_CERT_COMBINED_B64="$(cat "${SVC_KEY_TMPFILE}" "${SVC_CERT_TMPFILE}" | "${BASE64}")"
+	SVC_CERT="$(cat "${svc_cert_tmpfile}")"
+	SVC_KEY="$(cat "${svc_key_tmpfile}")"
+	SVC_CERT_COMBINED_B64="$(cat "${svc_key_tmpfile}" "${svc_cert_tmpfile}" | "${BASE64}")"
 
 	# save the public cert into openssl trusted certs
-	cp "${SVC_CERT_TMPFILE}" "${SVC_CERT_FILE}"
+	cp "${svc_cert_tmpfile}" "${SVC_CERT_FILE}"
 	# rehash certificate
 	ln -s "../$(basename "${SVC_CERT_FILE}")" "certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
 
-	rm -f "${SVC_KEY_TMPFILE}" "${SVC_CERT_TMPFILE}"
+	rm -f "${svc_key_tmpfile}" "${svc_cert_tmpfile}"
 }
 
 function configure_erigonesd() {
@@ -442,11 +442,16 @@ function install_archives() {
 }
 
 function _zk() {
-	zkcli="${USB_COPY}/scripts/zookeepercli"
 	cmd="${@}"
 
-	if ! "${zkcli}" -servers "${CFGDB_IP}:2181" -auth_usr "esdc" -auth_pwd "${ESDC_INSTALL_PASSWORD}" -c ${cmd} &> /dev/null; then
+	if ! "${QUERY_CFGDB}" ${cmd} &> /dev/null; then
 		fatal "Error: cfgdb command \"${cmd}\" failed"
+	fi
+}
+
+test_cfgdb_connect() {
+	if [[ -z "$(_zk ls /)" ]]; then
+		fatal "Unable to query cfgdb."
 	fi
 }
 
@@ -487,7 +492,7 @@ function configure_cfgdb() {
 	_zk creater /esdc/settings/zabbix/esdc_username "${ZABBIX_ESDC_USERNAME}"
 	_zk creater /esdc/settings/zabbix/esdc_password "${ZABBIX_ESDC_PASSWORD}"
 
-	_zk creater /esdc/settings/security/services-ssl-cert "${SVC_CERT}"
+	_zk creater /esdc/settings/security/services_ssl_cert "${SVC_CERT}"
 
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "true"
@@ -616,8 +621,19 @@ domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
 [[ -z "${domainname}" ]] && domainname="example.com"
 ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"monitoring@${domainname}"}"
 
+# global vars
+ERIGONES_HOME="/opt/erigones"
+QUERY_CFGDB="${ERIGONES_HOME}/bin/query_cfgdb"
+
+# DC internal services certificate
+SVC_CERT=
+SVC_KEY=
+SVC_CERT_COMBINED_B64=
+
 configure_erigonesd
 configure_zabbix
+test_cfgdb_connect
+generate_svc_ssl_cert
 
 {% for vm in usb_vms %}
 create_vm {{ vm.name }}
@@ -627,7 +643,6 @@ MGMT_SSH_KEY="$(get_mgmt_ssh_key)"
 
 install_isos
 configure_imgadm
-generate_svc_ssl_cert
 configure_cfgdb
 install_images
 import_smf_manifests
