@@ -106,6 +106,7 @@ esdc_mgmt:
     enabled: true
     username: "provisioner"
     password: "zabbix"
+  svc_cert_file: "/etc/pki/tls/certs/dc-erigonesd.pem"
 
 esdc_cfgdb:
   zookeeper:

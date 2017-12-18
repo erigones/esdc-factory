@@ -188,10 +188,14 @@
 - name: Copy application stack service configurations
   copy: src="{{ item }}" dest="/etc/{{ item }}" mode=0644
   with_items:
-    - "haproxy/haproxy.cfg"
     - "nginx/nginx.conf"
     - "nginx/vhost.d/esdc.conf"
     - "logrotate.d/esdc"
+
+- name: Copy templated application stack service configurations
+  template: src="{{ item }}.j2" dest="/etc/{{ item }}" mode=0644
+  with_items:
+    - "haproxy/haproxy.cfg"
 
 - name: Restart application web stack services
   service: name={{ item }} state=restarted
