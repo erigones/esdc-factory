@@ -61,17 +61,17 @@ firewall_allowed_tcp_ports:
   - port: 443
   - port: 22
     iface: eth0
-  - port: 5672
+  - port: "{{ esdc_mgmt.rabbitmq.port }}" 
     iface: eth0
-  - port: 15672
-  - port: 6379
+  - port: "{{ esdc_mgmt.redis.port }}"
     iface: eth0
-  - port: 16379
-  - port: 12181
-  - port: 6432
+  - port: "{{ esdc_mgmt.pgsql_esdc.port }}"
     iface: eth0
   - port: 10050
     iface: eth0
+  - port: "{{ esdc_mgmt.rabbitmq.port_ssl }}" 
+  - port: "{{ esdc_mgmt.redis.port_ssl }}"
+  - port: "{{ esdc_cfgdb.zookeeper.port_ssl }}"
 
 sudo_users:
   - user: erigones
