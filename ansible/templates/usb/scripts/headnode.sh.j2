@@ -458,7 +458,7 @@ function _zk() {
 }
 
 test_cfgdb_connect() {
-	if [[ -z "$(_zk ls /)" ]]; then
+	if [[ -z "$(_zk get /esdc)" ]]; then
 		fatal "Unable to query cfgdb."
 	fi
 }
