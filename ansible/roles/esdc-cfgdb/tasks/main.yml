@@ -13,8 +13,15 @@
         group=root
         mode=0755
 
+- name: Copy cfgdb_zk_rest_server.py script
+  copy: src=cfgdb_disco_server.py
+        dest=/usr/local/bin/cfgdb_zk_rest_server.py
+        owner=root
+        group=root
+        mode=0755
+
 - name: Copy query_cfgdb script
-  copy: src=query_cfgdb
+  copy: src=query_cfgdb_local
         dest=/usr/local/bin/query_cfgdb
         owner=root
         group=root
@@ -27,9 +34,16 @@
         group=root
         mode=0755
 
+- name: Copy cfgdb-zk-rest SMF manifest
+  copy: src=cfgdb-zk-rest.xml
+        dest=/opt/local/lib/svc/manifest/cfgdb-zk-rest.xml
+
 - name: Copy cfgdb-disco SMF manifest
   copy: src=cfgdb-disco.xml
         dest=/opt/local/lib/svc/manifest/cfgdb-disco.xml
+
+- name: Import cfgdb-zk-rest SMF manifest
+  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/cfgdb-zk-rest.xml
 
 - name: Import cfgdb-disco SMF manifest
   command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/cfgdb-disco.xml

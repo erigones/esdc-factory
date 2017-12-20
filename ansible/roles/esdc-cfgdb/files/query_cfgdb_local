@@ -1,9 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 ZKCLI=/usr/local/bin/zookeepercli
-QUERY_STRING="$@"
 
-if [[ -z "${QUERY_STRING}" ]]; then
+if [[ -z "${2}" ]]; then
 	echo "Usage:   $0 <query>" 1>&2
 	echo "Example: $0 ls /esdc/nodes" 1>&2
 	exit 10
@@ -19,9 +18,9 @@ CFGDB_USERNAME="$(mdata-get org.erigones:cfgdb_username 2>/dev/null || echo 'esd
 CFGDB_PASSWORD="$(mdata-get org.erigones:cfgdb_password 2>/dev/null)"
 
 if [[ -n "${CFGDB_USERNAME}" && -n "${CFGDB_PASSWORD}" ]]; then
-	"${ZKCLI}" -servers localhost -auth_usr "${CFGDB_USERNAME}" -auth_pwd "${CFGDB_PASSWORD}" -c ${QUERY_STRING}
+	"${ZKCLI}" -servers localhost -auth_usr "${CFGDB_USERNAME}" -auth_pwd "${CFGDB_PASSWORD}" -c "${@}"
 else
-	"${ZKCLI}" -servers localhost -c ${QUERY_STRING}
+	"${ZKCLI}" -servers localhost -c "${@}"
 fi
 
 exit $?
