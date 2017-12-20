@@ -125,7 +125,7 @@ function generate_svc_ssl_cert() {
 
 	SVC_CERT="$(cat "${svc_cert_tmpfile}")"
 	SVC_KEY="$(cat "${svc_key_tmpfile}")"
-	SVC_CERT_COMBINED_B64="$(cat "${svc_key_tmpfile}" "${svc_cert_tmpfile}" | "${BASE64}")"
+	SVC_CERT_COMBINED_B64="$(cat "${svc_key_tmpfile}" "${svc_cert_tmpfile}" | "${BASE64}" -w 0)"
 
 	# save the public cert into openssl trusted certs
 	cp "${svc_cert_tmpfile}" "${SVC_CERT_FILE}"
