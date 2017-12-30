@@ -1,0 +1,11 @@
+This directory permanently stores SmartOS IPSec configuration.
+
+If you want to enable IPSec at boot, edit files in this directory.
+The files will be copied to /etc/inet and if necessary,
+the appropriate services will be restarted.
+If you want to apply new IPSec configuration without reboot, run
+/opt/custom/etc/rc-pre-network.d/020-ipsec-restore.sh refresh
+
+Please note that if you use script "esdc-overlay" for altering
+overlay/IPSec configuration, it will overwrite these files each run.
+
