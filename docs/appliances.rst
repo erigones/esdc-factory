@@ -469,7 +469,7 @@ Changelog
 2.7.0
 ~~~~~
 
-- Version bump.
+- Fixed /etc/rc.d/rc.local permissions - `#109 <https://github.com/erigones/esdc-factory/issues/109>`__
 
 2.6.7
 ~~~~~
@@ -588,6 +588,7 @@ Changelog
 
 - Fixed monitoring items of erigonesd mgmt worker - `#98 <https://github.com/erigones/esdc-factory/issues/98>`__
 - Fixed timezone of the Zabbix frontend - `#106 <https://github.com/erigones/esdc-factory/issues/106>`__
+- Fixed /etc/rc.d/rc.local permissions - `#109 <https://github.com/erigones/esdc-factory/issues/109>`__
 
 2.6.7
 ~~~~~
