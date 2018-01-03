@@ -25,7 +25,7 @@ base-64-es
 Changelog
 ---------
 
-2.7.0
+3.0.0
 ~~~~~
 
 - Version bump.
@@ -135,7 +135,7 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
-2.7.0
+3.0.0
 ~~~~~
 
 - Version bump.
@@ -246,7 +246,7 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
-2.7.0
+3.0.0
 ~~~~~
 
 - Version bump.
@@ -351,7 +351,7 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 Changelog
 ---------
 
-2.7.0
+3.0.0
 ~~~~~
 
 - Version bump.
@@ -466,7 +466,7 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.7.0
+3.0.0
 ~~~~~
 
 - Fixed /etc/rc.d/rc.local permissions - `#109 <https://github.com/erigones/esdc-factory/issues/109>`__
@@ -583,7 +583,7 @@ The image supports following metadata:
 Changelog
 ---------
 
-2.7.0
+3.0.0
 ~~~~~
 
 - Fixed monitoring items of erigonesd mgmt worker - `#98 <https://github.com/erigones/esdc-factory/issues/98>`__
