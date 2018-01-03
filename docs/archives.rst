@@ -21,6 +21,7 @@ Can be created using the ``make archive-local`` command or manually on a clean S
     pkgin -y full-upgrade
 
     # Install esDC OS dependencies
+    # (see ansible/tasks/build/archives/create-local-archive.yml in this repo)
     pkgin -y install gcc49 gmake autoconf git-base python27 py27-virtualenv patch
 
     # Create tarball
@@ -52,4 +53,12 @@ Can be created using the ``make archive-monitoring`` command or manually:
 
 
 .. note:: Zabbix is a registered trademark of `Zabbix LLC <http://www.zabbix.com>`_.
+
+
+opt-custom
+==========
+
+Custom files and directories placed in ``/opt/custom``. Required for a Danube Cloud compute node.
+
+Can be created by using the ``make archive-opt-custom`` command or manually by creating a tarball from the ``ansible/files/archives/opt-custom`` directory in this repo (see ``ansible/tasks/build/archives/create-opt-custom-archive.yml`` for more details).
 

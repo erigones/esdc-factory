@@ -1,7 +1,7 @@
 Danube Cloud :: Factory :: Appliances
 #####################################
 
-Danube Cloud appliances (VM images), which are part of the Danube Cloud head node USB image:
+Danube Cloud appliances (VM images), which are part of the Danube Cloud first compute node USB image:
 
     * `base-64-es`_ (OS zone)
     * `esdc-cfgdb`_ (OS zone)

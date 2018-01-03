@@ -24,6 +24,7 @@ All build results are stored in following folders in ``build_base_dir``:
 
     * local
     * monitoring
+    * opt-custom
     * esdc-node
 
 * **platform**: Tarballs, which contain the `hypervisor platform <docs/platform.rst>`_ - SmartOS raw kernel and boot_archive.

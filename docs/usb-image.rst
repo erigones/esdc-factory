@@ -19,11 +19,35 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-2.7.0 (unreleased)
+3.0.0 (unreleased)
 ==================
 
-- Fixed root dataset properties when installed to HDD - `#94 <https://github.com/erigones/esdc-factory/issues/94>`__
-- Moved ``net-cleanup`` SMF service into platform image - `#96 <https://github.com/erigones/esdc-factory/issues/96>`__
+- Updated to a new platform version - 20171216T012846Z from upstream/release-20171221:
+    - Added support for the ``dns_options`` /usbkey/config setting - `erigonos-overlay#1 <https://github.com/erigones/esdc-erigonos-overlay/issues/1>`__
+    - Added support for admin NIC tag on etherstub - `#86 <https://github.com/erigones/esdc-factory/issues/86>`__
+    - Added support for the ``vnc_listen_address`` in /usbkey/config - `#88 <https://github.com/erigones/esdc-factory/issues/88>`__
+    - Added support for custom postboot SMF user scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
+    - Added live migration support - `#93 <https://github.com/erigones/esdc-factory/issues/93>`__
+    - Moved ``net-cleanup`` SMF service into platform image - `#96 <https://github.com/erigones/esdc-factory/issues/96>`__
+    - Added ``network/virtual`` SMF service with support for the ``overlay_rule_*`` /usbkey/config setting - `erigonos-overlay#7 <https://github.com/erigones/esdc-erigonos-overlay/issues/7>`__
+    - Increased "/" (root) ramdisk size `smartos-live/commit 8a490b6 <https://github.com/erigones/smartos-live/commit/8a490b6e42279a64e60a097a2dbed0740209dc8c>`__
+    - Fixed node.js fs.readFile[Sync]() problem with reading /dev/stdin - `joyent/smartos-live#753 <https://github.com/joyent/smartos-live/issues/753>`__
+
+- Updated the *local* archive [local-2016Q4-20180103]
+
+- Updated the *monitoring* archive [local-2016Q4-20180103]:
+    - Updated Zabbix agent to 3.0.14 - `#110 <https://github.com/erigones/esdc-factory/issues/110>`__
+
+- Updated the *opt-custom* archive [opt-custom-2016Q4-20180103]:
+    - Added support for custom postboot SMF user scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
+    - Added sample firewall and mount-iscsi RC scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
+    - Added ipsec RC script - `#107 <https://github.com/erigones/esdc-factory/issues/107>`__
+
+- Updated installer:
+    - Fixed long resolution timeout when DNS unavailable - `#62 <https://github.com/erigones/esdc-factory/issues/62>`__
+    - Added option to preserve MAC address on external interface - `#78 <https://github.com/erigones/esdc-factory/issues/78>`__
+    - Added support for admin NIC tag on etherstub - `#86 <https://github.com/erigones/esdc-factory/issues/86>`__
+    - Fixed root dataset properties when installed to HDD - `#94 <https://github.com/erigones/esdc-factory/issues/94>`__
 
 
 2.6.7 (released on 2017-11-06)
@@ -86,6 +110,7 @@ Changelog
     - Added creation of zones/backups/manifests - `esdc-ce#155 <https://github.com/erigones/esdc-ce/issues/155>`__
     - Changed Headnode to Compute node - we want to remove the headnode concept - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
     - Added netboot and netboot_install_script boot options to support installation from network - `#37 <https://github.com/erigones/esdc-factory/issues/37>`__
+
 - Updated zabbix scripts [monitoring-2016Q4-20170713] - `esdc-ce#129 <https://github.com/erigones/esdc-ce/issues/129>`__ (`#49 <https://github.com/erigones/esdc-factory/issues/49>`__), `esdc-ce#183 <https://github.com/erigones/esdc-ce/issues/183>`__ (`#58 <https://github.com/erigones/esdc-factory/issues/58>`__)
 - Updated zabbix agent to 3.0.9 [monitoring-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
 - Updated pkgsrc to 2016Q4 in local archive [local-2016Q4-20170510] - `#36 <https://github.com/erigones/esdc-factory/issues/36>`__
