@@ -33,12 +33,12 @@ Changelog
     - Increased "/" (root) ramdisk size `smartos-live/commit 8a490b6 <https://github.com/erigones/smartos-live/commit/8a490b6e42279a64e60a097a2dbed0740209dc8c>`__
     - Fixed node.js fs.readFile[Sync]() problem with reading /dev/stdin - `joyent/smartos-live#753 <https://github.com/joyent/smartos-live/issues/753>`__
 
-- Updated the *local* archive [local-2016Q4-20180103]
+- Updated *local* archive [local-2016Q4-20180103]
 
-- Updated the *monitoring* archive [local-2016Q4-20180103]:
+- Updated *monitoring* archive [local-2016Q4-20180103]:
     - Updated Zabbix agent to 3.0.14 - `#110 <https://github.com/erigones/esdc-factory/issues/110>`__
 
-- Updated the *opt-custom* archive [opt-custom-2016Q4-20180103]:
+- Updated *opt-custom* archive [opt-custom-2016Q4-20180103]:
     - Added support for custom postboot SMF user scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
     - Added sample firewall and mount-iscsi RC scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
     - Added ipsec RC script - `#107 <https://github.com/erigones/esdc-factory/issues/107>`__
