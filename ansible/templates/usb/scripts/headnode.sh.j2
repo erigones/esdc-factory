@@ -458,7 +458,7 @@ function _zk() {
 }
 
 test_cfgdb_connect() {
-	if [[ -z "$(_zk get /esdc)" ]]; then
+	if [[ -z "$("${QUERY_CFGDB}" ${cmd} 2> /dev/null)" ]]; then
 		fatal "Unable to query cfgdb."
 	fi
 }
@@ -631,7 +631,6 @@ ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"monitoring@${domainname}"}"
 
 configure_erigonesd
 configure_zabbix
-test_cfgdb_connect
 generate_svc_ssl_cert
 
 {% for vm in usb_vms %}
@@ -642,6 +641,7 @@ MGMT_SSH_KEY="$(get_mgmt_ssh_key)"
 
 install_isos
 configure_imgadm
+test_cfgdb_connect
 configure_cfgdb
 install_images
 import_smf_manifests
