@@ -6,3 +6,9 @@
   shell: |
     mv /opt/local /opt/local.old
     /usr/bin/gtar -xzf /var/tmp/local.tar.gz -C /
+
+- name: Configure openssl.cnf for generating erigonesd SSL certificate
+  ini_file: dest="/opt/local/etc/openssl/openssl.cnf"
+            section="SAN"
+            option="subjectAltName"
+            value="{{ esdc_mgmt.erigonesd.subjectAltName }}"

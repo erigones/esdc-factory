@@ -1,10 +1,8 @@
 #!/usr/bin/bash
 
 #
-# Copyright (c) 2015-2017, Erigones, s. r. o.
+# Copyright (c) 2015-2018, Erigones, s. r. o.
 #
-
-set -e
 
 unset LD_LIBRARY_PATH
 PATH=/usr/bin:/usr/sbin:/smartdc/bin
@@ -25,10 +23,10 @@ exec 4>>/dev/console
 # Time to wait for each VM to setup (in seconds)
 VM_DEPLOY_TIMEOUT=600
 
-BASE64="/opt/local/bin/base64"
 OPENSSL="/opt/local/bin/openssl"
 OPENSSL_HOME="/opt/local/etc/openssl"
-SVC_CERT_FILE="${OPENSSL_HOME}/dc-erigonesd.pem"
+SVC_CERT_FILE_NAME="dc-erigonesd.pem"
+SVC_CERT_FILE="${OPENSSL_HOME}/${SVC_CERT_FILE_NAME}"
 QUERY_CFGDB="${ERIGONES_HOME}/bin/query_cfgdb"
 TIMEOUT="/opt/local/bin/timeout"
 
@@ -90,9 +88,21 @@ if [[ -f /var/lib/setup.json ]]; then
 fi
 
 function configure_erigonesd() {
-	echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${RABBITMQ_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
-	echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${REDIS_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
-	echo "ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)" >> /opt/erigones/core/celery/local_config.py
+	if [[ ! -f "${SVC_CERT_FILE}" ]]; then
+		fatal "SSL certificate file not present: ${SVC_CERT_FILE}"
+	fi
+
+	cat > /opt/erigones/core/celery/local_config.py << EOF
+BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port_ssl }}/{{ esdc_mgmt.rabbitmq.vhost }}'
+CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port_ssl }}/0'
+ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)
+
+import ssl
+
+BROKER_USE_SSL = { 'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }"
+REDIS_BACKEND_USE_SSL = { 'ssl_cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }"
+EOF
+
 	chown root:root /opt/erigones/core/celery/local_config.py
 	chmod 0600 /opt/erigones/core/celery/local_config.py
 }
@@ -132,9 +142,7 @@ function install_archives() {
 }
 
 function __zk() {
-	cmd="${@}"
-
-	"${QUERY_CFGDB}" ${cmd}
+	"${QUERY_CFGDB}" "${@}"
 }
 
 function _zk() {
@@ -156,8 +164,8 @@ function _zk_noverify() {
 }
 
 test_cfgdb_connect() {
-	if [[ -z "$(_zk get /esdc)" ]]; then
-		fatal "Unable to query cfgdb."
+	if [[ -z "$(_zk_noverify get /esdc/settings)" ]]; then
+		fatal "Unable to query cfgdb"
 	fi
 }
 
@@ -175,27 +183,24 @@ function setup_svc_ssl_cert() {
 
 	# the only expected case for not getting the certificate
 	# is adding v3.0.0 or later compute node to pre-v3.0.0 management
-	if [[ -z "${svc_cert}" && "${CONFIG_remote_node}" -eq 1 ]]; then
-		# remote node must have SSL enabled..
+	if [[ -z "${svc_cert}" ]]; then
+		# node must have SSL enabled...
 		# fail loudly then
-		fatal "No certificate retrieved from configuration database. Certificate is required for a remote compute node."
-	elif [[ -z "${svc_cert}" ]]; then
-		# no cert but we allow fallback to non-ssl queries
-		# nothing to do then...
-		return 0
+		fatal "No certificate retrieved from configuration database. Installation cannot continue."
 	fi
 
 	# save the public cert into openssl trusted certs
 	echo "${svc_cert}" > "${SVC_CERT_FILE}"
 	# rehash certificate
-	ln -s "../$(basename "${SVC_CERT_FILE}")" "certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+	ln -s "${SVC_CERT_FILE}" "${OPENSSL_HOME}/certs/${SVC_CERT_FILE_NAME}"
+	ln -s "${SVC_CERT_FILE_NAME}" "${OPENSSL_HOME}/certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
 }
 
 # Wait for configuration database availability
 function wait_for_cfgdb() {
 	while true; do
 		printf_log "\r%-64s" "Waiting for cfgdb availability... "
-		if ping -n "${CFGDB_IP}" > /dev/null 2>&1; then
+		if ping -n "${CFGDB_IP}" 2 > /dev/null 2>&1; then
 			if 
 				test_port_open "${CFGDB_IP}" "{{ esdc_cfgdb.zookeeper.port_ssl }}" ||
 				test_port_open "${CFGDB_IP}" "{{ esdc_cfgdb.zookeeper.port }}"; then
@@ -336,8 +341,8 @@ generate_ssh_keys
 CFGDB_IP="${CONFIG_cfgdb_admin_ip}"
 
 wait_for_cfgdb
-setup_svc_ssl_cert
 test_cfgdb_connect
+setup_svc_ssl_cert
 pull_cfgdb_data
 configure_erigonesd
 configure_zabbix

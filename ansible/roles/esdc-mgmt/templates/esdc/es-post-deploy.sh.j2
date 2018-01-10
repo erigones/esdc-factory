@@ -69,26 +69,38 @@ chmod 600 /etc/pki/tls/certs/server.pem
 chmod 600 /etc/pki/tls/certs/server.key
 
 # setup mgmt services SSL proxy
-SVC_CERT_COMBINED_B64="$(mdata-get org.erigones:erigonesd_ssl_cert 2> /dev/null)"
+SVC_SSL_CERT="$(mdata-get org.erigones:erigonesd_ssl_cert 2> /dev/null)"
+SVC_SSL_KEY="$(mdata-get org.erigones:erigonesd_ssl_key 2> /dev/null)"
 CFGDB_IP="$(mdata-get org.erigones:cfgdb_ip 2> /dev/null)"
-SVC_CERT_FILE="{{ esdc_mgmt.svc_cert_file }}"
+ERIGONESD_SSL_KEY_FILE="{{ esdc_mgmt.erigonesd.ssl_key_file }}"
+ERIGONESD_SSL_CERT_FILE="{{ esdc_mgmt.erigonesd.ssl_cert_file }}"
+ERIGONESD_SSL_FILE="{{ esdc_mgmt.erigonesd.ssl_file }}"
 
-if [[ -z "${CFGDB_IP}" ]]; then
-	CFGDB_IP="127.0.0.1"
-fi
-
-if [[ -n "${SVC_CERT_COMBINED_B64}" ]]; then
+if [[ -n "${SVC_SSL_CERT}" && -n "${SVC_SSL_KEY}" ]]; then
 	# certificate exists, write it to file
-	echo "${SVC_CERT_COMBINED_B64}" | /usr/bin/base64 -d > "${SVC_CERT_FILE}"
-else
+	echo "${SVC_SSL_KEY}" > "${ERIGONESD_SSL_KEY_FILE}"
+	echo "${SVC_SSL_CERT}" > "${ERIGONESD_SSL_CERT_FILE}"
+	# merge to combined pem
+	echo "${SVC_SSL_KEY}" "${SVC_SSL_CERT}" > "${ERIGONESD_SSL_FILE}"
+	# set perms
+	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
+if [[ -z "${SVC_SSL_CERT}" && -z "${SVC_SSL_KEY}" ]]; then
 	# cert was not provided
 	# we have to generate the cert and push it to mdata
-	openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=*.*/O=Danube Cloud/' -newkey rsa:8192 -keyout "${SVC_CERT_FILE}" -out "${SVC_CERT_FILE}"
-	mdata-put "org.erigones:erigonesd_ssl_cert" "$(sed -ne "/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p" ${SVC_CERT_FILE} | /usr/bin/base64)"
+	openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${ERIGONESD_SSL_KEY_FILE}" -out "${ERIGONESD_SSL_CERT_FILE}"
+	# merge to combined pem
+	cat "${ERIGONESD_SSL_KEY_FILE}" "${ERIGONESD_SSL_CERT_FILE}" > "${ERIGONESD_SSL_FILE}"
+	# set perms
+	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
+	mdata-put "org.erigones:erigonesd_ssl_cert" "$(cat "${ERIGONESD_SSL_CERT_FILE}")"
+	mdata-put "org.erigones:erigonesd_ssl_key" "$(cat "${ERIGONESD_SSL_KEY_FILE}")"
+else
+	log "WARNING: Inconsistent ZK REST certificate in mdata. Skipping haproxy setup."
 fi
 
-chmod 600 "${SVC_CERT_FILE}"
-sed -i'' -e "s/%CFGDB_IP%/${CFGDB_IP}/g" /etc/haproxy/haproxy.cfg
+if [[ -n "${CFGDB_IP}" ]]; then
+	sed -i'' -e "s/127.0.0.1:/${CFGDB_IP}/g" /etc/haproxy/haproxy.cfg
+fi
 
 log "Restaring haproxy"
 systemctl restart haproxy

@@ -106,7 +106,11 @@ esdc_mgmt:
     enabled: true
     username: "provisioner"
     password: "zabbix"
-  svc_cert_file: "/etc/pki/tls/certs/dc-erigonesd.pem"
+  erigonesd:
+    ssl_file:      "/etc/pki/tls/certs/dc-erigonesd.pem"
+    ssl_cert_file: "/etc/pki/tls/certs/dc-erigonesd.crt"
+    ssl_key_file:  "/etc/pki/tls/certs/dc-erigonesd.key"
+    subjectAltName: "DNS:esdc.local,DNS:mgmt01.local,DNS:mgmt.local,DNS:mon01.local,DNS:mon.local,DNS:cfgdb01.local,DNS:cfgdb.local,DNS:img01.local,DNS:img.local,DNS:dns01.local,DNS:dns.local,DNS:*.local"
 
 esdc_cfgdb:
   zookeeper:
