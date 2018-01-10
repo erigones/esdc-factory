@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #
-# Copyright (c) 2015-2017, Erigones, s. r. o.
+# Copyright (c) 2015-2018, Erigones, s. r. o.
 #
 
 unset LD_LIBRARY_PATH
@@ -25,16 +25,16 @@ VM_DEPLOY_TIMEOUT=600
 
 # global vars
 ERIGONES_HOME="/opt/erigones"
-BASE64="/opt/local/bin/base64"
 OPENSSL="/opt/local/bin/openssl"
 OPENSSL_HOME="/opt/local/etc/openssl"
-SVC_CERT_FILE="${OPENSSL_HOME}/dc-erigonesd.pem"
+SVC_CERT_FILE_NAME="dc-erigonesd.pem"
+SVC_CERT_FILE="${OPENSSL_HOME}/${SVC_CERT_FILE_NAME}"
 QUERY_CFGDB="${ERIGONES_HOME}/bin/query_cfgdb"
+TIMEOUT="/opt/local/bin/timeout"
 
 # certificate for DC internal services 
 SVC_CERT=
 SVC_KEY=
-SVC_CERT_COMBINED_B64=
 
 
 # Helper functions
@@ -115,7 +115,7 @@ function generate_svc_ssl_cert() {
 
 	UMASK_OLD="$(umask)"
 	umask 0077
-	"${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=*.*/O=Danube Cloud/' -newkey rsa:8192 -keyout "${svc_key_tmpfile}" -out "${svc_cert_tmpfile}"
+	"${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${svc_key_tmpfile}" -out "${svc_cert_tmpfile}"
 	umask "${UMASK_OLD}"
 
 	if [[ ! -s "${svc_cert_tmpfile}" ]] || [[ ! -s "${svc_key_tmpfile}" ]]; then
@@ -125,30 +125,31 @@ function generate_svc_ssl_cert() {
 
 	SVC_CERT="$(cat "${svc_cert_tmpfile}")"
 	SVC_KEY="$(cat "${svc_key_tmpfile}")"
-	SVC_CERT_COMBINED_B64="$(cat "${svc_key_tmpfile}" "${svc_cert_tmpfile}" | "${BASE64}" -w 0)"
 
 	# save the public cert into openssl trusted certs
 	cp "${svc_cert_tmpfile}" "${SVC_CERT_FILE}"
 	# rehash certificate
-	ln -s "../$(basename "${SVC_CERT_FILE}")" "certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+	ln -s "${SVC_CERT_FILE}" "${OPENSSL_HOME}/certs/${SVC_CERT_FILE_NAME}"
+	ln -s "${SVC_CERT_FILE_NAME}" "${OPENSSL_HOME}/certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
 
 	rm -f "${svc_key_tmpfile}" "${svc_cert_tmpfile}"
 }
 
 function configure_erigonesd() {
-	if [[ -f "${SVC_CERT_FILE}" ]]; then
-		# SSL is enabled
-		echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port_ssl }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
-		echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port_ssl }}/0'" >> /opt/erigones/core/celery/local_config.py
-		echo "BROKER_USE_SSL = { 'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }" >> /opt/erigones/core/celery/local_config.py
-		echo "REDIS_BACKEND_USE_SSL = { 'ssl_cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }" >> /opt/erigones/core/celery/local_config.py
-	else
-		# SSL is disabled, connect using plaintext
-		echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
-		echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
+	if [[ ! -f "${SVC_CERT_FILE}" ]]; then
+		fatal "SSL certificate file not present: ${SVC_CERT_FILE}"
 	fi
 
-	echo "ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)" >> /opt/erigones/core/celery/local_config.py
+	cat > /opt/erigones/core/celery/local_config.py << EOF
+BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port_ssl }}/{{ esdc_mgmt.rabbitmq.vhost }}'
+CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port_ssl }}/0'
+ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)
+
+import ssl
+
+BROKER_USE_SSL = { 'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }"
+REDIS_BACKEND_USE_SSL = { 'ssl_cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }"
+EOF
 
 	chown root:root /opt/erigones/core/celery/local_config.py
 	chmod 0600 /opt/erigones/core/celery/local_config.py
@@ -230,7 +231,8 @@ function _build_vmmanifest() {
 				-e "s|@MON_IP@|${MON_IP}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
 				-e "s|@ESDC_INSTALL_PASSWORD@|${ESDC_INSTALL_PASSWORD}|" \
-				-e "s|@ERIGONESD_SSL_CERT@|${SVC_CERT_COMBINED_B64}|" \
+				-e "s|@ERIGONESD_SSL_CERT@|${SVC_CERT}|" \
+				-e "s|@ERIGONESD_SSL_KEY@|${SVC_KEY}|" \
 				"${template}" > "${manifest}"
 		;;
 
@@ -280,7 +282,8 @@ function _build_vmmanifest() {
 				-e "s|@PGSQL_PDNS_PASSWORD@|${PGSQL_PDNS_PASSWORD}|" \
 				-e "s|@PGSQL_MGMT_MON_PASSWORD@|${PGSQL_MGMT_MON_PASSWORD}|" \
 				-e "s|@ESDC_ADMIN_EMAIL@|${ZABBIX_ADMIN_EMAIL}|" \
-				-e "s|@ERIGONESD_SSL_CERT@|${SVC_CERT_COMBINED_B64}|" \
+				-e "s|@ERIGONESD_SSL_CERT@|${SVC_CERT}|" \
+				-e "s|@ERIGONESD_SSL_KEY@|${SVC_KEY}|" \
 				-e "s|@CFGDB_IP@|${CFGDB_IP}|" \
 				"${template}" > "${manifest}"
 		;;
@@ -449,16 +452,38 @@ function install_archives() {
 	fi
 }
 
-function _zk() {
-	cmd="${@}"
+test_port_open() {
+	local host="${1}"
+	local port="${2}"
+	local waittime=5
 
-	if ! "${QUERY_CFGDB}" ${cmd} &> /dev/null; then
-		fatal "Error: cfgdb command \"${cmd}\" failed"
+	"${TIMEOUT}" "${waittime}" nc -z "${host}" "${port}"
+}
+
+# Wait for configuration database availability
+function wait_for_cfgdb() {
+	while true; do
+		printf_log "\r%-64s" "Waiting for cfgdb availability... "
+		if ping -n "${CFGDB_IP}" 1 > /dev/null 2>&1; then
+			if 
+				test_port_open "${CFGDB_IP}" "{{ esdc_cfgdb.zookeeper.port_ssl }}" ||
+				printf_log "done\n"
+				break
+			fi
+		fi
+		printf_log "not yet\n"
+		sleep 1
+	done
+}
+
+function _zk() {
+	if ! "${QUERY_CFGDB}" "${@}" 2> /dev/null; then
+		fatal "Error: cfgdb command \"${@}\" failed"
 	fi
 }
 
 test_cfgdb_connect() {
-	if [[ -z "$("${QUERY_CFGDB}" ${cmd} 2> /dev/null)" ]]; then
+	if [[ -z "$("${QUERY_CFGDB}" get /esdc/settings 2> /dev/null)" ]]; then
 		fatal "Unable to query cfgdb."
 	fi
 }
@@ -629,9 +654,9 @@ domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
 [[ -z "${domainname}" ]] && domainname="example.com"
 ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"monitoring@${domainname}"}"
 
+generate_svc_ssl_cert
 configure_erigonesd
 configure_zabbix
-generate_svc_ssl_cert
 
 {% for vm in usb_vms %}
 create_vm {{ vm.name }}
@@ -641,6 +666,7 @@ MGMT_SSH_KEY="$(get_mgmt_ssh_key)"
 
 install_isos
 configure_imgadm
+wait_for_cfgdb
 test_cfgdb_connect
 configure_cfgdb
 install_images

@@ -131,6 +131,9 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 * **org.erigones:cfgdb_data**: data for the *org.erigones:cfgdb_node* (default: ``DanubeCloud``).
 * **org.erigones:cfgdb_username**: protects the *org.erigones:cfgdb_node* with a username and password (requires *org.erigones:cfgdb_password* to be set, default: ``esdc``).
 * **org.erigones:cfgdb_password**: protects the *org.erigones:cfgdb_node* with a username and password (requires *org.erigones:cfgdb_username* to be set).
+* **org.erigones:cfgdb_ip**: IP address of cfgdb01.local server that will be configured in port forwarding in local haproxy (optional, default: ``127.0.0.1``)
+* **org.erigones:erigonesd_ssl_cert**: SSL certificate to be used by internal Danube Cloud services (optional, no default)
+* **org.erigones:erigonesd_ssl_key**: SSL key to be used by internal Danube Cloud services (optional, no default)
 
 Changelog
 ---------
