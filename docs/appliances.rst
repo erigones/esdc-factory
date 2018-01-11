@@ -131,6 +131,8 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 * **org.erigones:cfgdb_data**: data for the *org.erigones:cfgdb_node* (default: ``DanubeCloud``).
 * **org.erigones:cfgdb_username**: protects the *org.erigones:cfgdb_node* with a username and password (requires *org.erigones:cfgdb_password* to be set, default: ``esdc``).
 * **org.erigones:cfgdb_password**: protects the *org.erigones:cfgdb_node* with a username and password (requires *org.erigones:cfgdb_username* to be set).
+* **org.erigones:cfgdb_zk_rest_ssl_cert**: SSL certificate for the ZK REST service (optional).
+* **org.erigones:cfgdb_zk_rest_ssl_key**: SSL private key for the ZK REST service. The ZK REST service is enabled only if the key and the certificate are both provided (optional).
 
 Changelog
 ---------
@@ -138,7 +140,8 @@ Changelog
 3.0.0
 ~~~~~
 
-- Version bump.
+- Added ZooKeeper REST service - `#108 <https://github.com/erigones/esdc-factory/issues/108>`__
+- Added ``cfgdb_zk_rest_ssl_{cert,key}`` metadata and updated related post-deploy configuration script - `#102 <https://github.com/erigones/esdc-factory/issues/102>`__
 
 2.6.7
 ~~~~~
