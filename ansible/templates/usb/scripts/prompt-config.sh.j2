@@ -7,7 +7,7 @@
 
 #
 # Copyright (c) 2017, Joyent, Inc.
-# Copyright (c) 2017, Erigones, s. r. o.
+# Copyright (c) 2018, Erigones, s. r. o.
 #
 
 # XXX - TODO
@@ -2051,7 +2051,9 @@ web management.\n\n"
 You have entered an IP address outside the admin subnet.
 Remote compute node connects to the management VMs
 via internet instead using the admin network.\n"
-		print "${message}"
+		if [[ $(getanswer "skip_instructions") != "true" ]]; then
+			printf "$message"
+		fi
 		promptbool "Is this a remote compute node? (y/n)" "y" "remote_node"
 		remote_node=${val}
 	else
