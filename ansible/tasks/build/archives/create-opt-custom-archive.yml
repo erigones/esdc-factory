@@ -17,10 +17,13 @@
 - name: Mark SMF methods executable
   shell: chmod -R 755 "{{ builder_tmp_dir }}/opt-custom-archive/opt/custom/method/"
 
-- name: Create opt-src tarball {{ pkg_name }}{{ pkg_ext }}
+- name: Mark RC scripts executable
+  shell: chmod -R 755 "{{ builder_tmp_dir }}/opt-custom-archive/opt/custom/etc"/rc-*
+
+- name: Create opt-custom tarball {{ pkg_name }}{{ pkg_ext }}
   shell: chdir="{{ builder_tmp_dir }}/opt-custom-archive" tar -czvf "/var/tmp/{{ pkg_name }}{{ pkg_ext }}" opt
 
-- name: Save monitoring tarball {{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}
+- name: Save opt-custom tarball {{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}
   fetch: src="/var/tmp/{{ pkg_name }}{{ pkg_ext }}" dest="{{ save_dir }}/" flat=yes fail_on_missing=yes validate_checksum=yes
 
 - name: Clean old /opt/custom archive

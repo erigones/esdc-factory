@@ -37,7 +37,7 @@
     - { option: post_max_size,          value: 16M }
     - { option: upload_max_filesize,    value: 2M }
     - { option: max_input_time,         value: 300 }
-    - { option: date.timezone,          value: Europe/Bratislava, section: Date }
+    - { option: date.timezone,          value: UTC, section: Date }
 
 - name: Update /etc/zabbix/zabbix_server.conf
   lineinfile: dest="/etc/zabbix/zabbix_server.conf"

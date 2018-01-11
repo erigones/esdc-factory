@@ -22,7 +22,7 @@
 # esDC requirements: gcc49 gmake autoconf git-base python27 py27-virtualenv
 # glib2 is required by qemu-img
 - name: Install esDC OS dependencies
-  shell: pkgin -y install gcc49 gmake autoconf git-base python27 py27-virtualenv glib2
+  shell: pkgin -y install gcc49 gmake autoconf git-base python27 py27-virtualenv glib2 patch
 
 - name: Install requirements for desktop VM redirection
   shell: pkgin -y install modular-xorg-server xf86-video-vesa xf86-input-keyboard xf86-input-mouse xhost xauth rdesktop dejavu-ttf coreutils xinit
