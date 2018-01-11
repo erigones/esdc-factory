@@ -201,9 +201,7 @@ function wait_for_cfgdb() {
 	while true; do
 		printf_log "\r%-64s" "Waiting for cfgdb availability... "
 		if ping -n "${CFGDB_IP}" 2 > /dev/null 2>&1; then
-			if 
-				test_port_open "${CFGDB_IP}" "{{ esdc_cfgdb.zookeeper.port_ssl }}" ||
-				test_port_open "${CFGDB_IP}" "{{ esdc_cfgdb.zookeeper.port }}"; then
+			if test_port_open "${CFGDB_IP}" "{{ esdc_cfgdb.zookeeper.port_ssl }}"; then
 				printf_log "done\n"
 				break
 			fi
