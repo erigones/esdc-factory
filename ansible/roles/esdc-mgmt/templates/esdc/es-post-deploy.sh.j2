@@ -77,15 +77,17 @@ ERIGONESD_SSL_CERT_FILE="{{ esdc_mgmt.erigonesd.ssl_cert_file }}"
 ERIGONESD_SSL_FILE="{{ esdc_mgmt.erigonesd.ssl_file }}"
 
 if [[ -n "${SVC_SSL_CERT}" && -n "${SVC_SSL_KEY}" ]]; then
-	# certificate exists, write it to file
+	log "Got Danube Cloud SSL certificate/key in metadata - creating ${ERIGONESD_SSL_FILE}"
+	# certificate and key provided, write it to file
 	echo "${SVC_SSL_KEY}" > "${ERIGONESD_SSL_KEY_FILE}"
 	echo "${SVC_SSL_CERT}" > "${ERIGONESD_SSL_CERT_FILE}"
 	# merge to combined pem
 	echo "${SVC_SSL_KEY}" "${SVC_SSL_CERT}" > "${ERIGONESD_SSL_FILE}"
 	# set perms
 	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
-if [[ -z "${SVC_SSL_CERT}" && -z "${SVC_SSL_KEY}" ]]; then
-	# cert was not provided
+elif [[ -z "${SVC_SSL_CERT}" && -z "${SVC_SSL_KEY}" ]]; then
+	log "Danube Cloud SSL certificate/key not found in metadata -> generating new one and creating ${ERIGONESD_SSL_FILE}"
+	# cert/key were not provided
 	# we have to generate the cert and push it to mdata
 	openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${ERIGONESD_SSL_KEY_FILE}" -out "${ERIGONESD_SSL_CERT_FILE}"
 	# merge to combined pem
@@ -95,7 +97,7 @@ if [[ -z "${SVC_SSL_CERT}" && -z "${SVC_SSL_KEY}" ]]; then
 	mdata-put "org.erigones:erigonesd_ssl_cert" "$(cat "${ERIGONESD_SSL_CERT_FILE}")"
 	mdata-put "org.erigones:erigonesd_ssl_key" "$(cat "${ERIGONESD_SSL_KEY_FILE}")"
 else
-	log "WARNING: Inconsistent ZK REST certificate in mdata. Skipping haproxy setup."
+	log "WARNING: Inconsistent Danube Cloud SSL certificate/key in metadata. Skipping HAProxy setup."
 fi
 
 if [[ -n "${CFGDB_IP}" ]]; then
