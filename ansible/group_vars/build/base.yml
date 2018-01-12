@@ -38,8 +38,8 @@ builder_base_centos_imgfile: base-centos-7-latest.zfs.gz
 builder_base_centos_imgmanifest_url: "{{ builder.appliance.url }}/base-centos-7/{{ builder_base_centos_imgmanifest }}"
 builder_base_centos_imgfile_url: "{{ builder.appliance.url }}/base-centos-7/{{ builder_base_centos_imgfile }}"
 
-pkgsrc_version: 16.4.1
-pkgin_release: 2016Q4
+pkgsrc_version: 17.4.0
+pkgin_release: 2017Q4
 builder_base_zone_imgmanifest: "base-64-es-{{ pkgsrc_version }}.imgmanifest"
 builder_base_zone_imgfile: "base-64-es-{{ pkgsrc_version }}.zfs.gz"
 builder_base_zone_imgmanifest_url: "{{ builder.appliance.url }}/base-64-es/{{ builder_base_zone_imgmanifest }}"
