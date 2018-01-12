@@ -2049,8 +2049,9 @@ web management.\n\n"
 		# the CFGDB IP is outside the subnet
 		message="
 You have entered an IP address outside the admin subnet.
-Remote compute node connects to the management VMs
-via internet instead using the admin network.\n"
+That suggests this is a remote compute node.
+A remote compute node connects to the management VMs via the internet
+(external network) instead of connecting directly using the admin network.\n"
 		print "${message}"
 		promptbool "Is this a remote compute node? (y/n)" "y" "remote_node"
 		remote_node=${val}
