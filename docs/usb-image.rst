@@ -19,8 +19,9 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
-3.0.0 (unreleased)
-==================
+3.0.0
+=====
+Unreleased
 
 - Updated to a new platform version - 20171216T012846Z from upstream/release-20171221:
     - Added support for the ``dns_options`` /usbkey/config setting - `erigonos-overlay#1 <https://github.com/erigones/esdc-erigonos-overlay/issues/1>`__
@@ -52,54 +53,62 @@ Changelog
     - Internal Danube Cloud services use verified SSL certificates - `#102 <https://github.com/erigones/esdc-factory/issues/102>`__
 
 
-2.6.7 (released on 2017-11-06)
-==============================
+2.6.7
+=====
+Released on 2017-11-06
 
 - Fixed DNS configuration (resolv.conf) in *dns* and *mon* appliances - `#57 <https://github.com/erigones/esdc-factory/issues/57>`__
 
 
-2.6.6 (released on 2017-10-17)
-==============================
+2.6.6
+=====
+Released on 2017-10-17
 
 - Added support for unattended installation via answer file - `#82 <https://github.com/erigones/esdc-factory/issues/82>`__
 - Dropped DHCP support during first compute node install - `#70 <https://github.com/erigones/esdc-factory/issues/70>`__
 
 
-2.6.5 (released on 2017-10-04)
-==============================
+2.6.5
+=====
+Released on 2017-10-04
 
 - Updated zabbix agent to 3.0.11 [monitoring-2016Q4-20170930] - `#81 <https://github.com/erigones/esdc-factory/issues/81>`__
 
 
-2.6.4 (released on 2017-09-11)
-==============================
+2.6.4
+=====
+Released on 2017-09-11
 
 - Updated all internal service VM images (appliances) to be imported into the image server and available from the mgmt system - `esdc-ce#244 <https://github.com/erigones/esdc-ce/issues/244>`__
 - Added support for redirecting selected VM's graphical output to node's screen - `esdc-ce#258 <https://github.com/erigones/esdc-ce/issues/258>`__
 - Added the *opt-custom* archive [opt-custom-2016Q4-20170911] and updated *local* archive [local-2016Q4-20170911] - `#77 <https://github.com/erigones/esdc-factory/issues/77>`__
 
 
-2.6.3 (released on 2017-08-21)
-==============================
+2.6.3
+=====
+Released on 2017-08-21
 
 - Rewritten cfgdb_discovery script from python to C due to lack of python interpreter in the installation image - `#67 <https://github.com/erigones/esdc-factory/issues/67>`__
 - Fixed storage configuration question when installing on disk - `#68 <https://github.com/erigones/esdc-factory/issues/68>`__
 
 
-2.6.2 (released on 2017-08-09)
-==============================
+2.6.2
+=====
+Released on 2017-08-09
 
 
-2.6.1 (released on 2017-08-07)
-==============================
+2.6.1
+=====
+Released on 2017-08-07
 
 - Added automatic discovery of configuration database IP address during installation - `#64 <https://github.com/erigones/esdc-factory/issues/64>`__
 - Updated zabbix agent to 3.0.10 [monitoring-2016Q4-20170731] - commit `b9e16b5 <https://github.com/erigones/esdc-factory/commit/b9e16b542838418e9a4b0b10b71b9e3a298fc2ec>`__
 - Fixed network configuration when installed on HDD - `#65 <https://github.com/erigones/esdc-factory/issues/65>`__
 
 
-2.6.0 (released on 2017-07-21)
-==============================
+2.6.0
+=====
+Released on 2017-07-21
 
 - Updated to new platform version - 20170624T192838Z from upstream/release-20170622 + backported changes from upstream - `#46 <https://github.com/erigones/esdc-factory/issues/46>`__ `#35 <https://github.com/erigones/esdc-factory/issues/35>`__
     - Updated installer (prompt-config), which now supports custom NTP configuration - `#31 <https://github.com/erigones/esdc-factory/issues/31>`__
@@ -120,12 +129,14 @@ Changelog
 - Updated first compute node installer to set recursion forwarders in esdc-dns according to DNS resolvers - `#60 <https://github.com/erigones/esdc-factory/issues/60>`__
 
 
-2.5.3 (released on 2017-05-16)
-==============================
+2.5.3
+=====
+Released on 2017-05-16
 
 
-2.5.2 (released on 2017-04-11)
-==============================
+2.5.2
+=====
+Released on 2017-04-11
 
 - Fixed "install to HDD" question handling after pressing `no` in the installer's confirmation dialog - commit `d065712 <https://github.com/erigones/esdc-factory/commit/d0657120eef3a5ef472fdf8ad98984d0a4bc598c>`__
 - Updated zabbix agent to 3.0.8 [monitoring-2015Q4-20170324] - commit `07194fa <https://github.com/erigones/esdc-factory/commit/07194fa5637893b25a0fcc539c4c0c62fef4b836>`__
@@ -135,18 +146,21 @@ Changelog
 - Unified indentation of all installer messages - commit `b87ba63 <https://github.com/erigones/esdc-factory/commit/b87ba63a459be1d367ee63d49923d79a9ee90269>`__
 - Added default value (*domain name*) for *DNS search domain* in the installer - commit `2a163b2 <https://github.com/erigones/esdc-factory/commit/2a163b285f5940becbd093b1768cafd831096e66>`__
 
-2.5.1 (released on 2017-03-07)
-==============================
+2.5.1
+=====
+Released on 2017-03-07
 
 - Fixed default values for admin_email and DC name after pressing `no` in the installer's confirmation dialog - `#25 <https://github.com/erigones/esdc-factory/issues/25>`__
 
 
-2.5.0 (released on 2017-03-03)
-==============================
+2.5.0
+=====
+Released on 2017-03-03
 
 
-2.4.0 (released on 2017-02-22)
-==============================
+2.4.0
+=====
+Released on 2017-02-22
 
 - Importing locally all images on the headnode USB key, so they can be initialized by the esdc-mgmt VM - commit `1a912d1 <https://github.com/erigones/esdc-factory/commit/1a912d1be36a7d6098d7e4d55cf8ed0f7b656b97>`__
 - Updated the *local* and *monitoring* archives - `#24 <https://github.com/erigones/esdc-factory/issues/24>`__
@@ -156,17 +170,20 @@ Changelog
 - Fixed situation when running mount-usb from HDD-installed machine - commit `f68eb5b <https://github.com/erigones/esdc-factory/commit/f68eb5bfdbf8a9fee817ae272b024270c06d43d5>`__
 
 
-2.3.3 (released on 2017-02-04)
-==============================
+2.3.3
+=====
+Released on 2017-02-04
 
 - Fixed esdc_install_password handling (added missing quotes) in installer - `#23 <https://github.com/erigones/esdc-factory/issues/23>`__
 
-2.3.2 (released on 2016-12-17)
-==============================
+2.3.2
+=====
+Released on 2016-12-17
 
 
-2.3.1 (released on 2016-12-15)
-==============================
+2.3.1
+=====
+Released on 2016-12-15
 
 - Fixed zookeepercli command error log in _zk() in computenode.sh - `#4 <https://github.com/erigones/esdc-factory/issues/4>`__
 - Updated zabbix agent to 3.0.5 [monitoring-2015Q4-20161127] - `#7 <https://github.com/erigones/esdc-factory/issues/7>`__
@@ -176,8 +193,9 @@ Changelog
 - Fixed alignment of some messages - `#3 <https://github.com/erigones/esdc-factory/issues/3>`__
 - Added functionality for adding the mgmt SSH key to all service VMs during headnode installation - `#18 <https://github.com/erigones/esdc-factory/issues/18>`__
 
-2.3.0 (released on 2016-11-17)
-==============================
+2.3.0
+=====
+Released on 2016-11-17
 
 - Going open source. Yeah!
 
