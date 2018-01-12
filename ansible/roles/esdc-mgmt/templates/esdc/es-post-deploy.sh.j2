@@ -94,8 +94,8 @@ elif [[ -z "${SVC_SSL_CERT}" || -z "${SVC_SSL_KEY}" ]]; then
 	cat "${ERIGONESD_SSL_KEY_FILE}" "${ERIGONESD_SSL_CERT_FILE}" > "${ERIGONESD_SSL_FILE}"
 	# set perms
 	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
-	mdata-put "org.erigones:erigonesd_ssl_cert" "$(cat "${ERIGONESD_SSL_CERT_FILE}" | sed -re 's/$/\\n/g' | tr -d '\n')"
-	mdata-put "org.erigones:erigonesd_ssl_key" "$(cat "${ERIGONESD_SSL_KEY_FILE}" | sed -re 's/$/\\n/g' | tr -d '\n')"
+	mdata-put "org.erigones:erigonesd_ssl_cert" "$(cat "${ERIGONESD_SSL_CERT_FILE}")"
+	mdata-put "org.erigones:erigonesd_ssl_key" "$(cat "${ERIGONESD_SSL_KEY_FILE}")"
 else
 	log "WARNING: Inconsistent Danube Cloud SSL certificate/key in metadata. Skipping HAProxy setup."
 fi
