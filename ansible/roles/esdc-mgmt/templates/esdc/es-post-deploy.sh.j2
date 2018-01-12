@@ -85,9 +85,10 @@ if [[ -n "${SVC_SSL_CERT}" && -n "${SVC_SSL_KEY}" ]]; then
 	echo "${SVC_SSL_KEY}" "${SVC_SSL_CERT}" > "${ERIGONESD_SSL_FILE}"
 	# set perms
 	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
-elif [[ -z "${SVC_SSL_CERT}" || -z "${SVC_SSL_KEY}" ]]; then
-	log "Danube Cloud SSL certificate/key not found in metadata -> generating new one and creating ${ERIGONESD_SSL_FILE}"
-	# cert/key were not provided
+else
+	log "Danube Cloud SSL certificate and/or key was not found in metadata -> generating new one and creating ${ERIGONESD_SSL_FILE}"
+	# just to be sure
+	rm -f "${ERIGONESD_SSL_KEY_FILE}" "${ERIGONESD_SSL_CERT_FILE}" "${ERIGONESD_SSL_FILE}"
 	# we have to generate the cert and push it to mdata
 	openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${ERIGONESD_SSL_KEY_FILE}" -out "${ERIGONESD_SSL_CERT_FILE}"
 	# merge to combined pem
@@ -96,8 +97,6 @@ elif [[ -z "${SVC_SSL_CERT}" || -z "${SVC_SSL_KEY}" ]]; then
 	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
 	mdata-put "org.erigones:erigonesd_ssl_cert" "$(cat "${ERIGONESD_SSL_CERT_FILE}")"
 	mdata-put "org.erigones:erigonesd_ssl_key" "$(cat "${ERIGONESD_SSL_KEY_FILE}")"
-else
-	log "WARNING: Inconsistent Danube Cloud SSL certificate/key in metadata. Skipping HAProxy setup."
 fi
 
 if [[ -n "${CFGDB_IP}" ]]; then
@@ -105,6 +104,7 @@ if [[ -n "${CFGDB_IP}" ]]; then
 fi
 
 log "Restaring haproxy"
+systemctl enable haproxy
 systemctl restart haproxy
 
 # RabbitMQ service is disabled by default (hostname issue)

@@ -10,8 +10,5 @@
       - "{{ rabbitmq.dbdir }}/.erlang.cookie"
       - "{{ rabbitmq.cfgdir }}/rabbitmq-env.conf"
 
-- name: Delete a temporary haproxy erigonesd SSL certificate
-  file: path="{{ esdc_mgmt.erigonesd.ssl_file }}" state=absent
-
 - name: Revert hostname back to localhost.localdomain
   hostname: name=localhost.localdomain
