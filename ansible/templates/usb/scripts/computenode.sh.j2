@@ -152,10 +152,8 @@ function _zk() {
 }
 
 function _zk_noerror() {
-	if ! __zk "${@}" 2> /dev/null; then
-		# return success anyway
-		return 0
-	fi
+	# return success anyway
+	__zk "${@}" 2> /dev/null || true
 }
 
 # omit SSL certificate verification

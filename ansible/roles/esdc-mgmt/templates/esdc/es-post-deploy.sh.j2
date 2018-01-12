@@ -85,7 +85,7 @@ if [[ -n "${SVC_SSL_CERT}" && -n "${SVC_SSL_KEY}" ]]; then
 	echo "${SVC_SSL_KEY}" "${SVC_SSL_CERT}" > "${ERIGONESD_SSL_FILE}"
 	# set perms
 	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
-elif [[ -z "${SVC_SSL_CERT}" && -z "${SVC_SSL_KEY}" ]]; then
+elif [[ -z "${SVC_SSL_CERT}" || -z "${SVC_SSL_KEY}" ]]; then
 	log "Danube Cloud SSL certificate/key not found in metadata -> generating new one and creating ${ERIGONESD_SSL_FILE}"
 	# cert/key were not provided
 	# we have to generate the cert and push it to mdata

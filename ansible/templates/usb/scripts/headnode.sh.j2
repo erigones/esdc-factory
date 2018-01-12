@@ -122,14 +122,20 @@ function generate_svc_ssl_cert() {
 	local svc_cert_tmpfile="/tmp/svc_$$_cert.pem"
 	local svc_key_tmpfile="/tmp/svc_$$_key.pem"
 
+	# update openssl conf to allow alternate names
+	cat << EOF >> /opt/local/etc/openssl/openssl.cnf
+
+[SAN]
+subjectAltName = {{ esdc_mgmt.erigonesd.subjectAltName }}
+EOF
+
 	UMASK_OLD="$(umask)"
 	umask 0077
 	"${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${svc_key_tmpfile}" -out "${svc_cert_tmpfile}"
 	umask "${UMASK_OLD}"
 
 	if [[ ! -s "${svc_cert_tmpfile}" ]] || [[ ! -s "${svc_key_tmpfile}" ]]; then
-		echo "Services SSL cert was not generated properly"
-		return 1
+		fatal "Services SSL cert was not generated properly"
 	fi
 
 	SVC_CERT="$(escape_cert_data "${svc_cert_tmpfile}")"
