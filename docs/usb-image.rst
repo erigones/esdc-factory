@@ -23,7 +23,7 @@ Changelog
 =====
 Unreleased
 
-- Updated to a new platform version - 20171216T012846Z from upstream/release-20171221:
+- Updated to a new platform version - 20180105T193033Z from upstream/release-20180104:
     - Added support for the ``dns_options`` /usbkey/config setting - `erigonos-overlay#1 <https://github.com/erigones/esdc-erigonos-overlay/issues/1>`__
     - Added support for admin NIC tag on etherstub - `#86 <https://github.com/erigones/esdc-factory/issues/86>`__
     - Added support for the ``vnc_listen_address`` in /usbkey/config - `#88 <https://github.com/erigones/esdc-factory/issues/88>`__
@@ -34,12 +34,13 @@ Unreleased
     - Increased "/" (root) ramdisk size `smartos-live/commit 8a490b6 <https://github.com/erigones/smartos-live/commit/8a490b6e42279a64e60a097a2dbed0740209dc8c>`__
     - Fixed node.js fs.readFile[Sync]() problem with reading /dev/stdin - `joyent/smartos-live#753 <https://github.com/joyent/smartos-live/issues/753>`__
 
-- Updated *local* archive [local-2016Q4-20180103]
+- Updated *local* archive [local-2017Q4-20180112]
+    - Changed pkgsrc version to 2017Q4 - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
 
-- Updated *monitoring* archive [local-2016Q4-20180103]:
+- Updated *monitoring* archive [local-2017Q4-20180112]:
     - Updated Zabbix agent to 3.0.14 - `#110 <https://github.com/erigones/esdc-factory/issues/110>`__
 
-- Updated *opt-custom* archive [opt-custom-2016Q4-20180103]:
+- Updated *opt-custom* archive [opt-custom-2017Q4-20180112]:
     - Added support for custom postboot SMF user scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
     - Added sample firewall and mount-iscsi RC scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
     - Added ipsec RC script - `#107 <https://github.com/erigones/esdc-factory/issues/107>`__

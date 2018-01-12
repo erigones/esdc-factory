@@ -28,7 +28,7 @@ Changelog
 3.0.0
 ~~~~~
 
-- Version bump.
+- Updated pkgsrc in /opt/local to 2017Q4 - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
 
 2.6.7
 ~~~~~
@@ -140,6 +140,7 @@ Changelog
 3.0.0
 ~~~~~
 
+- Built from new `base-64-es`_ with 2017Q4 pkgsrc - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
 - Added ZooKeeper REST service - `#108 <https://github.com/erigones/esdc-factory/issues/108>`__
 - Added ``cfgdb_zk_rest_ssl_{cert,key}`` metadata and updated related post-deploy configuration script - `#102 <https://github.com/erigones/esdc-factory/issues/102>`__
 
@@ -252,7 +253,7 @@ Changelog
 3.0.0
 ~~~~~
 
-- Version bump.
+- Built from new `base-64-es`_ with 2017Q4 pkgsrc - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
 
 2.6.7
 ~~~~~
@@ -357,7 +358,7 @@ Changelog
 3.0.0
 ~~~~~
 
-- Version bump.
+- Built from new `base-64-es`_ with 2017Q4 pkgsrc - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
 
 2.6.7
 ~~~~~
