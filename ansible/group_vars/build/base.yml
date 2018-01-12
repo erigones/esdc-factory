@@ -77,6 +77,7 @@ esdc_mgmt:
     user: 'esdc'
     host: '127.0.0.1'
     port: '5672'
+    port_ssl: '15672'
     password: 'S3cr3tP4ssw0rd'
     vhost: 'esdc'
     cfgdir: '/etc/rabbitmq'
@@ -84,6 +85,7 @@ esdc_mgmt:
   redis:
     host: '127.0.0.1'
     port: '6379'
+    port_ssl: '16379'
     password: 'S3cr3tP4ssw0rd'
   pgsql_esdc:
     name: 'esdc'
@@ -104,3 +106,14 @@ esdc_mgmt:
     enabled: true
     username: "provisioner"
     password: "zabbix"
+  erigonesd:
+    ssl_file:      "/etc/pki/tls/certs/dc-erigonesd.pem"
+    ssl_cert_file: "/etc/pki/tls/certs/dc-erigonesd.crt"
+    ssl_key_file:  "/etc/pki/tls/certs/dc-erigonesd.key"
+    subjectAltName: "DNS:esdc.local,DNS:mgmt01.local,DNS:mgmt.local,DNS:mon01.local,DNS:mon.local,DNS:cfgdb01.local,DNS:cfgdb.local,DNS:img01.local,DNS:img.local,DNS:dns01.local,DNS:dns.local,DNS:*.local"
+
+esdc_cfgdb:
+  zookeeper:
+    port: '2181'
+    port_ssl: '12181'
+

@@ -48,7 +48,9 @@ Unreleased
     - Fixed long resolution timeout when DNS unavailable - `#62 <https://github.com/erigones/esdc-factory/issues/62>`__
     - Added option to preserve MAC address on external interface - `#78 <https://github.com/erigones/esdc-factory/issues/78>`__
     - Added support for admin NIC tag on etherstub - `#86 <https://github.com/erigones/esdc-factory/issues/86>`__
+    - Added support for remote compute nodes - `#90 <https://github.com/erigones/esdc-factory/issues/90>`__
     - Fixed root dataset properties when installed to HDD - `#94 <https://github.com/erigones/esdc-factory/issues/94>`__
+    - Internal Danube Cloud services use verified SSL certificates - `#102 <https://github.com/erigones/esdc-factory/issues/102>`__
 
 
 2.6.7

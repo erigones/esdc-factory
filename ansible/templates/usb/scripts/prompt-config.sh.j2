@@ -7,7 +7,7 @@
 
 #
 # Copyright (c) 2017, Joyent, Inc.
-# Copyright (c) 2017, Erigones, s. r. o.
+# Copyright (c) 2018, Erigones, s. r. o.
 #
 
 # XXX - TODO
@@ -1508,6 +1508,7 @@ create_zpools()
 {% if usb_type != "hn" %}
 check_cfgdb()
 {
+	local ec
 	trap "" SIGINT
 	printf "Checking cfgdb availability..."
 	echo "ruok" | nc -n -w 10 "${cfgdb_admin_ip}" 2181 2> /dev/null | grep imok >/dev/null 2>&1
@@ -1525,18 +1526,23 @@ check_cfgdb()
 
 query_cfgdb()
 {
-	local zkcli="${USBMNT}/scripts/zookeepercli"
-
+	local curl_ec
+	local curl_out
+	local json_ec
+	local zk_ec
 	trap "" SIGINT
 	printf "Accessing cfgdb..."
-	datacenter_name=$("${zkcli}" -servers "${cfgdb_admin_ip}:2181" -auth_usr "esdc" \
-		-auth_pwd "${esdc_install_password}" -c get /esdc/settings/dc/datacenter_name 2>/var/tmp/zk-error)
-	ec=$?
 
-	if [[ "${ec}" -eq 0 ]]; then
+	curl_out=$(curl -m 15 -k -s -S -H "zk-username:esdc" -H "zk-password:${esdc_install_password}" "https://${cfgdb_admin_ip}:12181/esdc/settings/dc/datacenter_name" 2>&1)
+	curl_ec=$?
+	zk_ec="$(echo "${curl_out}" | json "returncode" 2> /dev/null)"
+	json_ec=$?
+
+	if [[ "${curl_ec}" -eq 0 ]] && [[ "${json_ec}" -eq 0 ]] && [[ "${zk_ec}" == "0" ]]; then
+		datacenter_name="$(echo "${curl_out}" | json "stdout")"
 		printf "OK\n"
 	else
-		printf "ERROR ($(nawk -F 'zk: ' '{ print $2 }' /var/tmp/zk-error))\n"
+		printf "ERROR (${curl_out})\n"
 	fi
 
 	trap sig_doshell SIGINT
@@ -1849,9 +1855,9 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 	printheader "Networking - default gateway"
 	message="
 The default gateway will determine which router will be used to connect
-this compute node to other networks. This will almost certainly be the router
-connected to your 'admin' network. Use 'none' if you have no gateway
-or you rely only on the dhcp.\n\n"
+this compute node to other networks. This is probably the router
+connected to your 'admin' or 'external' network.
+Use 'none' if you have no gateway or you rely only on the dhcp.\n\n"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
 		printf "$message"
@@ -2045,6 +2051,21 @@ web management.\n\n"
 	[[ -z "${cfgdb_admin_ip}" ]] && cfgdb_admin_ip="$(discover_cfgdb)"
 	prompt_host_ok_val "Configuration database IP address" "${cfgdb_admin_ip}" "cfgdb_admin_ip"
 	cfgdb_admin_ip="${val}"
+	if [[ ${advanced_install} -eq 1 ]] && ! ip_from_subnet "${cfgdb_admin_ip}" "${admin_ip}" "${admin_netmask}" ; then
+		# the CFGDB IP is outside the subnet
+		message="
+You have entered an IP address outside the admin subnet.
+That suggests this is a remote compute node.
+A remote compute node connects to the management VMs via the internet
+(external network) instead of connecting directly using the admin network.\n"
+		if [[ $(getanswer "skip_instructions") != "true" ]]; then
+			printf "$message"
+		fi
+		promptbool "Is this a remote compute node? (y/n)" "y" "remote_node"
+		remote_node=${val}
+	else
+		remote_node=0
+	fi
 	skip_cfgdb_check=$(getanswer "skip_cfgdb_check")
 	[[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]] && check_cfgdb
 {% endif %}
@@ -2075,6 +2096,12 @@ the first compute node installation.\n\n"
 	if [[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]]; then
 		if ! query_cfgdb; then  # This will set the datacenter_name
 			print_warning "Failed to read data from the configuration database"
+		fi
+		if [[ "${remote_node}" -eq 1 ]]; then
+			datacenter_name="${datacenter_name} remote"
+			echo
+			promptval "Enter remote DC name" "${datacenter_name}" "datacenter_name"
+			datacenter_name="$val"
 		fi
 	fi
 {% endif %}
@@ -2290,6 +2317,9 @@ echo "img_admin_ip=${img_admin_ip}" >>$tmp_config
 echo "cfgdb_admin_ip=${cfgdb_admin_ip}" >>$tmp_config
 echo "esdc_install_password='${esdc_install_password}'" >>$tmp_config
 echo "install_to_hdd=${install_to_hdd}" >>$tmp_config
+if [[ -n "${remote_node}" ]]; then
+	echo "remote_node=${remote_node}" >>$tmp_config
+fi
 echo  >>$tmp_config
 # END: Danube Cloud settings
 printf "%4s\n" "done"

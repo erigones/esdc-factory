@@ -123,3 +123,23 @@ backend stats
 	stats enable
 	stats realm Haproxy\ Statistics
 	stats uri /
+
+
+# BEGIN Danube Cloud rabbitmq service proxy
+listen rabbitmq
+	mode tcp
+	bind *:{{ esdc_mgmt.rabbitmq.port_ssl }} ssl crt {{ esdc_mgmt.svc_cert_file }}
+	server rabbitmq-mgmt 127.0.0.1:{{ esdc_mgmt.rabbitmq.port }}
+# END Danube Cloud rabbitmq service proxy
+# BEGIN Danube Cloud redis service proxy
+listen redis
+	mode tcp
+	bind *:{{ esdc_mgmt.redis.port_ssl }} ssl crt {{ esdc_mgmt.svc_cert_file }}
+	server redis-mgmt 127.0.0.1:{{ esdc_mgmt.redis.port }}
+# END Danube Cloud redis service proxy
+# BEGIN Danube Cloud zk_rest service proxy
+listen zk_rest
+	mode tcp
+	bind *:{{ esdc_cfgdb.zk_rest_api.port }}
+	server zk-rest-cfgdb 127.0.0.1:{{ esdc_cfgdb.zookeeper.port_ssl }}
+# END Danube Cloud zk_rest service proxy

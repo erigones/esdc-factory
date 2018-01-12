@@ -12,3 +12,12 @@
   with_items:
     - /etc/pki/tls/certs/server.key
     - /etc/pki/tls/certs/server.crt
+
+- name: Configure openssl.cnf for generating erigonesd SSL certificate
+  ini_file: dest="/etc/pki/tls/openssl.cnf"
+            section="SAN"
+            option="subjectAltName"
+            value="{{ esdc_mgmt.erigonesd.subjectAltName }}"
+
+- name: Generate new temporary erigonesd SSL key and certificate for haproxy to work
+  shell: openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "{{ esdc_mgmt.erigonesd.ssl_file }}" -out "{{ esdc_mgmt.erigonesd.ssl_file }}"

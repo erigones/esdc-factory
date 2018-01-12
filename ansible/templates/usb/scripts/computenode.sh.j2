@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #
-# Copyright (c) 2015-2017, Erigones, s. r. o.
+# Copyright (c) 2015-2018, Erigones, s. r. o.
 #
 
 unset LD_LIBRARY_PATH
@@ -22,6 +22,14 @@ exec 4>>/dev/console
 
 # Time to wait for each VM to setup (in seconds)
 VM_DEPLOY_TIMEOUT=600
+
+OPENSSL="/opt/local/bin/openssl"
+OPENSSL_HOME="/opt/local/etc/openssl"
+SVC_CERT_FILE_NAME="dc-erigonesd.pem"
+SVC_CERT_FILE="${OPENSSL_HOME}/${SVC_CERT_FILE_NAME}"
+QUERY_CFGDB="${ERIGONES_HOME}/bin/query_cfgdb"
+TIMEOUT="/opt/local/bin/timeout"
+
 
 # Helper functions
 function printf_log() {
@@ -80,9 +88,21 @@ if [[ -f /var/lib/setup.json ]]; then
 fi
 
 function configure_erigonesd() {
-	echo "BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port }}/{{ esdc_mgmt.rabbitmq.vhost }}'" > /opt/erigones/core/celery/local_config.py
-	echo "CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port }}/0'" >> /opt/erigones/core/celery/local_config.py
-	echo "ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)" >> /opt/erigones/core/celery/local_config.py
+	if [[ ! -f "${SVC_CERT_FILE}" ]]; then
+		fatal "SSL certificate file not present: ${SVC_CERT_FILE}"
+	fi
+
+	cat > /opt/erigones/core/celery/local_config.py << EOF
+BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port_ssl }}/{{ esdc_mgmt.rabbitmq.vhost }}'
+CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port_ssl }}/0'
+ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)
+
+import ssl
+
+BROKER_USE_SSL = { 'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }"
+REDIS_BACKEND_USE_SSL = { 'ssl_cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }"
+EOF
+
 	chown root:root /opt/erigones/core/celery/local_config.py
 	chmod 0600 /opt/erigones/core/celery/local_config.py
 }
@@ -122,24 +142,64 @@ function install_archives() {
 }
 
 function __zk() {
-	zkcli="${USB_COPY}/scripts/zookeepercli"
-	args="${@}"
-
-	"${zkcli}" -servers "${CFGDB_IP}:2181" -auth_usr "esdc" -auth_pwd "${ESDC_INSTALL_PASSWORD}" ${args}
+	"${QUERY_CFGDB}" "${@}"
 }
 
 function _zk() {
-	if ! __zk -c "${@}" 2> /dev/null; then
+	if ! __zk "${@}" 2> /dev/null; then
 		fatal "Error: cfgdb command \"${@}\" failed"
 	fi
 }
 
+function _zk_noerror() {
+	# return success anyway
+	__zk "${@}" 2> /dev/null || true
+}
+
+# omit SSL certificate verification
+function _zk_noverify() {
+	_zk_noerror -k "${@}"
+}
+
+test_cfgdb_connect() {
+	if [[ -z "$(_zk_noverify get /esdc/settings)" ]]; then
+		fatal "Unable to query cfgdb"
+	fi
+}
+
+test_port_open() {
+	local host="${1}"
+	local port="${2}"
+	local waittime=5
+
+	"${TIMEOUT}" "${waittime}" nc -z "${host}" "${port}"
+}
+
+function setup_svc_ssl_cert() {
+	# download SSL cert
+	local svc_cert="$(_zk_noverify get /esdc/settings/security/services_ssl_cert)"
+
+	# the only expected case for not getting the certificate
+	# is adding v3.0.0 or later compute node to pre-v3.0.0 management
+	if [[ -z "${svc_cert}" ]]; then
+		# node must have SSL enabled...
+		# fail loudly then
+		fatal "No certificate retrieved from configuration database. Installation cannot continue."
+	fi
+
+	# save the public cert into openssl trusted certs
+	echo "${svc_cert}" > "${SVC_CERT_FILE}"
+	# rehash certificate
+	ln -s "${SVC_CERT_FILE}" "${OPENSSL_HOME}/certs/${SVC_CERT_FILE_NAME}"
+	ln -s "${SVC_CERT_FILE_NAME}" "${OPENSSL_HOME}/certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+}
+
+# Wait for configuration database availability
 function wait_for_cfgdb() {
-	set +e
 	while true; do
 		printf_log "\r%-64s" "Waiting for cfgdb availability... "
-		if ping -n "${CFGDB_IP}" > /dev/null 2>&1; then
-			if echo "ruok" | nc -n -w 10 "${CFGDB_IP}" 2181 2> /dev/null | grep imok >/dev/null 2>&1; then
+		if ping -n "${CFGDB_IP}" 2 > /dev/null 2>&1; then
+			if test_port_open "${CFGDB_IP}" "{{ esdc_cfgdb.zookeeper.port_ssl }}"; then
 				printf_log "done\n"
 				break
 			fi
@@ -147,36 +207,61 @@ function wait_for_cfgdb() {
 		printf_log "not yet\n"
 		sleep 1
 	done
-	set -e
 }
 
-function query_cfgdb() {
-	# Wait for configuration database availability
-	wait_for_cfgdb
-
+function pull_cfgdb_data() {
 	printf_log "\r%-64s" "Retrieving Danube Cloud management configuration from cfgdb... "
 
-	_mgmt_ip=$(_zk get "/esdc/settings/rabbitmq/host")
-	_mon_ip=$(_zk get "/esdc/settings/zabbix/host")
-	_rabbitmq_password=$(_zk get "/esdc/settings/rabbitmq/password")
-	_redis_password=$(_zk get "/esdc/settings/redis/password")
+	# first search for node-specific configuration for this specific node
+	_rabbitmq_ip=$(_zk_noerror get "/esdc/settings/node/${SYSINFO_Hostname}/rabbitmq/host")
+	_redis_ip=$(_zk_noerror get "/esdc/settings/node/${SYSINFO_Hostname}/redis/host")
+	_mon_ip=$(_zk_noerror get "/esdc/settings/node/${SYSINFO_Hostname}/zabbix/host")
+	_rabbitmq_password=$(_zk_noerror get "/esdc/settings/${SYSINFO_Hostname}/rabbitmq/password")
+	_redis_password=$(_zk_noerror get "/esdc/settings/${SYSINFO_Hostname}/redis/password")
 
-	if [[ -z "${_mgmt_ip}" || -z "${_mon_ip}" || -z "${_rabbitmq_password}" || -z "${_redis_password}" ]]; then
+	if [[ "${CONFIG_remote_node}" -eq 1 ]]; then
+		# Get the remote IPs. If they do not exist, fill in cfgdb IP that was specified during install
+		# because remote cfgdb is expected to be a proxy to all services
+		# (unless explicitly specified otherwise in /esdc/settings/remote/*).
+
+		# if node-specific config is not found, search generic remote configuration
+		[[ -z "${_rabbitmq_ip}" ]] &&   _rabbitmq_ip=$(_zk_noerror get "/esdc/settings/remote/rabbitmq/host")
+		[[ -z "${_redis_ip}" ]] &&      _redis_ip=$(_zk_noerror get "/esdc/settings/remote/redis/host")
+		[[ -z "${_mon_ip}" ]] &&        _mon_ip=$(_zk_noerror get "/esdc/settings/remote/zabbix/host")
+
+		# fallback for remote node is cfgdb IP
+		[[ -z "${_rabbitmq_ip}" ]] &&   _rabbitmq_ip="${CFGDB_IP}"
+		[[ -z "${_redis_ip}" ]] &&      _redis_ip="${CFGDB_IP}"
+		[[ -z "${_mon_ip}" ]] &&       	_mon_ip="${CFGDB_IP}"
+	fi
+
+	# as a fallback, query global services settings (return error if not found)
+	[[ -z "${_rabbitmq_ip}" ]] &&           _rabbitmq_ip=$(_zk get "/esdc/settings/rabbitmq/host")
+	[[ -z "${_redis_ip}" ]] &&              _redis_ip=$(_zk get "/esdc/settings/redis/host")
+	[[ -z "${_mon_ip}" ]] &&                _mon_ip=$(_zk get "/esdc/settings/zabbix/host")
+	[[ -z "${_rabbitmq_password}" ]] &&     _rabbitmq_password=$(_zk get "/esdc/settings/rabbitmq/password")
+	[[ -z "${_redis_password}" ]] &&        _redis_password=$(_zk get "/esdc/settings/redis/password")
+
+	if [[ -z "${_rabbitmq_ip}" || -z "${_redis_ip}" || -z "${_mon_ip}" || -z "${_rabbitmq_password}" || -z "${_redis_password}" ]]; then
 		fatal "Incomplete data in configuration database, aborting setup"
 	fi
 
 	printf_log "%4s\n" "done"
 	printf_log "\r%-64s" "Registering compute node into cfgdb... "
 
-	set +e
-	__zk -force=true -c rmr "/esdc/nodes/hosts/${SYSINFO_UUID}" &> /dev/null
-	set -e
+	_zk_noerror rmr --force "/esdc/nodes/hosts/${SYSINFO_UUID}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "false"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/hostname" "${SYSINFO_Hostname}"
+	if [[ -n "${CONFIG_remote_node}" ]]; then
+		_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/is_remote" "${CONFIG_remote_node}"
+	else
+		_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/is_remote" "0"
+	fi
 
-	MGMT_IP=${_mgmt_ip}
 	MON_IP=${_mon_ip}
+	RABBITMQ_IP=${_rabbitmq_ip}
+	REDIS_IP=${_redis_ip}
 	RABBITMQ_PASSWORD=${_rabbitmq_password}
 	REDIS_PASSWORD=${_redis_password}
 
@@ -250,9 +335,11 @@ generate_ssh_keys
 
 # Metatada for installation
 CFGDB_IP="${CONFIG_cfgdb_admin_ip}"
-ESDC_INSTALL_PASSWORD="${CONFIG_esdc_install_password}"
 
-query_cfgdb
+wait_for_cfgdb
+test_cfgdb_connect
+setup_svc_ssl_cert
+pull_cfgdb_data
 configure_erigonesd
 configure_zabbix
 

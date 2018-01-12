@@ -465,6 +465,9 @@ The image supports following metadata:
 * **org.erigones:zabbix_esdc_username**: MON_ZABBIX_USERNAME in esDC.
 * **org.erigones:zabbix_esdc_password**: MON_ZABBIX_PASSWORD in esDC.
 * **org.erigones:esdc_admin_email**: change email of admin user.
+* **org.erigones:cfgdb_ip**: IP address of cfgdb01.local server that will be configured in port forwarding in local HAProxy (optional, default: ``127.0.0.1``).
+* **org.erigones:erigonesd_ssl_cert**: SSL certificate to be used by internal Danube Cloud services (optional, no default).
+* **org.erigones:erigonesd_ssl_key**: SSL key to be used by internal Danube Cloud services (optional, no default).
 
 Changelog
 ---------
@@ -473,6 +476,7 @@ Changelog
 ~~~~~
 
 - Fixed /etc/rc.d/rc.local permissions - `#109 <https://github.com/erigones/esdc-factory/issues/109>`__
+- Added ``cfgdb_ip`` and ``erigonesd_ssl_{cert,key}`` metadata and updated related post-deploy configuration script - `#102 <https://github.com/erigones/esdc-factory/issues/102>`__
 
 2.6.7
 ~~~~~
