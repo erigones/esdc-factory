@@ -140,6 +140,6 @@ listen redis
 # BEGIN Danube Cloud zk_rest service proxy
 listen zk_rest
 	mode tcp
-	bind *:{{ esdc_cfgdb.zk_rest_api.port }}
+	bind *:{{ esdc_cfgdb.zookeeper.port }}
 	server zk-rest-cfgdb 127.0.0.1:{{ esdc_cfgdb.zookeeper.port_ssl }}
 # END Danube Cloud zk_rest service proxy
