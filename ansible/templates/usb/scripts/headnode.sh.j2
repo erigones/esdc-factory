@@ -109,6 +109,15 @@ function configure_imgadm() {
 	fi
 }
 
+# change all newlines to '\n'
+function escape_cert_data() {
+	local certfile="$1"
+
+	if [[ -f "${certfile}" ]]; then
+		sed -re 's/$/\\n/g' "${certfile}" | tr -d '\n'
+	fi
+}
+
 function generate_svc_ssl_cert() {
 	local svc_cert_tmpfile="/tmp/svc_$$_cert.pem"
 	local svc_key_tmpfile="/tmp/svc_$$_key.pem"
@@ -123,8 +132,8 @@ function generate_svc_ssl_cert() {
 		return 1
 	fi
 
-	SVC_CERT="$(cat "${svc_cert_tmpfile}")"
-	SVC_KEY="$(cat "${svc_key_tmpfile}")"
+	SVC_CERT="$(escape_cert_data "${svc_cert_tmpfile}")"
+	SVC_KEY="$(escape_cert_data "${svc_key_tmpfile}")"
 
 	# save the public cert into openssl trusted certs
 	cp "${svc_cert_tmpfile}" "${SVC_CERT_FILE}"
@@ -524,7 +533,7 @@ function configure_cfgdb() {
 	_zk creater /esdc/settings/zabbix/esdc_username "${ZABBIX_ESDC_USERNAME}"
 	_zk creater /esdc/settings/zabbix/esdc_password "${ZABBIX_ESDC_PASSWORD}"
 
-	_zk creater /esdc/settings/security/services_ssl_cert "${SVC_CERT}"
+	_zk creater /esdc/settings/security/services_ssl_cert "$(cat ${SVC_CERT_FILE})"
 
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "true"
