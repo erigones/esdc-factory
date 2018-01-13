@@ -14,7 +14,7 @@
         mode=0755
 
 - name: Copy cfgdb_zk_rest_server.py script
-  copy: src=cfgdb_disco_server.py
+  copy: src=cfgdb_zk_rest_server.py
         dest=/usr/local/bin/cfgdb_zk_rest_server.py
         owner=root
         group=root
