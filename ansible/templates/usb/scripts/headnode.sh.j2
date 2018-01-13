@@ -28,7 +28,7 @@ ERIGONES_HOME="/opt/erigones"
 OPENSSL="/opt/local/bin/openssl"
 OPENSSL_HOME="/opt/local/etc/openssl"
 SVC_CERT_FILE_NAME="dc-erigonesd.pem"
-SVC_CERT_FILE="${OPENSSL_HOME}/${SVC_CERT_FILE_NAME}"
+SVC_CERT_FILE="/opt/custom/etc/${SVC_CERT_FILE_NAME}"
 QUERY_CFGDB="${ERIGONES_HOME}/bin/query_cfgdb"
 TIMEOUT="/opt/local/bin/timeout"
 
@@ -114,7 +114,7 @@ function escape_cert_data() {
 	local certfile="$1"
 
 	if [[ -f "${certfile}" ]]; then
-		sed -re 's/$/\\n/g' "${certfile}" | tr -d '\n'
+		sed -re 's/$/\\\\n/g' "${certfile}" | tr -d '\n'
 	fi
 }
 
@@ -129,10 +129,10 @@ function generate_svc_ssl_cert() {
 subjectAltName = {{ esdc_mgmt.erigonesd.subjectAltName }}
 EOF
 
-	UMASK_OLD="$(umask)"
-	umask 0077
-	"${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${svc_key_tmpfile}" -out "${svc_cert_tmpfile}"
-	umask "${UMASK_OLD}"
+	(
+	  umask 0077
+	  "${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${svc_key_tmpfile}" -out "${svc_cert_tmpfile}"
+	)
 
 	if [[ ! -s "${svc_cert_tmpfile}" ]] || [[ ! -s "${svc_key_tmpfile}" ]]; then
 		fatal "Services SSL cert was not generated properly"
@@ -141,7 +141,7 @@ EOF
 	SVC_CERT="$(escape_cert_data "${svc_cert_tmpfile}")"
 	SVC_KEY="$(escape_cert_data "${svc_key_tmpfile}")"
 
-	# save the public cert into openssl trusted certs
+	# save the public cert into our location and link to openssl trusted certs
 	cp "${svc_cert_tmpfile}" "${SVC_CERT_FILE}"
 	# rehash certificate
 	ln -s "${SVC_CERT_FILE}" "${OPENSSL_HOME}/certs/${SVC_CERT_FILE_NAME}"
