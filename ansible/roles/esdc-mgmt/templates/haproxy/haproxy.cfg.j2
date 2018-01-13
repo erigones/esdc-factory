@@ -128,13 +128,13 @@ backend stats
 # BEGIN Danube Cloud rabbitmq service proxy
 listen rabbitmq
 	mode tcp
-	bind *:{{ esdc_mgmt.rabbitmq.port_ssl }} ssl crt {{ esdc_mgmt.svc_cert_file }}
+	bind *:{{ esdc_mgmt.rabbitmq.port_ssl }} ssl crt {{ esdc_mgmt.erigonesd.ssl_file }}
 	server rabbitmq-mgmt 127.0.0.1:{{ esdc_mgmt.rabbitmq.port }}
 # END Danube Cloud rabbitmq service proxy
 # BEGIN Danube Cloud redis service proxy
 listen redis
 	mode tcp
-	bind *:{{ esdc_mgmt.redis.port_ssl }} ssl crt {{ esdc_mgmt.svc_cert_file }}
+	bind *:{{ esdc_mgmt.redis.port_ssl }} ssl crt {{ esdc_mgmt.erigonesd.ssl_file }}
 	server redis-mgmt 127.0.0.1:{{ esdc_mgmt.redis.port }}
 # END Danube Cloud redis service proxy
 # BEGIN Danube Cloud zk_rest service proxy

@@ -1,17 +1,8 @@
 - name: Generate self-signed SSL certificate
-  command: openssl req -new -nodes -x509 -subj "/C=SK/ST=Slovakia/L=Bratislava/O=IT/CN=*.*" -days 3650 -keyout /etc/pki/tls/certs/server.key -out /etc/pki/tls/certs/server.crt -extensions v3_ca creates=/etc/pki/tls/certs/server.crt
-
-- name: Create self-signed SSL certificate in PEM format
-  shell: cat /etc/pki/tls/certs/server.key /etc/pki/tls/certs/server.crt > /etc/pki/tls/certs/server.pem
+  command: openssl req -new -nodes -x509 -subj '/CN=*.*/O=Danube Cloud/' -days 10000 -keyout /etc/pki/tls/certs/server.pem -out /etc/pki/tls/certs/server.pem -extensions v3_ca creates=/etc/pki/tls/certs/server.pem
 
 - name: Change permissions of /etc/pki/tls/certs/server.pem
   file: path=/etc/pki/tls/certs/server.pem owner=root group=root mode=0600
-
-- name: Remove stale certificate files
-  file: path={{ item }} state=absent
-  with_items:
-    - /etc/pki/tls/certs/server.key
-    - /etc/pki/tls/certs/server.crt
 
 - name: Configure openssl.cnf for generating erigonesd SSL certificate
   ini_file: dest="/etc/pki/tls/openssl.cnf"
@@ -20,4 +11,7 @@
             value="{{ esdc_mgmt.erigonesd.subjectAltName }}"
 
 - name: Generate new temporary erigonesd SSL key and certificate for haproxy to work
-  shell: openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "{{ esdc_mgmt.erigonesd.ssl_file }}" -out "{{ esdc_mgmt.erigonesd.ssl_file }}"
+  command: openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "{{ esdc_mgmt.erigonesd.ssl_file }}" -out "{{ esdc_mgmt.erigonesd.ssl_file }}" creates="{{ esdc_mgmt.erigonesd.ssl_file }}"
+
+- name: Change permissions of {{ esdc_mgmt.erigonesd.ssl_file }}
+  file: path="{{ esdc_mgmt.erigonesd.ssl_file }}" owner=root group=root mode=0600

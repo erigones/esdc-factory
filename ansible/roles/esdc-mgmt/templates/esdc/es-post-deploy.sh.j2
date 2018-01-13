@@ -57,8 +57,8 @@ MGMT_SSH_KEY="$(cat /root/.ssh/id_rsa.pub)"
 
 log "Generating SSL certificate"
 openssl req -new -nodes -x509 \
--subj "/C=SK/ST=Slovakia/L=Bratislava/O=IT/CN=*.*" \
--days 3650 \
+-subj -subj '/CN=*.*/O=Danube Cloud/' \
+-days 10000 \
 -keyout /etc/pki/tls/certs/server.key \
 -out /etc/pki/tls/certs/server.crt \
 -extensions v3_ca
