@@ -497,7 +497,7 @@ function _zk() {
 }
 
 test_cfgdb_connect() {
-	if [[ -z "$("${QUERY_CFGDB}" get /esdc/settings 2> /dev/null)" ]]; then
+	if [[ -z "$("${QUERY_CFGDB}" get /esdc 2> /dev/null)" ]]; then
 		fatal "Unable to query cfgdb"
 	fi
 }

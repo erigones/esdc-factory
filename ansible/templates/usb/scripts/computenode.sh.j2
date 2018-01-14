@@ -162,7 +162,7 @@ function _zk_noverify() {
 }
 
 test_cfgdb_connect() {
-	if [[ -z "$(_zk_noverify get /esdc/settings)" ]]; then
+	if [[ -z "$(_zk_noverify get /esdc)" ]]; then
 		fatal "Unable to query cfgdb"
 	fi
 }
