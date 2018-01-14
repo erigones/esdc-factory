@@ -99,8 +99,8 @@ ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }
 
 import ssl
 
-BROKER_USE_SSL = { 'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }"
-REDIS_BACKEND_USE_SSL = { 'ssl_cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }"
+BROKER_USE_SSL = { 'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': '${SVC_CERT_FILE}' }
+REDIS_BACKEND_USE_SSL = { 'ssl_cert_reqs': ssl.CERT_REQUIRED, 'ssl_ca_certs': '${SVC_CERT_FILE}' }
 EOF
 
 	chown root:root /opt/erigones/core/celery/local_config.py
