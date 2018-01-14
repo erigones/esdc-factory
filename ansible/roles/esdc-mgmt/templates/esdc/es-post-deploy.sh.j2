@@ -81,26 +81,23 @@ if [[ -n "${SVC_SSL_CERT}" && -n "${SVC_SSL_KEY}" ]]; then
 	# certificate and key provided, write it to file
 	echo "${SVC_SSL_KEY}" > "${ERIGONESD_SSL_KEY_FILE}"
 	echo "${SVC_SSL_CERT}" > "${ERIGONESD_SSL_CERT_FILE}"
-	# merge to combined pem
-	echo "${SVC_SSL_KEY}" "${SVC_SSL_CERT}" > "${ERIGONESD_SSL_FILE}"
-	# set perms
-	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
 else
 	log "Danube Cloud SSL certificate and/or key was not found in metadata -> generating new one and creating ${ERIGONESD_SSL_FILE}"
 	# just to be sure
-	rm -f "${ERIGONESD_SSL_KEY_FILE}" "${ERIGONESD_SSL_CERT_FILE}" "${ERIGONESD_SSL_FILE}"
+	rm -f "${ERIGONESD_SSL_KEY_FILE}" "${ERIGONESD_SSL_CERT_FILE}"
 	# we have to generate the cert and push it to mdata
 	openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${ERIGONESD_SSL_KEY_FILE}" -out "${ERIGONESD_SSL_CERT_FILE}"
-	# merge to combined pem
-	cat "${ERIGONESD_SSL_KEY_FILE}" "${ERIGONESD_SSL_CERT_FILE}" > "${ERIGONESD_SSL_FILE}"
-	# set perms
-	chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
 	mdata-put "org.erigones:erigonesd_ssl_cert" "$(cat "${ERIGONESD_SSL_CERT_FILE}")"
 	mdata-put "org.erigones:erigonesd_ssl_key" "$(cat "${ERIGONESD_SSL_KEY_FILE}")"
 fi
 
+# merge to combined pem
+cat "${ERIGONESD_SSL_KEY_FILE}" "${ERIGONESD_SSL_CERT_FILE}" > "${ERIGONESD_SSL_FILE}"
+# set perms
+chmod 600 "${ERIGONESD_SSL_FILE}" "${ERIGONESD_SSL_KEY_FILE}"
+
 if [[ -n "${CFGDB_IP}" ]]; then
-	sed -i'' -e "s/127.0.0.1:/${CFGDB_IP}/g" /etc/haproxy/haproxy.cfg
+	sed -i'' -e "s/127.0.0.1:{{ esdc_cfgdb.zookeeper.port_ssl }}/${CFGDB_IP}:{{ esdc_cfgdb.zookeeper.port_ssl }}/g" /etc/haproxy/haproxy.cfg
 fi
 
 log "Restaring haproxy"
