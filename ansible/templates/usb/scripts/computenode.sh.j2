@@ -145,7 +145,7 @@ function install_archives() {
 }
 
 function set_esdc_version() {
-	"${CTLSH}" esdc_version > "${ESDC_VERSION}"
+	echo "v$("${CTLSH}" esdc_version)" > "${ESDC_VERSION}"
 }
 
 function __zk() {
