@@ -25,6 +25,8 @@ VM_DEPLOY_TIMEOUT=600
 
 # global vars
 ERIGONES_HOME="/opt/erigones"
+ESDC_VERSION="/opt/custom/esdc.version"
+CTLSH="${ERIGONES_HOME}/bin/ctl.sh"
 OPENSSL="/opt/local/bin/openssl"
 OPENSSL_HOME="/opt/local/etc/openssl"
 SVC_CERT_FILE_NAME="dc-erigonesd.pem"
@@ -467,6 +469,10 @@ function install_archives() {
 	fi
 }
 
+function set_esdc_version() {
+	"${CTLSH}" esdc_version > "${ESDC_VERSION}"
+}
+
 test_port_open() {
 	local host="${1}"
 	local port="${2}"
@@ -640,6 +646,7 @@ cr_once
 printf_log "%-64s\n" "==> Setup starting... "
 validate_config
 install_archives
+set_esdc_version
 generate_ssh_keys
 
 # Metatada for VMs

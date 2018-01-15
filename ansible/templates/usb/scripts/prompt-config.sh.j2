@@ -1511,7 +1511,7 @@ check_cfgdb()
 	local ec
 	trap "" SIGINT
 	printf "Checking cfgdb availability..."
-	echo "ruok" | nc -n -w 10 "${cfgdb_admin_ip}" 2181 2> /dev/null | grep imok >/dev/null 2>&1
+	curl -m 15 -k -s -I "https://${cfgdb_admin_ip}:12181" 2>/dev/null | grep -q "ESDC ZooKeeper REST"
 	ec=$?
 
 	if [[ "${ec}" -eq 0 ]]; then
@@ -1526,6 +1526,7 @@ check_cfgdb()
 
 query_cfgdb()
 {
+	local ec
 	local curl_ec
 	local curl_out
 	local json_ec
@@ -1541,8 +1542,10 @@ query_cfgdb()
 	if [[ "${curl_ec}" -eq 0 ]] && [[ "${json_ec}" -eq 0 ]] && [[ "${zk_ec}" == "0" ]]; then
 		datacenter_name="$(echo "${curl_out}" | json "stdout")"
 		printf "OK\n"
+		ec=0
 	else
 		printf "ERROR (${curl_out})\n"
+		ec=1
 	fi
 
 	trap sig_doshell SIGINT

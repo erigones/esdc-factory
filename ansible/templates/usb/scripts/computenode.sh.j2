@@ -23,6 +23,9 @@ exec 4>>/dev/console
 # Time to wait for each VM to setup (in seconds)
 VM_DEPLOY_TIMEOUT=600
 
+ERIGONES_HOME="/opt/erigones"
+ESDC_VERSION="/opt/custom/esdc.version"
+CTLSH="${ERIGONES_HOME}/bin/ctl.sh"
 OPENSSL="/opt/local/bin/openssl"
 OPENSSL_HOME="/opt/local/etc/openssl"
 SVC_CERT_FILE_NAME="dc-erigonesd.pem"
@@ -93,8 +96,8 @@ function configure_erigonesd() {
 	fi
 
 	cat > /opt/erigones/core/celery/local_config.py << EOF
-BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.rabbitmq.port_ssl }}/{{ esdc_mgmt.rabbitmq.vhost }}'
-CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${MGMT_IP}:{{ esdc_mgmt.redis.port_ssl }}/0'
+BROKER_URL = 'amqp://{{ esdc_mgmt.rabbitmq.user }}:${RABBITMQ_PASSWORD}@${RABBITMQ_IP}:{{ esdc_mgmt.rabbitmq.port_ssl }}/{{ esdc_mgmt.rabbitmq.vhost }}'
+CELERY_RESULT_BACKEND = 'redis://:${REDIS_PASSWORD}@${REDIS_IP}:{{ esdc_mgmt.redis.port_ssl }}/0'
 ERIGONES_MGMT_WORKERS = ('mgmt@{{ esdc_mgmt.hostname | default('mgmt01.local') }}',)
 
 import ssl
@@ -139,6 +142,10 @@ function install_archives() {
 		gtar xf "${USB_COPY}/archives/${archive}" -C /opt &> /dev/null
 		printf_log "%4s\n" "done"
 	fi
+}
+
+function set_esdc_version() {
+	"${CTLSH}" esdc_version > "${ESDC_VERSION}"
 }
 
 function __zk() {
@@ -331,6 +338,7 @@ cr_once
 printf_log "%-64s\n" "==> Setup starting... "
 validate_config
 install_archives
+set_esdc_version
 generate_ssh_keys
 
 # Metatada for installation
