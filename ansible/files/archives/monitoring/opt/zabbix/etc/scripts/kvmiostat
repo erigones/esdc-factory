@@ -96,7 +96,7 @@ for (my $ii = 0; $ii < $count; $ii++) {
     if ($rows_printed == 0 || $ALL_ZONES) {
              printf($HEADER_FMT, $INTERVAL_SUFFIX, $INTERVAL_SUFFIX,
                   $BYTES_PREFIX, $INTERVAL_SUFFIX, $BYTES_PREFIX,
-                  $INTERVAL_SUFFIX, $INTERVAL_SUFFIX);
+                  $INTERVAL_SUFFIX);
     }
 
     $rows_printed = $rows_printed >= 0 ? 0 : $rows_printed + 1;
@@ -119,7 +119,7 @@ for (my $ii = 0; $ii < $count; $ii++) {
 	    #$socket->print("{\"execute\": \"query-blockstats\"}");
 	    
 	    while(<$socket>) {
-		    unless (/QMP/ || /{"return": {}}/) {;
+		    unless (/QMP/ || /\{"return": \{\}\}/) {;
 	    		    $json_data = $_;
 			    last;
 	    	    }
