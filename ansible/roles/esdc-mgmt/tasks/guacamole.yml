@@ -42,3 +42,11 @@
   with_items:
     - guacd
     - tomcat
+
+- name: Waiting for Gaucamole to initialize
+  pause: seconds=10
+
+- name: Check tomcat logs
+  command: cat /var/log/tomcat/*.log
+  register: tomcat_logs
+  failed_when: "'SEVERE in tomcat_logs.stdout"
