@@ -22,11 +22,11 @@
   service: name=tomcat state=stopped
 
 - name: Download additional JAR files
-  get_url: url={{ item }} dest=/var/lib/tomcat/webapps/guacamole/WEB-INF/lib/
+  get_url: url="{{ item.url }}" checksum="{{ item.checksum }}" dest=/var/lib/tomcat/webapps/guacamole/WEB-INF/lib/
   with_items:
-    - http://central.maven.org/maven2/org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar
-    - http://search.maven.org/remotecontent?filepath=redis/clients/jedis/2.9.0/jedis-2.9.0.jar
-    - https://github.com/erigones/guacamole-auth-redis/releases/download/0.2.1/guacamole-auth-redis-0.2.1.jar
+    - {"url": "https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar", "checksum": "sha1:e5f4f28f19d57716fbc3989d7a357ebf1e454fea"}
+    - {"url": "https://repo1.maven.org/maven2/redis/clients/jedis/2.9.0/jedis-2.9.0.jar", "checksum": "sha1:292bc9cc26553acd3cccc26f2f95620bf88a04c2"}
+    - {"url": "https://github.com/erigones/guacamole-auth-redis/releases/download/0.2.1/guacamole-auth-redis-0.2.1.jar", "checksum": "sha1:75381d583b62fc7a5ba0e871894b7e42c964f3fb"}
 
 - name: Setting correct owners of JAR files
   file: path=/var/lib/tomcat/webapps/guacamole/WEB-INF/lib owner=tomcat group=tomcat recurse=yes
