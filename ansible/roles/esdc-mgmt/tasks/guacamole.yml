@@ -12,6 +12,12 @@
 - name: Create /etc/tomcat/conf.d/java_opts.conf
   copy: dest=/etc/tomcat/conf.d/java_opts.conf content="JAVA_OPTS='-Djava.security.egd=file:/dev/urandom'\n" mode=0644
 
+- name: Upload tomcat_redis_connect SELinux module
+  copy: src=selinux/tomcat_redis_connect.pp dest=/tmp/tomcat_redis_connect.pp
+
+- name: Install tomcat_redis_connect SELinux module
+  command: semodule -i /tmp/tomcat_redis_connect.pp
+
 - name: Download guacamole.war
   get_url: dest=/var/lib/tomcat/webapps/guacamole.war url=http://downloads.sourceforge.net/project/guacamole/current/binary/guacamole-0.9.9.war?use_mirror=netcologne
 
