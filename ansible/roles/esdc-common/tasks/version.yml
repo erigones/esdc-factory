@@ -1,3 +1,3 @@
 - name: Save image version into /etc/esdc.version
-  copy: content="v{{ image_version }}" dest="/etc/esdc.version" mode=0644 owner=root group=root
+  copy: content="{{ appliance_version | default('v' + image_version) }}" dest="/etc/esdc.version" mode=0644 owner=root group=root
   when: release_type == "stable"
