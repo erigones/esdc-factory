@@ -66,4 +66,4 @@
 - name: Check tomcat logs
   command: cat /var/log/tomcat/*.log
   register: tomcat_logs
-  failed_when: "'SEVERE in tomcat_logs.stdout"
+  failed_when: "'SEVERE' in tomcat_logs.stdout"
