@@ -56,7 +56,7 @@
   pause: seconds=10
 
 - name: Perform first request to Guacamole to load servlets
-  uri: uri="http://localhost:8080/guacamole/" return_content=yes timeout=30
+  uri: url="http://localhost:8080/guacamole/" return_content=yes timeout=60
   register: guacamole_index
 
 - name: Check Guacamole index page
