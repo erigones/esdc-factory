@@ -49,6 +49,14 @@
 - name: Waiting for Gaucamole to initialize
   pause: seconds=10
 
+- name: Perform first request to Guacamole to load servlets
+  uri: uri="http://localhost:8080/guacamole/" return_content=yes timeout=30
+  register: guacamole_index
+
+- name: Check Guacamole index page
+  fail: msg="Invalid response from Guacamole"
+  when: guacamole_index.content.find('<guac-login') == -1
+
 - name: Check tomcat logs
   command: cat /var/log/tomcat/*.log
   register: tomcat_logs
