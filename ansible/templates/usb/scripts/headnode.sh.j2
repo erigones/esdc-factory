@@ -673,7 +673,7 @@ ZABBIX_ADMIN_EMAIL="${CONFIG_admin_email:-""}"
 DNS_RESOLVERS="${CONFIG_dns_resolvers}"
 domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
 [[ -z "${domainname}" ]] && domainname="example.com"
-ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"monitoring@${domainname}"}"
+ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"zabbix@mon01.local"}"
 
 generate_svc_ssl_cert
 configure_erigonesd
