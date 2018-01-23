@@ -185,6 +185,7 @@ test_port_open() {
 function setup_svc_ssl_cert() {
 	# download SSL cert
 	local svc_cert="$(_zk_noverify get /esdc/settings/security/services_ssl_cert)"
+	local cert_hash_file
 
 	# the only expected case for not getting the certificate
 	# is adding v3.0.0 or later compute node to pre-v3.0.0 management
@@ -197,8 +198,10 @@ function setup_svc_ssl_cert() {
 	# save the public cert into openssl trusted certs
 	echo "${svc_cert}" > "${SVC_CERT_FILE}"
 	# rehash certificate
+	cert_hash_file="${OPENSSL_HOME}/certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+	rm -f "${OPENSSL_HOME}/certs/${SVC_CERT_FILE_NAME}" "${cert_hash_file}"
 	ln -s "${SVC_CERT_FILE}" "${OPENSSL_HOME}/certs/${SVC_CERT_FILE_NAME}"
-	ln -s "${SVC_CERT_FILE_NAME}" "${OPENSSL_HOME}/certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+	ln -s "${SVC_CERT_FILE_NAME}" "${cert_hash_file}"
 }
 
 # Wait for configuration database availability
