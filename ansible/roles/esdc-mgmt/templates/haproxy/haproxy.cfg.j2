@@ -8,7 +8,7 @@
 # Global settings
 #---------------------------------------------------------------------
 global
-	log		127.0.0.1 local2 
+	log	/dev/log local0 info
 	chroot	/var/lib/haproxy
 	pidfile	/var/run/haproxy.pid
 	maxconn	30000
@@ -129,18 +129,24 @@ backend stats
 listen rabbitmq
 	mode tcp
 	bind *:{{ esdc_mgmt.rabbitmq.port_ssl }} ssl crt {{ esdc_mgmt.erigonesd.ssl_file }}
+	option tcplog
+	option tcpka
+	timeout client 3h
+	timeout server 3h
 	server rabbitmq-mgmt 127.0.0.1:{{ esdc_mgmt.rabbitmq.port }}
 # END Danube Cloud rabbitmq service proxy
 # BEGIN Danube Cloud redis service proxy
 listen redis
 	mode tcp
 	bind *:{{ esdc_mgmt.redis.port_ssl }} ssl crt {{ esdc_mgmt.erigonesd.ssl_file }}
+	option tcplog
 	server redis-mgmt 127.0.0.1:{{ esdc_mgmt.redis.port }}
 # END Danube Cloud redis service proxy
 # BEGIN Danube Cloud zk_rest service proxy
 listen zk_rest
 	mode tcp
 	bind *:{{ esdc_cfgdb.zookeeper.port_ssl }}
+	option tcplog
 	server zk-rest-cfgdb 127.0.0.1:{{ esdc_cfgdb.zookeeper.port_ssl }}
 # END Danube Cloud zk_rest service proxy
 
