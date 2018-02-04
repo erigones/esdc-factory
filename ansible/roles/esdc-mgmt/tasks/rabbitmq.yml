@@ -17,6 +17,13 @@
         mode=0755
         state=directory
 
+- name: Copy rabbitmq.config file to /etc/rabbitmq
+  copy: src=rabbitmq/rabbitmq.config
+        dest=/etc/rabbitmq/rabbitmq.config
+        owner=root
+        group=root
+        mode=0644
+
 - name: Copy custom rabbitmq-server config file to /etc/systemd/system/rabbitmq-server.service.d
   copy: src=rabbitmq/custom.conf
         dest=/etc/systemd/system/rabbitmq-server.service.d/custom.conf
