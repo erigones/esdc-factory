@@ -26,6 +26,12 @@ The image supports following metadata:
 Changelog
 ---------
 
+20180209
+~~~~~~~~
+
+- Based on 2017Q4 base-64-es 3.0.0 image.
+
+
 20170808
 ~~~~~~~~
 
