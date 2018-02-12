@@ -42,7 +42,7 @@ game_mgmt_ip="$(mdata-get game_mgmt_ip)"
 if [[ -n "${game_mgmt_ip}" ]]; then
 	log "Allowing Snakepit game server port from ${game_mgmt_ip}"
 	echo "pass in quick proto tcp from ${game_mgmt_ip} to any port = 8111 keep state" >> /etc/ipf/ipf.conf
-	svcadm -s restart ipfilter
+	svcadm restart ipfilter
 fi
 
 game_settings="$(mdata-get game_settings | base64 -d)"

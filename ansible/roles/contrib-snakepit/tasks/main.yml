@@ -5,10 +5,10 @@
     - zabbix-agent
     - ipfilter
 
-- name: Uninstall unneeded packages
-  command: pkgin -y remove "{{ item }}"
-  with_items:
-    - zabbix-agent
+- name: Delete /var/zoneinit/includes/21-zabbix.sh
+  file:
+    path: /var/zoneinit/includes/21-zabbix.sh
+    state: absent
 
 - name: Disable SSH service upon next boot
   command: svccfg -s network/ssh:default setprop general/enabled = false
