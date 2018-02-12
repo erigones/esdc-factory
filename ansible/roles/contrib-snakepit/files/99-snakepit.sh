@@ -8,7 +8,7 @@ function create_robot_user() {
 	echo "${user}"
 
 	useradd -s /usr/bin/false "${user}"
-	projadd -K "project.max-lwps=(privileged,2,deny)" -K "project.cpu-cap=(privileged,50,deny)" -K "rcap.max-rss=(privileged,64M,deny)" "user.${user}"
+	projadd -K "project.max-lwps=(privileged,2,deny)" -K "project.cpu-cap=(privileged,50,deny)" -K "rcap.max-rss=64M" -K "process.max-file-size=(privileged,256M,deny)'" "user.${user}"
 }
 
 function robot_instance_manifest() {
@@ -63,7 +63,7 @@ if [[ -n "${game_robot_players}" ]]; then
 		robot_xml="/var/tmp/${robot_uuid}.xml"
 		robot_user="$(create_robot_user "${robot_uuid}")"
 
-		mdata-get "game_robot_${robot_uuid}_code" > "${robot_code}"
+		mdata-get "game_robot_${robot_uuid}_code" | base64 -d > "${robot_code}"
 		robot_instance_manifest "${robot_user}" "${robot_uuid}" "${robot_code}" "${robot_name}" > "${robot_xml}"
 		svccfg -s svc:/application/robot import "${robot_xml}"
 		log "Robot snake svc:/application/robot:${robot_uuid} is ready"
