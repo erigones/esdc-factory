@@ -1,7 +1,7 @@
 GAME_DIR="/opt/snakepit"
 
 function create_robot_user() {
-	local uuid="$2"
+	local uuid="$1"
 	local user
 
 	user="$(echo "${uuid}" | cut -d '-' -f 1)"
