@@ -1,0 +1,37 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-snakepit.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/zone/register-host.yml
+        hostname=snakepit
+
+- name: Install and configure appliance
+  hosts: snakepit
+  gather_facts: true
+  vars_files:
+    - vars/build/os/contrib-snakepit.yml
+  roles:
+    - esdc-common
+    - contrib-snakepit
+    - vm-image
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-snakepit.yml
+  vars:
+    image_tags: {internal: false, resize: true, deploy: false}
+  tasks:
+    - include: tasks/build/zone/create-image.yml

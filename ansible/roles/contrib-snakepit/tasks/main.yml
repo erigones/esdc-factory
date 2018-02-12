@@ -1,0 +1,107 @@
+---
+- name: Disable unneeded services
+  command: svcadm disable "{{ item }}"
+  with_items:
+    - zabbix-agent
+    - ipfilter
+
+- name: Uninstall unneeded packages
+  command: pkgin -y remove "{{ item }}"
+  with_items:
+    - zabbix-agent
+
+- name: Disable SSH service upon next boot
+  command: svccfg -s network/ssh:default setprop general/enabled = false
+
+- name: Enable ipfilter service upon next boot
+  command: svccfg -s network/ipfilter:default setprop general/enabled = true
+
+- name: Copy firewall rules
+  copy:
+    src: ipf.conf
+    dest: /etc/ipf/ipf.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install required packages
+  command: pkgin -y install {{ item }}
+  register: res
+  changed_when: "'nothing to do.' not in res.stdout"
+  with_items:
+    - python36
+    - py36-expat
+
+- name: Copy game tarball to /var/tmp/game.tar.bz2
+  copy:
+    src: game-master-45308413a3f3dccfcada09e5f9d2baf6a649e7a1.tar.bz2
+    dest: /var/tmp/game.tar.bz2
+
+- name: Create /opt/snakepit
+  file:
+    path: /opt/snakepit
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Extract game to /opt/snakepit
+  command: gtar -xjf /var/tmp/game.tar.bz2 -C /opt/snakepit --strip-components=1
+
+- name: Remove /var/tmp/game.tar.bz2
+  file:
+    path: /var/tmp/game.tar.bz2
+    state: absent
+
+- name: Change permissions of {{ item }}
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: nobody
+    mode: 0775
+  with_items:
+    - /opt/snakepit/var/log
+    - /opt/snakepit/var/tmp
+    - /opt/snakepit/var/run
+
+- name: Prepare the game Python environment
+  shell: |
+    cd /opt/snakepit
+    python3.6 -m venv env
+    source env/bin/activate
+    pip install -r doc/requirements.txt
+    export PYTHONPATH=$(pwd -P)
+    bin/run_robot.py --help
+
+- name: Copy snakepit initialization script
+  copy:
+    src: 99-snakepit.sh
+    dest: /var/zoneinit/includes/99-snakepit.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy main.sh
+  copy:
+    src: main.sh
+    dest: /usr/local/bin/main.sh
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Copy SMF manifest {{ item }}
+  copy:
+    src: "{{ item }}"
+    dest: "/opt/local/lib/svc/manifest/{{ item }}"
+  with_items:
+    - main.xml
+    - main-stop.xml
+    - robot.xml
+
+- name: Import SMF manifests {{ item }}
+  command: /usr/sbin/svccfg import "/opt/local/lib/svc/manifest/{{ item }}"
+  with_items:
+    - main.xml
+    - main-stop.xml
+    - robot.xml

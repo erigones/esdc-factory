@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+<service_bundle type='manifest' name='export'>
+	<service name='application/robot' type='service' version='0'>
+
+		<dependency name='network' grouping='require_all' restart_on='none' type='service'>
+			<service_fmri value='svc:/milestone/network:default'/>
+		</dependency>
+		<dependency name='filesystem-local' grouping='require_all' restart_on='none' type='service'>
+			<service_fmri value='svc:/system/filesystem/local:default'/>
+		</dependency>
+		<dependency name='zoneinit' grouping='require_all' restart_on='none' type='service'>
+			<service_fmri value='svc:/system/zoneinit:default'/>
+		</dependency>
+		<dependency name='mdata-fetch' grouping='require_all' restart_on='none' type='service'>
+			<service_fmri value='svc:/smartdc/mdata:fetch'/>
+		</dependency>
+		<dependency name='mdata-execute' grouping='require_all' restart_on='none' type='service'>
+			<service_fmri value='svc:/smartdc/mdata:execute'/>
+		</dependency>
+
+		<exec_method type='method' name='start' exec='/opt/snakepit/bin/run_robot.py --code %{robot/code} "%{robot/name}" &amp;' timeout_seconds='30'>
+			<method_context working_directory='/var/tmp'>
+				<method_credential user='%{robot/user}' group=':default' />
+				<method_environment>
+					<envvar name='PATH' value='/opt/snakepit/env/bin:/opt/local/bin:/usr/bin:/bin' />
+					<envvar name='PYTHONPATH' value='/opt/snakepit' />
+					<envvar name='VIRTUAL_ENV' value='/opt/snakepit/env' />
+				</method_environment>
+			</method_context>
+		</exec_method>
+
+		<exec_method type='method' name='stop' exec=':kill' timeout_seconds='30'/>
+
+		<stability value='Unstable' />
+
+		<template>
+			<common_name>
+				<loctext xml:lang='C'>Game robot</loctext>
+			</common_name>
+		</template>
+	</service>
+</service_bundle>

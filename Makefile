@@ -11,7 +11,8 @@ BUILD_TARGETS =	base-centos-6 \
 				contrib-centos-7 \
 				contrib-gitlab-ce \
 				contrib-centos-7-desktop \
-				network-access-zone
+				network-access-zone \
+				contrib-snakepit
 
 define newline
 
