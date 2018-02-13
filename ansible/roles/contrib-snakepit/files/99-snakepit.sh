@@ -8,7 +8,7 @@ function create_robot_user() {
 	echo "${user}"
 
 	useradd -s /usr/bin/false "${user}"
-	projadd -K "project.max-lwps=(privileged,2,deny)" -K "project.cpu-cap=(privileged,50,deny)" -K "rcap.max-rss=64M" -K "process.max-file-size=(privileged,256M,deny)'" "user.${user}"
+	projadd -K "project.max-lwps=(privileged,2,deny)" -K "project.cpu-cap=(privileged,50,deny)" -K "rcap.max-rss=64M" -K "process.max-file-size=(privileged,256M,deny)" "user.${user}"
 }
 
 function robot_instance_manifest() {
