@@ -24,6 +24,9 @@
     - { path: /etc/motd, state: touch }
     - { path: /root/.bash_history, state: absent }
 
+- name: Fix sm-prepare-image
+  shell: sed -i'' 's/^rm -f \/.zonecontrol\/metadata.sock/rm -f \/.zonecontrol\/metadata.sock || true/' /opt/local/bin/sm-prepare-image
+
 - name: Place default zoneinit scripts
   copy: src="{{ item.src }}"
         dest="{{ item.dest }}"
