@@ -61,6 +61,7 @@ if [[ -n "${game_onetime_robot_players}" ]]; then
 	svccfg -s robot setprop startd/duration = transient
 	svccfg -s robot setprop start/timeout_seconds = 0
 	svccfg -s robot setprop start/exec = \"/opt/snakepit/bin/run_robot.py --code %{robot/code} %{robot/name}\"
+	svccfg -s robot setprop stop/exec = \":true\"
 fi
 
 game_robot_players="$(mdata-get game_robot_players | base64 -d)"
