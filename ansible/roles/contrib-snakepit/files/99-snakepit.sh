@@ -24,10 +24,12 @@ function robot_instance_manifest() {
     <service name='application/robot' type='service' version='0'>
         <instance name='${uuid}' enabled='false'>
             <property_group name='robot' type='application'>
-                <propval name='user' type='astring' value='${user}' />
                 <propval name='uuid' type='astring' value='${uuid}' />
                 <propval name='code' type='astring' value='${code}' />
                 <propval name='name' type='astring' value='${name}' />
+            </property_group>
+            <property_group name='start' type='method'>
+                <propval name='user' type='astring' value='${user}' />
             </property_group>
         </instance>
     </service>
@@ -50,6 +52,15 @@ if [[ -n "${game_settings}" ]]; then
 	log "Creating ${GAME_DIR}/snakepit/local_settings.py"
 	echo  >> "${GAME_DIR}/snakepit/local_settings.py"
 	echo "${game_settings}" >> "${GAME_DIR}/snakepit/local_settings.py"
+fi
+
+game_onetime_robot_players="$(mdata-get game_onetime_robot_players || echo '')"
+if [[ -n "${game_onetime_robot_players}" ]]; then
+	log "Switching Snakepit robot service to transient mode"
+	svccfg -s robot addpg startd framework
+	svccfg -s robot setprop startd/duration = transient
+	svccfg -s robot setprop start/timeout_seconds = 0
+	svccfg -s robot setprop start/exec = \"/opt/snakepit/bin/run_robot.py --code %{robot/code} %{robot/name}\"
 fi
 
 game_robot_players="$(mdata-get game_robot_players | base64 -d)"
