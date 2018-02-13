@@ -22,7 +22,7 @@ function robot_instance_manifest() {
 <!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
 <service_bundle type='manifest' name='export'>
     <service name='application/robot' type='service' version='0'>
-        <instance name='${uuid}' enabled='false'>
+        <instance name='player-${uuid}' enabled='false'>
             <property_group name='robot' type='application'>
                 <propval name='uuid' type='astring' value='${uuid}' />
                 <propval name='code' type='astring' value='${code}' />
