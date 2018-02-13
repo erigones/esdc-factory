@@ -29,6 +29,7 @@ Changelog
 ~~~~~
 
 - Updated pkgsrc in /opt/local to 2017Q4 - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
+- Fixed sm-prepare-image - commit `7e3d694 <https://github.com/erigones/esdc-factory/commit/7e3d694321a836839e8eadbfdd2c8bdaffe9eae9>`__
 
 2.6.7
 ~~~~~
