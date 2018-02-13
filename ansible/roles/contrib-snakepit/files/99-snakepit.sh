@@ -4,7 +4,7 @@ function create_robot_user() {
 	local uuid="$1"
 	local user
 
-	user="$(echo "${uuid}" | cut -d '-' -f 1)"
+	user="u$(echo "${uuid}" | cut -d '-' -f 1)"
 	echo "${user}"
 
 	useradd -s /usr/bin/false "${user}"

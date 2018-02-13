@@ -7,14 +7,14 @@ set -o xtrace
 GAME_DIR="/opt/snakepit"
 
 function start_robots() {
-	svcs -a -o FMRI -H | grep "application/robot:" | while read robot_svc; do
-		(sleep 5 && svcadm enable "${robot_svc}") &
+	/usr/bin/svcs -a -o FMRI -H | grep "application/robot:player" | while read robot_svc; do
+		(sleep 5 && /usr/sbin/svcadm enable "${robot_svc}") &
 	done
 }
 
 function stop_robots() {
-	svcs -a -o FMRI -H | grep "application/robot:" | while read robot_svc; do
-		svcadm disable -s "${robot_svc}"
+	/usr/bin/svcs -a -o FMRI -H | grep "application/robot:player" | while read robot_svc; do
+		/usr/sbin/svcadm disable -s "${robot_svc}"
 		robot_uuid="$(svcprop -p "robot/uuid" "${robot_svc}")"
 		robot_log="$(svcprop -p "restarter/logfile" "${robot_svc}")"
 		tail -c 32768 "${robot_log}" | base64 | mdata-put "game_robot_${robot_uuid}_log"
