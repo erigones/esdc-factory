@@ -34,7 +34,7 @@
 
 - name: Copy game tarball to /var/tmp/game.tar.bz2
   copy:
-    src: game-master-53913390dc0ab97a4b2bae05b868fe2631d61fbc.tar.bz2
+    src: snakepit-game.tar.bz2
     dest: /var/tmp/game.tar.bz2
 
 - name: Create /opt/snakepit
