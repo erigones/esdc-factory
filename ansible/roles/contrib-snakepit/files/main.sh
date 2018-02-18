@@ -17,7 +17,7 @@ function stop_robots() {
 		/usr/sbin/svcadm disable -s "${robot_svc}"
 		robot_uuid="$(svcprop -p "robot/uuid" "${robot_svc}")"
 		robot_log="$(svcprop -p "restarter/logfile" "${robot_svc}")"
-		tail -c 32768 "${robot_log}" | grep -v "^\[" | base64 | mdata-put "game_robot_${robot_uuid}_log"
+		tail -c 65536 "${robot_log}" | grep -v "^\[" | base64 | mdata-put "game_robot_${robot_uuid}_log"
 	done
 }
 
@@ -35,7 +35,7 @@ function start() {
 
 function stop() {
 	export PATH="/usr/local/sbin:/usr/local/bin:/opt/local/sbin:/opt/local/bin:/usr/sbin:/usr/bin:/sbin"
-	tail -c 32768 "${GAME_DIR}/var/log/game.log" | base64 | mdata-put "game_log"
+	tail -c 131072 "${GAME_DIR}/var/log/game.log" | base64 | mdata-put "game_log"
 	cat "${GAME_DIR}/var/run/top_scores.txt" | base64 | mdata-put "game_top_scores"
 	stop_robots
 }
