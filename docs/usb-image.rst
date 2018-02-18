@@ -23,7 +23,7 @@ Changelog
 =====
 Unreleased
 
-- Updated to a new platform version - 20180105T193033Z from upstream/release-20180104:
+- Updated to a new platform version - 20180218T102008Z from upstream/release-20180215:
     - Added support for the ``dns_options`` /usbkey/config setting - `erigonos-overlay#1 <https://github.com/erigones/esdc-erigonos-overlay/issues/1>`__
     - Added support for admin NIC tag on etherstub - `#86 <https://github.com/erigones/esdc-factory/issues/86>`__
     - Added support for the ``vnc_listen_address`` in /usbkey/config - `#88 <https://github.com/erigones/esdc-factory/issues/88>`__
@@ -33,6 +33,7 @@ Unreleased
     - Added ``network/virtual`` SMF service with support for the ``overlay_rule_*`` /usbkey/config setting - `erigonos-overlay#7 <https://github.com/erigones/esdc-erigonos-overlay/issues/7>`__
     - Increased "/" (root) ramdisk size `smartos-live/commit 8a490b6 <https://github.com/erigones/smartos-live/commit/8a490b6e42279a64e60a097a2dbed0740209dc8c>`__
     - Fixed node.js fs.readFile[Sync]() problem with reading /dev/stdin - `joyent/smartos-live#753 <https://github.com/joyent/smartos-live/issues/753>`__
+    - Fixed boot problems related to ``/usbkey`` being unmounted after boot - `esdc-ce#359 <https://github.com/erigones/esdc-ce/issues/359>`__
 
 - Updated *local* archive [local-2017Q4-20180112]
     - Changed pkgsrc version to 2017Q4 - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
