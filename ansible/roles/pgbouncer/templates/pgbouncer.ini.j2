@@ -78,7 +78,7 @@ pool_mode = {{ pgbouncer_pool_mode }}
 ;
 ; Empty if transaction pooling is in use.
 ;
-server_reset_query = {{ 'DISCARD ALL' if pgbouncer_pool_mode == 'session' else '' }}
+server_reset_query = {{ 'DISCARD ALL;' if pgbouncer_pool_mode == 'session' else '' }}
 
 ;
 ; Comma-separated list of parameters to ignore when given

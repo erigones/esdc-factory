@@ -23,10 +23,10 @@ pgbouncer_stats_users:
     - stats
     - postgres
 
-pgbouncer_pool_mode: "transaction"
+pgbouncer_pool_mode: "session"
 
 pgbouncer_max_client_conn: 100
-pgbouncer_default_pool_size: 20
+pgbouncer_default_pool_size: 80
 pgbouncer_reserve_pool_size: 5
 pgbouncer_server_lifetime: 1200
 pgbouncer_server_idle_timeout: 30

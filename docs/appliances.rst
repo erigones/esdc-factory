@@ -255,6 +255,7 @@ Changelog
 ~~~~~
 
 - Built from new `base-64-es`_ with 2017Q4 pkgsrc - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
+- Changed PowerDNS packages to our powerdns40* - `#113 <https://github.com/erigones/esdc-factory/issues/113>`__
 
 2.6.7
 ~~~~~
@@ -480,6 +481,7 @@ Changelog
 - Fixed /etc/rc.d/rc.local permissions - `#109 <https://github.com/erigones/esdc-factory/issues/109>`__
 - Added ``cfgdb_ip`` and ``erigonesd_ssl_{cert,key}`` metadata and updated related post-deploy configuration script - `#102 <https://github.com/erigones/esdc-factory/issues/102>`__
 - Enabled TCP keepalive in RabbitMQ - `esdc-ce#350 <https://github.com/erigones/esdc-ce/issues/350>`__
+- Switched pgbouncer pool_mode to session -  `#113 <https://github.com/erigones/esdc-factory/issues/113>`__
 
 2.6.7
 ~~~~~
