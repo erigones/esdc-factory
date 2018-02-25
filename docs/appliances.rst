@@ -28,6 +28,7 @@ Changelog
 3.0.0
 ~~~~~
 
+- Updated Zabbix agent to 3.0.14 - `#110 <https://github.com/erigones/esdc-factory/issues/110>`__
 - Updated pkgsrc in /opt/local to 2017Q4 - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
 - Fixed sm-prepare-image - commit `7e3d694 <https://github.com/erigones/esdc-factory/commit/7e3d694321a836839e8eadbfdd2c8bdaffe9eae9>`__
 
