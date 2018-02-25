@@ -6,7 +6,7 @@ usb_type: "hn"  # "hn" or "cn"
 usb_root_pw: "$5$2HOHRnK3$NvLlm.1KQBbB0WjoP7xcIwGnllhzp2HnT.mDO7DpxYA"  # root
 
 platform_version: "20180218T102008Z"
-platform_upstream_version: "release-20180104"
+platform_upstream_version: "release-20180215"
 platform_os_archive: "{{ builder.platform.dir }}/platform-{{ platform_version }}.tgz"
 platform_boot_archive: "{{ builder.platform.dir }}/boot-{{ platform_version }}.tgz"
 
