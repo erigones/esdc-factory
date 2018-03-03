@@ -1,0 +1,11 @@
+--- /var/zoneinit/includes/999-cleanup.sh
++++ /var/zoneinit/includes/999-cleanup.sh
+@@ -6,5 +6,6 @@ svccfg -s zoneinit 'setprop application/done = true'
+ svcadm refresh zoneinit
+ rm -f ${ZONECONFIG}
+
+-log "scheduling an immediate reboot"
+-echo "reboot >/dev/null" | at now >/dev/null
++log "clearing first boot barrier, letting mdata finish the provision"
++rm -f /tmp/.FIRST_REBOOT_NOT_YET_COMPLETE
++svcadm refresh mdata:fetch

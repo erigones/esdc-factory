@@ -105,3 +105,10 @@
     - main.xml
     - main-stop.xml
     - robot.xml
+
+# https://github.com/joyent/zoneinit/issues/3
+- name: Make zoneinit skip final reboot during provisioning phase
+  patch:
+    src: zoneinit_no_reboot.patch
+    dest: /var/zoneinit/includes/999-cleanup.sh
+
