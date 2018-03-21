@@ -23,7 +23,7 @@ Changelog
 =====
 Unreleased
 
-- Updated to a new platform version - 20180218T102008Z from upstream/release-20180215:
+- Updated to a new platform version - 20180318T095138Z from upstream/release-20180315:
     - Added support for the ``dns_options`` /usbkey/config setting - `erigonos-overlay#1 <https://github.com/erigones/esdc-erigonos-overlay/issues/1>`__
     - Added support for admin NIC tag on etherstub - `#86 <https://github.com/erigones/esdc-factory/issues/86>`__
     - Added support for the ``vnc_listen_address`` in /usbkey/config - `#88 <https://github.com/erigones/esdc-factory/issues/88>`__
