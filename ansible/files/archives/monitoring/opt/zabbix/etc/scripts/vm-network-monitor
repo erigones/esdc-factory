@@ -57,7 +57,6 @@ my @metrics = (
 use strict;
 use warnings;
 use Sun::Solaris::Kstat;
-use Data::Dumper;
 
 my $Kstat = Sun::Solaris::Kstat->new();
 

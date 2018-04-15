@@ -38,8 +38,9 @@ Unreleased
 - Updated *local* archive [local-2017Q4-20180112]
     - Changed pkgsrc version to 2017Q4 - `#111 <https://github.com/erigones/esdc-factory/issues/111>`__
 
-- Updated *monitoring* archive [local-2017Q4-20180112]:
-    - Updated Zabbix agent to 3.0.14 - `#110 <https://github.com/erigones/esdc-factory/issues/110>`__
+- Updated *monitoring* archive [local-2017Q4-20180410]:
+    - Updated Zabbix agent to 3.0.16 - `#110 <https://github.com/erigones/esdc-factory/issues/110>`__
+    - Fixed Perl monitoring scripts - `esdc-ce#369 <https://github.com/erigones/esdc-ce/issues/369>`__
 
 - Updated *opt-custom* archive [opt-custom-2017Q4-20180112]:
     - Added support for custom postboot SMF user scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__

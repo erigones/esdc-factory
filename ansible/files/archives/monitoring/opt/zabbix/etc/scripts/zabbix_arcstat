@@ -7,7 +7,6 @@
 
 use strict;
 use Sun::Solaris::Kstat;
-use Switch;
 
 my $kstat = Sun::Solaris::Kstat->new();
 
@@ -45,31 +44,27 @@ if ($l2_size != 0) {
 	
 }
 
-switch ($ARGV[0]) {
-	
-	# ARC accesses
-	case 'arc_hits'			{ print "$arc_hits\n";		}
-	case 'arc_misses'		{ print "$arc_misses\n";	}
+my $param = $ARGV[0];
 
-	# ARC size breakdown
-        case 'arc_size'                 { print "$arc_size\n";          }
-        case 'mfu_size'                 { print "$mfu_size\n";          }
-        case 'mru_size'                 { print "$mru_size\n";          }
-	case 'target_size'		{ print "$target_size\n";	}
-
-        # ARC efficiency
-        case 'arc_hit_perc'             { print "$arc_hits_perc\n";     }
-        case 'arc_miss_perc'            { print "$arc_misses_perc\n";   }
-
-	# L2ARC accesses
-	case 'l2_hits'			{ print "$l2_hits\n";	}
-	case 'l2_misses'		{ print "$l2_misses\n";	}
-
-	# L2ARC efficiency
-	case 'l2_hits_perc'			{ print "$l2_hits_perc\n"; }
-	case 'l2_misses_perc'			{ print "$l2_misses_perc\n"; }
-
-	# L2ARC throughput 
-	case 'l2_read_bytes'			{ print "$l2_read_bytes\n"; }
-	case 'l2_write_bytes'			{ print "$l2_write_bytes\n"; }
-}
+# ARC accesses
+if    ($param eq 'arc_hits') 		{ print "$arc_hits\n"; }
+elsif ($param eq 'arc_misses')		{ print "$arc_misses\n"; }
+# ARC size breakdown
+elsif ($param eq 'arc_size') 		{ print "$arc_size\n"; }
+elsif ($param eq 'mfu_size')		{ print "$mfu_size\n"; }
+elsif ($param eq 'mru_size')		{ print "$mru_size\n"; }
+elsif ($param eq 'target_size')		{ print "$target_size\n"; }
+# ARC efficiency
+elsif ($param eq 'arc_hit_perc')	{ print "$arc_hits_perc\n"; }
+elsif ($param eq 'arc_miss_perc')	{ print "$arc_misses_perc\n"; }
+# L2ARC accesses
+elsif ($param eq 'l2_hits')			{ print "$l2_hits\n"; }
+elsif ($param eq 'l2_misses')		{ print "$l2_misses\n"; }
+# L2ARC efficiency
+elsif ($param eq 'l2_hits_perc')	{ print "$l2_hits_perc\n"; }
+elsif ($param eq 'l2_misses_perc')	{ print "$l2_misses_perc\n"; }
+# L2ARC throughput
+elsif ($param eq 'l2_read_bytes')	{ print "$l2_read_bytes\n"; }
+elsif ($param eq 'l2_write_bytes')	{ print "$l2_write_bytes\n"; }
+# No $param
+else { ; }
