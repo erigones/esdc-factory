@@ -124,6 +124,12 @@ function generate_svc_ssl_cert() {
 	local svc_cert_tmpfile="/tmp/svc_$$_cert.pem"
 	local svc_key_tmpfile="/tmp/svc_$$_key.pem"
 
+	if [[ -f "${SVC_CERT_FILE}" ]]; then
+		# certificate is already generated
+		# nothing to do
+		return 0
+	fi
+
 	# update openssl conf to allow alternate names
 	cat << EOF >> /opt/local/etc/openssl/openssl.cnf
 
