@@ -20,7 +20,7 @@ builder_archives:
     desc: '/opt/local directory on hypervisor'
     link: 'local-latest'
   - name: 'opt-custom'
-    version: '2017Q4-20180112'
+    version: '2017Q4-20180506'
     desc: '/opt/custom directory on hypervisor'
     link: 'opt-custom-latest'
 

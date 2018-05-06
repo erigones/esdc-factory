@@ -21,7 +21,7 @@ Changelog
 
 3.0.0
 =====
-Unreleased
+Released on 2018-05-07
 
 - Updated to a new platform version - 20180318T095138Z from upstream/release-20180315:
     - Added support for the ``dns_options`` /usbkey/config setting - `erigonos-overlay#1 <https://github.com/erigones/esdc-erigonos-overlay/issues/1>`__
@@ -42,10 +42,11 @@ Unreleased
     - Updated Zabbix agent to 3.0.16 - `#110 <https://github.com/erigones/esdc-factory/issues/110>`__
     - Fixed Perl monitoring scripts - `esdc-ce#369 <https://github.com/erigones/esdc-ce/issues/369>`__
 
-- Updated *opt-custom* archive [opt-custom-2017Q4-20180112]:
+- Updated *opt-custom* archive [opt-custom-2017Q4-20180506]:
     - Added support for custom postboot SMF user scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
     - Added sample firewall and mount-iscsi RC scripts - `#89 <https://github.com/erigones/esdc-factory/issues/89>`__
     - Added ipsec RC script - `#107 <https://github.com/erigones/esdc-factory/issues/107>`__
+    - Added ``create-router-from-gz.sh`` script - `#117 <https://github.com/erigones/esdc-factory/issues/117>`__
 
 - Updated installer:
     - Fixed long resolution timeout when DNS unavailable - `#62 <https://github.com/erigones/esdc-factory/issues/62>`__
