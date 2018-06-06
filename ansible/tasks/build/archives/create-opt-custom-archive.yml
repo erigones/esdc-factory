@@ -20,6 +20,9 @@
 - name: Mark RC scripts executable
   shell: chmod -R 755 "{{ builder_tmp_dir }}/opt-custom-archive/opt/custom/etc"/rc-*
 
+- name: Make /opt/custom/bin content executable
+  shell: chmod -R 755 "{{ builder_tmp_dir }}/opt-custom-archive/opt/custom/bin/"
+
 - name: Create opt-custom tarball {{ pkg_name }}{{ pkg_ext }}
   shell: chdir="{{ builder_tmp_dir }}/opt-custom-archive" tar -czvf "/var/tmp/{{ pkg_name }}{{ pkg_ext }}" opt
 
