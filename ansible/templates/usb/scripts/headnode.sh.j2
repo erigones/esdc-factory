@@ -33,10 +33,13 @@ SVC_CERT_FILE_NAME="dc-erigonesd.pem"
 SVC_CERT_FILE="/opt/custom/etc/${SVC_CERT_FILE_NAME}"
 QUERY_CFGDB="${ERIGONES_HOME}/bin/query_cfgdb"
 TIMEOUT="/opt/local/bin/timeout"
+PWD_TMPSTORE="/opt/custom/etc/esdc_svc_tmp_pwds.json"
 
 # certificate for DC internal services 
 SVC_CERT=
 SVC_KEY=
+SVC_CERT_TMPFILE="/opt/custom/etc/esdc_svc_tmp_cert.pem"
+SVC_KEY_TMPFILE="/opt/custom/etc/esdc_svc_tmp_key.pem"
 
 
 # Helper functions
@@ -121,41 +124,51 @@ function escape_cert_data() {
 }
 
 function generate_svc_ssl_cert() {
-	local svc_cert_tmpfile="/tmp/svc_$$_cert.pem"
-	local svc_key_tmpfile="/tmp/svc_$$_key.pem"
-
-	if [[ -f "${SVC_CERT_FILE}" ]]; then
-		# certificate is already generated
-		# nothing to do
+	if [[ -s "${SVC_CERT_TMPFILE}" && -s "${SVC_KEY_TMPFILE}" ]]; then
+		# certificates are already generated, just load them
+		SVC_CERT="$(escape_cert_data "${SVC_CERT_TMPFILE}")"
+		SVC_KEY="$(escape_cert_data "${SVC_KEY_TMPFILE}")"
 		return 0
 	fi
 
 	# update openssl conf to allow alternate names
-	cat << EOF >> /opt/local/etc/openssl/openssl.cnf
+	if ! grep -q "DNS:esdc.local" /opt/local/etc/openssl/openssl.cnf; then 
+		cat << EOF >> /opt/local/etc/openssl/openssl.cnf
 
 [SAN]
 subjectAltName = {{ esdc_mgmt.erigonesd.subjectAltName }}
 EOF
+	fi
 
 	(
+	  clean_tmp_certs
 	  umask 0077
-	  "${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${svc_key_tmpfile}" -out "${svc_cert_tmpfile}"
+	  "${OPENSSL}" req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "${SVC_KEY_TMPFILE}" -out "${SVC_CERT_TMPFILE}"
 	)
 
-	if [[ ! -s "${svc_cert_tmpfile}" ]] || [[ ! -s "${svc_key_tmpfile}" ]]; then
+	if [[ ! -s "${SVC_CERT_TMPFILE}" ]] || [[ ! -s "${SVC_KEY_TMPFILE}" ]]; then
 		fatal "Services SSL cert was not generated properly"
 	fi
 
-	SVC_CERT="$(escape_cert_data "${svc_cert_tmpfile}")"
-	SVC_KEY="$(escape_cert_data "${svc_key_tmpfile}")"
+	SVC_CERT="$(escape_cert_data "${SVC_CERT_TMPFILE}")"
+	SVC_KEY="$(escape_cert_data "${SVC_KEY_TMPFILE}")"
 
 	# save the public cert into our location and link to openssl trusted certs
-	cp "${svc_cert_tmpfile}" "${SVC_CERT_FILE}"
+	cp -f "${SVC_CERT_TMPFILE}" "${SVC_CERT_FILE}"
 	# rehash certificate
-	ln -s "${SVC_CERT_FILE}" "${OPENSSL_HOME}/certs/${SVC_CERT_FILE_NAME}"
-	ln -s "${SVC_CERT_FILE_NAME}" "${OPENSSL_HOME}/certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+	ln -sf "${SVC_CERT_FILE}" "${OPENSSL_HOME}/certs/${SVC_CERT_FILE_NAME}"
+	ln -sf "${SVC_CERT_FILE_NAME}" "${OPENSSL_HOME}/certs/$("${OPENSSL}" x509 -hash -noout -in "${SVC_CERT_FILE}").0"
+}
 
-	rm -f "${svc_key_tmpfile}" "${svc_cert_tmpfile}"
+function clean_tmp_certs() {
+	rm -f "${SVC_KEY_TMPFILE}" "${SVC_CERT_TMPFILE}"
+}
+
+function clean_tmp_files() {
+	# remove the files only after all VMs are deployed to preserve the generated values between restarts
+	# of this script in case of VM deploy failure
+	clean_tmp_certs
+	rm -f "${PWD_TMPSTORE}"
 }
 
 function configure_erigonesd() {
@@ -639,6 +652,34 @@ function validate_config() {
 	_validate_config_var "esdc_install_password" "${CONFIG_esdc_install_password}"
 }
 
+function get_password() {
+	# make generated passwords persistent across reboots (generate only if pwd does not exist)
+	local pwdname="$1"
+	local length="$2"
+	local pwdval=
+
+	if [[ -z ${pwdname} ]]; then
+		echo "get_password: called with empty pwdname" >&2
+	fi
+
+	if json --validate -qf "${PWD_TMPSTORE}" &> /dev/null; then
+		pwdval="$(json -f "${PWD_TMPSTORE}" "${pwdname}")"
+	else
+		# json is invalid or does not exist
+		rm -f "${PWD_TMPSTORE}"
+		touch "${PWD_TMPSTORE}"
+	fi
+	
+	if [[ -z ${pwdval} ]]; then
+		# password does not exist, generate and add it to db
+		pwdval="$(random_string ${length})"
+		cat "${PWD_TMPSTORE}" <(echo "{ \"${pwdname}\": \"${pwdval}\" }") | json --merge > "${PWD_TMPSTORE}.tmp"
+		mv -f "${PWD_TMPSTORE}.tmp" "${PWD_TMPSTORE}"
+	fi
+	
+	printf "${pwdval}"
+}
+
 function random_string() {
 	local length="${1:-24}"
 	openssl rand -base64 "${length}" | tr -dc _A-Z-a-z-0-9
@@ -666,15 +707,15 @@ DNS_IP="${CONFIG_dns_admin_ip}"
 IMG_IP="${CONFIG_img_admin_ip}"
 CFGDB_IP="${CONFIG_cfgdb_admin_ip}"
 ESDC_INSTALL_PASSWORD="${CONFIG_esdc_install_password}"
-RABBITMQ_PASSWORD="$(random_string)"
-REDIS_PASSWORD="$(random_string)"
-PGSQL_ESDC_PASSWORD="$(random_string)"
-PGSQL_PDNS_PASSWORD="$(random_string)"
-PGSQL_MGMT_MON_PASSWORD="$(random_string)"
+RABBITMQ_PASSWORD="$(get_password RABBITMQ_PASSWORD)"
+REDIS_PASSWORD="$(get_password REDIS_PASSWORD)"
+PGSQL_ESDC_PASSWORD="$(get_password PGSQL_ESDC_PASSWORD)"
+PGSQL_PDNS_PASSWORD="$(get_password PGSQL_PDNS_PASSWORD)"
+PGSQL_MGMT_MON_PASSWORD="$(get_password PGSQL_MGMT_MON_PASSWORD)"
 ZABBIX_ESDC_USERNAME="{{ esdc_mgmt.zabbix_api.username }}"
-ZABBIX_ESDC_PASSWORD="$(random_string)"
+ZABBIX_ESDC_PASSWORD="$(get_password ZABBIX_ESDC_PASSWORD)"
 ZABBIX_ADMIN_USERNAME="Admin"
-ZABBIX_ADMIN_PASSWORD="$(random_string 9)"
+ZABBIX_ADMIN_PASSWORD="$(get_password ZABBIX_ADMIN_PASSWORD 9)"
 ZABBIX_ADMIN_EMAIL="${CONFIG_admin_email:-""}"
 DNS_RESOLVERS="${CONFIG_dns_resolvers}"
 domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
@@ -699,6 +740,7 @@ configure_cfgdb
 install_images
 import_smf_manifests
 create_setup_file
+clean_tmp_files
 inform_user
 
 exit 0
