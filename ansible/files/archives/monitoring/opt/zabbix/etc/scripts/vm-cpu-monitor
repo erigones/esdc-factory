@@ -79,7 +79,7 @@ while(my $line = <PRSTAT>) {
 
 		foreach $zonename (keys %cpu_stats) {
 			# Skip OS zones for now	
-			next if $cpu_stats{$zonename}->{'type'} eq 'OS';
+			next if $cpu_stats{$zonename}->{'type'} ne 'KVM';
 			
 			unless ($data{$zonename}) {
 				$data{$zonename} = "$zonename vm.cpu.perc $date 0\n";
@@ -113,7 +113,7 @@ while(my $line = <PRSTAT>) {
 	$zonename = $8;
 
 	# Skip OS zones for now
-	next if $cpu_stats{$zonename}->{'type'} eq 'OS';
+	next if $cpu_stats{$zonename}->{'type'} ne 'KVM';
 	
 	if ($cpu_perc == 0) {
 		$real_perc = 0;
