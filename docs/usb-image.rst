@@ -19,6 +19,14 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
+4.0.0
+=====
+Released on `TBA`
+
+- Updated to a new platform version - `<TBD>` from upstream/release-`<TBD>`
+- Fixed CPU monitoring script - `esdc-ce#375 <https://github.com/erigones/esdc-ce/issues/375>`__
+
+
 3.0.0
 =====
 Released on 2018-05-07
