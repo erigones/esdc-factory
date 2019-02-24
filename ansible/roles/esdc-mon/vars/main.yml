@@ -49,6 +49,14 @@ monitoring_templates:
   - t_vm_network_net5.json
   - t_vm_network_net6.json
   - t_vm_network_net7.json
+  - t_vm_network_net8.json
+  - t_vm_network_net9.json
+  - t_vm_network_net10.json
+  - t_vm_network_net11.json
+  - t_vm_network_net12.json
+  - t_vm_network_net13.json
+  - t_vm_network_net14.json
+  - t_vm_network_net15.json
 
   - t_zfs_io_throttle.json
   - t_zfs_arc.json
