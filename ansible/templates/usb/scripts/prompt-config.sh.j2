@@ -2059,8 +2059,9 @@ web management.\n\n"
 		message="
 You have entered an IP address outside the admin subnet.
 That suggests this is a remote compute node.
-A remote compute node connects to the management VMs via internet (external network)
-instead of connecting directly using the admin network.\n\n"
+
+A remote compute node connects to the management VMs via internet (external
+network) instead of connecting directly using the admin network.\n\n"
 		if [[ $(getanswer "skip_instructions") != "true" ]]; then
 			printf "$message"
 		fi
