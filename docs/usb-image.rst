@@ -29,7 +29,7 @@ Released on `TBA`
 - Bumped default gcc version from 4.9 to 7 - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
 - Allow parralel builds of ``hn`` and ``cn`` usb images - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
 - Fixed CPU monitoring script - `esdc-ce#375 <https://github.com/erigones/esdc-ce/issues/375>`__
-- Fixes ``ike`` service not enabled after reboot - `#124 <https://github.com/erigones/esdc-factory/pull/124>`__
+- Fixed ``ike`` service not enabled after reboot - `#124 <https://github.com/erigones/esdc-factory/pull/124>`__
 
 
 3.0.0
