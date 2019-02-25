@@ -27,5 +27,5 @@
   command: vmadm list -Hpo state uuid="{{ zone_uuid }}"
   register: result
   until: result.stdout.find("stopped") != -1
-  retries: 120
+  retries: 200
   delay: 10

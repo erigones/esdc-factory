@@ -10,7 +10,7 @@
 #   - pkg_desc (optional)
 ---
 - name: Download package from {{ pkg_url }}
-  get_url: url="{{ pkg_url }}" dest="{{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}" mode=0644 force="{{ force_download|default(false) }}"
+  get_url: url="{{ pkg_url }}" dest="{{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}" mode=0644 force="{{ force_download|default(false) }}" tmp_dest="/var/tmp"
   when: pkg_url is defined and pkg_url
 
 - name: Get package file information

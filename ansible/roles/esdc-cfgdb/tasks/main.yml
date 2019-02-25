@@ -6,6 +6,11 @@
         group=root
         mode=0755
 
+- name: Make sure /usr/local/bin exists
+  file: path=/usr/local/bin
+        state=directory
+        mode=0755
+
 - name: Copy zookeepercli script
   copy: src=zookeepercli
         dest=/usr/local/bin/zookeepercli

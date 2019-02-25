@@ -142,7 +142,7 @@ case "\$1" in
 		exit \$SMF_EXIT_OK
 		;;
 	*)
-		echo "Usage: $0 {start|stop|refresh}"
+		echo "Usage: \$0 {start|stop|refresh}"
 		exit \$SMF_EXIT_ERR_CONFIG
 esac
 

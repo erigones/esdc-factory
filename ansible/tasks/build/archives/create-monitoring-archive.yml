@@ -5,7 +5,7 @@
   shell: gtar -xzf /var/tmp/zabbix.tar.gz -C /var/tmp
 
 - name: Configure; make; make install
-  shell: chdir="/var/tmp/zabbix-{{ zabbix_agent_version }}" ./configure --prefix=/opt/zabbix --enable-agent && make && make install
+  shell: chdir="/var/tmp/zabbix-{{ zabbix_agent_version }}" export LD_LIBRARY_PATH=/opt/local/lib && ./configure --prefix=/opt/zabbix --enable-agent && make && make install
 
 - name: Add custom Zabbix configuration and SMF manifests
   copy: src=files/archives/monitoring/opt/ dest=/opt/

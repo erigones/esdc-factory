@@ -12,7 +12,7 @@
   when: zone_brand == "kvm"
 
 - name: Create the virtual machine
-  vmadm: manifest={{ item }} state=present
+  shell: vmadm create -f "{{ item }}"
   with_items:
     - /tmp/{{ zone_uuid }}.json
 
