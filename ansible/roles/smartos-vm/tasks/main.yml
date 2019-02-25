@@ -11,12 +11,6 @@
             validate="vmadm validate create kvm -f %s"
   when: zone_brand == "kvm"
 
-## This is undocumented and not working anymore:
-#- name: Create the virtual machine
-#  vmadm: manifest={{ item }} state=present
-#  with_items:
-#    - /tmp/{{ zone_uuid }}.json
-
 - name: Create the virtual machine
   shell: vmadm create -f "{{ item }}"
   with_items:
