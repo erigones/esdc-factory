@@ -37,15 +37,17 @@
     - libjpeg-devel
     - patch
 
-- name: Download GeoIP database
-  get_url: url="http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
-           dest="/tmp/GeoIP.dat.gz"
-
-- name: Extract GeoIP database
-  shell: gzip -cd /tmp/GeoIP.dat.gz > /usr/share/GeoIP/GeoIP.dat
-
-- name: Remove downloaded GeoIP database
-  shell: rm -f /tmp/GeoIP.dat.gz
+# GeoIP DB is no longer downloadable and the DB was updated in rpm itself
+#- name: Download GeoIP database
+#  #get_url: url="http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
+#  get_url: url="{{ build_base_url }}/platform-janci/GeoIP.dat.gz"
+#           dest="/tmp/GeoIP.dat.gz"
+#
+#- name: Extract GeoIP database
+#  shell: gzip -cd /tmp/GeoIP.dat.gz > /usr/share/GeoIP/GeoIP.dat
+#
+#- name: Remove downloaded GeoIP database
+#  shell: rm -f /tmp/GeoIP.dat.gz
 
 - name: Create erigones group
   group: name=erigones state=present system=yes

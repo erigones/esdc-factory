@@ -12,7 +12,7 @@
     - python27
     - py27-virtualenv
     - git-base
-    - gcc49
+    - gcc7
     - gmake
     - autoconf
 
@@ -41,7 +41,7 @@
 - name: Build esDC compute node software (que)
   shell: /opt/erigones/bin/ctl.sh build --node
   environment:
-    PATH: "{{ ansible_env.PATH }}:/opt/local/gcc49/bin"
+    PATH: "{{ ansible_env.PATH }}:/opt/local/gcc7/bin"
 
 - name: Cleanup esDC virtualenvs
   shell: /opt/erigones/bin/ctl.sh clean_envs
