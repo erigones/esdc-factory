@@ -20,6 +20,7 @@
                 <method_credential user="root" group="bin"/>
                 <method_environment>
                         <envvar name="PATH" value="/usr/bin:/sbin:/usr/sbin:/opt/local/bin:/opt/zabbix/sbin:/usr/sfw/bin" />
+                        <envvar name="LD_LIBRARY_PATH" value="/opt/local/lib" />
                 </method_environment>
         </method_context>
      </exec_method>
