@@ -20,5 +20,6 @@
   vmadm: uuid={{ zone_uuid }} state=started
 
 - name: Disable fsync for the virtual machine
-  shell: zfs set sync=disabled "$(vmadm get {{ zone_uuid }} | json {% if zone_brand == 'kvm' %}disks.0.zfs_filesystem{% else %}zfs_filesystem{% endif %})"
+  shell: zfs set sync=disabled "$(vmadm get {{ zone_uuid }} | json {% if zone_brand == 'kvm' %}disks.0.{% endif %}zfs_filesystem)"
   when: vm_fsync_off | default(true)
+  ignore_errors: True
