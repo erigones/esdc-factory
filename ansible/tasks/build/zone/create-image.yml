@@ -1,4 +1,9 @@
 ---
+- name: Enable fsync for the virtual machine disk
+  shell: zfs set sync=standard "$(vmadm get {{ zone_uuid }} | json {% if zone_brand == 'kvm' %}disks.0.{% endif %}zfs_filesystem)"
+  when: vm_fsync_off | default(true)
+  ignore_errors: True
+
 # sm-prepare-image -y shuts the machine down
 - name: Wait for a few seconds (SmartOS)
   pause: seconds=30
