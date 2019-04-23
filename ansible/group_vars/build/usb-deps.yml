@@ -1,18 +1,18 @@
 builder_platform_url: 'http://download.erigones.org/esdc/factory/platform'
 builder_platform:
   - name: 'boot'
-    version: '20190320T103638Z'
+    version: '20190422T104439Z'
     desc: 'SmartOS grub boot loader'
     link: 'boot-latest'
   - name: 'platform'
-    version: '20190320T103638Z'
+    version: '20190422T104439Z'
     desc: 'SmartOS kernel and boot_archive'
     link: 'platform-latest'
 
 builder_archives_url: 'http://download.erigones.org/esdc/factory/archives'
 builder_archives:
   - name: 'monitoring'
-    version: '2018Q4-20190217'
+    version: '2018Q4-4.0-rc1'
     desc: '/opt/zabbix directory on hypervisor'
     link: 'monitoring-latest'
   - name: 'local'
@@ -20,7 +20,7 @@ builder_archives:
     desc: '/opt/local directory on hypervisor'
     link: 'local-latest'
   - name: 'opt-custom'
-    version: '2018Q4-20190217'
+    version: 'latest'
     desc: '/opt/custom directory on hypervisor'
     link: 'opt-custom-latest'
 

@@ -16,7 +16,5 @@ zone_zfs_data_recsize: 16384
 zone_zfs_root_compression: "{{ build_disk_compression | default('lz4') }}"
 zone_zfs_data_compression: "{{ build_disk_compression | default('lz4') }}"
 zone_customer_metadata:
-  - key: user-script
-    value: "/usr/sbin/mdata-get root_authorized_keys > /root/.ssh/authorized_keys ;"
   - key: root_authorized_keys
     value: "{{ builder_ssh_key }}"
