@@ -25,6 +25,7 @@
   roles:
     - esdc-common
     - selinux
+    - serial-getty
     - sudo
     - iptables
     - mdata-client

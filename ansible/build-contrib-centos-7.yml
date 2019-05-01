@@ -30,6 +30,7 @@
     - iptables
     - selinux
     - cloud-init
+    - serial-getty
     - mdata-client
     - rc-scripts
     - qemu-guest-agent
