@@ -24,6 +24,7 @@
     - vars/build/os/contrib-centos-7-desktop.yml
   roles:
     - selinux
+    - serial-getty
     - zabbix-agent
     - cloud-init
     - rc-scripts

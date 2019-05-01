@@ -1,0 +1,35 @@
+---
+- name: grub | enable serial console menu output
+  lineinfile:
+    state=present
+    dest=/etc/sysconfig/grub
+    regexp="^GRUB_TERMINAL_OUTPUT=.*$"
+    line='GRUB_TERMINAL_OUTPUT="serial console"'
+  when: serial_console_is_primary | default(false)
+
+- name: grub | enable serial console kernel output
+  lineinfile:
+    state=present
+    dest=/etc/sysconfig/grub
+    regexp="^GRUB_CMDLINE_LINUX=.*$"
+    line='GRUB_CMDLINE_LINUX="tsc=reliable divider=10 plymouth.enable=0 net.ifnames=0 crashkernel=auto console=ttyS0"'
+  when: serial_console_is_primary | default(false)
+
+- name: grub | set serial console params
+  lineinfile:
+    state=present
+    dest=/etc/sysconfig/grub
+    regexp="^GRUB_SERIAL_COMMAND=.*$"
+    line='GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"'
+  when: serial_console_is_primary | default(false)
+
+- name: grub | update grub2.cfg
+  shell: grub2-mkconfig -o /boot/grub2/grub.cfg && cp -f /boot/grub2/grub.cfg /etc/grub2.cfg
+  when: serial_console_is_primary | default(false)
+
+- name: enable getty on serial console
+  service: 
+    name: 'serial-getty@ttyS0'
+    state: started
+    enabled: yes
+
