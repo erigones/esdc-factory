@@ -30,6 +30,7 @@ Released on `TBA`
 - Allow parralel builds of ``hn`` and ``cn`` usb images - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
 - Fixed CPU monitoring script - `esdc-ce#375 <https://github.com/erigones/esdc-ce/issues/375>`__
 - Fixed ``ike`` service not enabled after reboot - `#124 <https://github.com/erigones/esdc-factory/pull/124>`__
+- Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
 
 
 3.0.0
