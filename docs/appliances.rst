@@ -25,6 +25,11 @@ base-64-es
 Changelog
 ---------
 
+4.0
+~~~~~
+
+- Built from new `base-64-es`_ with 2018Q4 pkgsrc - `#126 <https://github.com/erigones/esdc-factory/pull/126>`__
+
 3.0.0
 ~~~~~
 
@@ -139,6 +144,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+4.0
+~~~~~
+
+- Built from new `base-64-es`_ with 2018Q4 pkgsrc - `#126 <https://github.com/erigones/esdc-factory/pull/126>`__
+
 3.0.0
 ~~~~~
 
@@ -252,6 +262,11 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+4.0
+~~~~~
+
+- Version bump.
+
 3.0.0
 ~~~~~
 
@@ -357,6 +372,11 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 
 Changelog
 ---------
+
+4.0
+~~~~~
+
+- Built from new `base-64-es`_ with 2018Q4 pkgsrc - `#126 <https://github.com/erigones/esdc-factory/pull/126>`__
 
 3.0.0
 ~~~~~
@@ -475,6 +495,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+4.0
+~~~~~
+
+- Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
 
 3.0.0
 ~~~~~
@@ -595,6 +620,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+4.0
+~~~~~
+
+- Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
 
 3.0.0
 ~~~~~

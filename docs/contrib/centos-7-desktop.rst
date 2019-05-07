@@ -24,6 +24,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+4.0
+~~~~~
+
+- Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
+
 20170930
 ~~~~~~~~
 
