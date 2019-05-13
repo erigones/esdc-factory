@@ -162,7 +162,8 @@
         - remove loopback device
 
     - name: Copy stage files to USB image
-      synchronize: src="{{ usb_tmp_stage }}/" dest="{{ usb_tmp_mountpoint }}/" owner=no group=no perms=no times=no
+      #synchronize: src="{{ usb_tmp_stage }}/" dest="{{ usb_tmp_mountpoint }}/" owner=no group=no perms=no times=no
+      shell: /usr/bin/rsync --delay-updates --quiet --archive --no-perms --no-times --no-owner --no-group "{{ usb_tmp_stage }}/" "{{ usb_tmp_mountpoint }}/"
 
     - meta: flush_handlers  # Unmount USB image and remove loopback device
 
