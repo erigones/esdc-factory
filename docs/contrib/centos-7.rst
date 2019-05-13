@@ -8,13 +8,16 @@ The image supports following metadata:
 * **org.erigones:zabbix_ip**: ``Server`` and ``ServerActive`` parameters in zabbix_agentd.conf.
 * **org.erigones:zabbix_setup_done**: If set, the configuration of zabbix_agentd.conf will be skipped (set after first deploy).
 * **cloud-init** modules: growpart, resizefs, ssh, set-passwords.
+* **hostname**: Full hostname to be configured by `cloud-init <https://cloudinit.readthedocs.io/>`__ at first boot.
 
 Changelog
 ---------
 
-4.0
-~~~~~
+20190513
+~~~~~~~~
 
+- Version bump to CentOS 7.6 (1810).
+- Enable `vmadm console` support - `#130 <https://github.com/erigones/esdc-factory/issues/130>`__
 - Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
 
 20180207

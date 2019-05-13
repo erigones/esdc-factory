@@ -492,6 +492,7 @@ The image supports following metadata:
 * **org.erigones:cfgdb_ip**: IP address of cfgdb01.local server that will be configured in port forwarding in local HAProxy (optional, default: ``127.0.0.1``).
 * **org.erigones:erigonesd_ssl_cert**: SSL certificate to be used by internal Danube Cloud services (optional, no default).
 * **org.erigones:erigonesd_ssl_key**: SSL key to be used by internal Danube Cloud services (optional, no default).
+* **hostname**: Full hostname to be configured by `cloud-init <https://cloudinit.readthedocs.io/>`__ at first boot.
 
 Changelog
 ---------
@@ -499,6 +500,7 @@ Changelog
 4.0
 ~~~~~
 
+- Enable `vmadm console` support - `#130 <https://github.com/erigones/esdc-factory/issues/130>`__
 - Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
 
 3.0.0
@@ -615,6 +617,7 @@ The image supports following metadata:
 * **org.erigones:zabbix_admin_password**: *Admin* zabbix user password.
 * **org.erigones:zabbix_admin_email**: create *E-mail* media type with this email for user *Admin*.
 * **org.erigones:zabbix_smtp_email**: configure outgoing e-mail address in the *E-mail* media type.
+* **hostname**: Full hostname to be configured by `cloud-init <https://cloudinit.readthedocs.io/>`__ at first boot.
 
 .. note:: Zabbix is a registered trademark of `Zabbix LLC <http://www.zabbix.com>`_.
 
@@ -624,6 +627,7 @@ Changelog
 4.0
 ~~~~~
 
+- Enable `vmadm console` support - `#130 <https://github.com/erigones/esdc-factory/issues/130>`__
 - Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
 
 3.0.0
