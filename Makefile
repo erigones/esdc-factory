@@ -61,18 +61,18 @@ define HELP_TEXT
   EXTRA_VARS   override ansible variables, e.g.:
     - usb_type={hn,cn}  (default: hn)
     - release_edition={ce,ee}  (default: ce)
-    - esdc_source_repo="https://github.com/erigones/esdc-ce.git"
-    - esdc_prod_repo=""
+    - esdc_source_repo=\"https://github.com/erigones/esdc-ce.git\"
+    - esdc_prod_repo=\"\"
     - image_debug={false,true}  (default: false)
 
   EXAMPLES:
   gmake esdc-mon
-  env EXTRA_VARS="builder_platform_url='http://10.100.10.60/platform-custom'" gmake platform
-  env VERSION="v4.0-beta2" EXTRA_VARS="software_branch=master" gmake esdc-mgmt
-  env VERSION="v4.0-rc1" gmake esdc-mgmt
-  env VERSION="v4.0" gmake archive-monitoring
-  env VERSION="v4.0" EXTRA_VARS="usb_type=hn" gmake usb-image
-  env VERSION="v4.0" EXTRA_VARS="usb_type=cn" gmake usb-image
+  env EXTRA_VARS=\"builder_platform_url=\'http://10.100.10.60/platform-custom\'\" gmake platform
+  env VERSION=\"v4.0-beta2\" EXTRA_VARS=\"software_branch=master\" gmake esdc-mgmt
+  env VERSION=\"v4.0-rc1\" gmake esdc-mgmt
+  env VERSION=\"v4.0\" gmake archive-monitoring
+  env VERSION=\"v4.0\" EXTRA_VARS=\"usb_type=hn\" gmake usb-image
+  env VERSION=\"v4.0\" EXTRA_VARS=\"usb_type=cn\" gmake usb-image
 
 endef
 
