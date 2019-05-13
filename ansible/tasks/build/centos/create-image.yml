@@ -8,7 +8,7 @@
 - name: Create image {{ image_name }}
   command: chdir="/opt/{{ zone_uuid }}" imgadm create -c gzip "{{ zone_uuid }}"
            name='{{ image_name }}'
-           version='{{ image_version }}'
+           version='"{{ image_version }}"'
            tags='{{ image_tags | to_json }}'
            published_at="{{ lookup('pipe', 'date -u +\"%Y-%m-%dT%H:%M:%SZ\"') }}"
            os=linux
