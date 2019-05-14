@@ -12,11 +12,16 @@
   handlers:
     - name: unmount USB image
       shell: umount "{{ usb_tmp_mountpoint }}"
+      when: already_unmounted is not defined
       ignore_errors: yes
 
     - name: remove loopback device
       shell: lofiadm -d {{ lofiadm.stdout }}
       when: lofiadm is defined
+      ignore_errors: yes
+
+    - name: remove delegated image dataset
+      shell: zfs destroy '{{ tmp_image_ds }}'
       ignore_errors: yes
 
   pre_tasks:
@@ -145,18 +150,61 @@
     - name: Create USB image mountpoint
       file: path="{{ usb_tmp_mountpoint }}" state=directory mode=0755
 
-    - name: Prepare empty USB image
-      shell: gzip -d -c "files/usb/images/{{ usb_type }}.img.gz" > "{{ usb_tmp_image }}"
+    - name: get zonename
+      command: /usr/bin/zonename
+      register: zonename
 
-    - name: Create USB image loopback device
+    - name: set delegated dataset name
+      set_fact:
+        data_image_ds: 'zones/{{ zonename.stdout }}/data'
+
+    - name: discover delegated dataset
+      set_fact:
+        tmp_image_ds: '{{ data_image_ds }}/esdc-usb-image-{{ usb_type }}'
+      when: data_image_ds in (ansible_mounts | map(attribute='device'))
+
+    # zvol block device nodes are refreshed only after listing the root dev dir
+    # (otherwise they remain old when you destroy & re-create dataset with the same name)
+    - name: refresh zvol devices in /dev (DS mode)
+      shell: "ls '/dev/zvol/dsk/{{ data_image_ds }}' '/dev/zvol/rdsk/{{ data_image_ds }}' &> /dev/null"
+      when: tmp_image_ds is defined
+
+    - name: create temporary image dataset (DS mode)
+      shell: "zfs create -V {% if usb_type == 'hn' %}4G{% else %}2G{% endif %} -o volblocksize=4k -o sync=disabled {{ tmp_image_ds }}"
+      when: tmp_image_ds is defined
+      #ignore_errors: True      # this can be a lofs fallback implementation in the future (but it's probably not needed)
+      #register: zfs_create
+      notify:
+        - unmount USB image
+        - remove delegated image dataset
+
+    - name: Prepare empty USB image (DS mode)
+      shell: gzip -d -c "files/usb/images/{{ usb_type }}.img.gz" | gdd of='/dev/zvol/rdsk/{{ tmp_image_ds }}' bs=8M conv=sparse oflag=dsync
+      when: tmp_image_ds is defined
+      #when: tmp_image_ds is defined and zfs_create is not failed   # example of lofs fallback
+
+    - name: Mount USB image device (DS mode)
+      shell: mount -F pcfs -o noclamptime,noatime '/dev/zvol/dsk/{{ tmp_image_ds }}:c' "{{ usb_tmp_mountpoint }}"
+      when: tmp_image_ds is defined
+      notify:
+        - unmount USB image
+        - remove delegated image dataset
+
+    - name: Prepare empty USB image (lofs mode)
+      shell: gzip -d -c "files/usb/images/{{ usb_type }}.img.gz" > "{{ usb_tmp_image }}"
+      when: tmp_image_ds is not defined
+
+    - name: Create USB image loopback device (lofs mode)
       shell: lofiadm -a "{{ usb_tmp_image }}"
+      when: tmp_image_ds is not defined
       register: lofiadm
       notify:
         - unmount USB image
         - remove loopback device
 
-    - name: Mount USB image loopback device
+    - name: Mount USB image loopback device (lofs mode)
       shell: mount -F pcfs -o noclamptime,noatime {{ lofiadm.stdout }}:c "{{ usb_tmp_mountpoint }}"
+      when: tmp_image_ds is not defined
       notify:
         - unmount USB image
         - remove loopback device
@@ -165,10 +213,19 @@
       #synchronize: src="{{ usb_tmp_stage }}/" dest="{{ usb_tmp_mountpoint }}/" owner=no group=no perms=no times=no
       shell: /usr/bin/rsync --delay-updates --quiet --archive --no-perms --no-times --no-owner --no-group "{{ usb_tmp_stage }}/" "{{ usb_tmp_mountpoint }}/"
 
-    - meta: flush_handlers  # Unmount USB image and remove loopback device
+    - name: unmount USB image
+      shell: umount '{{ usb_tmp_mountpoint }}'
+      register: already_unmounted
 
-    - name: Save USB image to output directory
+    - name: Save USB image to output directory (DS mode)
+      shell: gdd "bs={% if usb_type == 'hn' %}4000000{% else %}2000000{% endif %}" count=1000 'if=/dev/zvol/rdsk/{{ tmp_image_ds }}' | gzip -9 -c > "{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}"
+      when: tmp_image_ds is defined
+
+    - meta: flush_handlers  # Unmount USB image and remove loopback device (or remove dataset)
+
+    - name: Save USB image to output directory (lofi mode)
       shell: gzip -9 -c "{{ usb_tmp_image }}" > "{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}"
+      when: tmp_image_ds is not defined
 
     - name: Stat USB image file
       stat: path="{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}" checksum_algorithm="sha1"
