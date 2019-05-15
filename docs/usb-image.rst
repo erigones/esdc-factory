@@ -21,7 +21,7 @@ Changelog
 
 4.0
 =====
-Released on `TBA`
+Released on 2019-05-14
 
 - Updated to a new platform version - `<TBD>` from upstream/release-`<TBD>`
 - Updated pkgsrc version to 2018Q4 - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
