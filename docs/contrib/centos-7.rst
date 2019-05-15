@@ -13,7 +13,7 @@ The image supports following metadata:
 Changelog
 ---------
 
-20190513
+20190515
 ~~~~~~~~
 
 - Version bump to CentOS 7.6 (1810).
