@@ -1,0 +1,36 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+# create a generic VM from contrib-centos-7
+# that can be used to build k3os artifacts
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/generic-centos-7.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/centos/register-host.yml
+        hostname=generic-centos-7
+
+- name: Build k3os artifacts
+  hosts: generic-centos-7
+  gather_facts: false
+  vars_files:
+    - vars/build/os/k3os-artifacts.yml
+  tasks:
+    - include: tasks/build/k3os/install-docker-ce.yml
+    - include: tasks/build/k3os/build-k3os-artifacts.yml
+
+- name: Cleanup virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/generic-centos-7.yml
+  tasks:
+    - include: tasks/build/cleanup.yml

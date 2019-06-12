@@ -16,8 +16,16 @@
   with_items:
     - /tmp/{{ zone_uuid }}.json
 
+- name: Inject raw qemu args
+  template:
+    src: startvm.zone.j2
+    dest: '/{{ zone_zpool | default("zones") }}/{{ zone_uuid }}/root/startvm.zone'
+    mode: 0755
+  when: qemu_raw_args is defined
+
 - name: Ensure that virtual machine is running
   vmadm: uuid={{ zone_uuid }} state=started
+  when: not (dont_start_vm | default(false))
 
 - name: Disable fsync for the virtual machine disk
   shell: zfs set sync=disabled "$(vmadm get {{ zone_uuid }} | json {% if zone_brand == 'kvm' %}disks.0.{% endif %}zfs_filesystem)"

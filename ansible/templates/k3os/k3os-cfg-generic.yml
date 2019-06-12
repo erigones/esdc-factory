@@ -1,0 +1,4 @@
+k3os:
+  data_sources:
+  modules:
+  - kvm

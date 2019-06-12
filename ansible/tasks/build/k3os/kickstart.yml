@@ -1,0 +1,26 @@
+---
+- name: Ensure {{ builder_download_dir }} directory exists
+  file: path="{{ builder_download_dir }}" state=directory
+  delegate_to: builder
+
+- name: Copy k3os kickstart file to download directory
+  template: src="{{ k3os_config }}"
+            dest="{{ builder_download_dir }}/k3os.yml"
+            mode=0644
+  delegate_to: builder
+
+- name: Download kernel and initrd
+  get_url: url="{{ k3os_artifacts_http_dir }}/{{ item }}"
+           dest='/{{ zone_zpool | default("zones") }}/{{ zone_uuid }}/root/{{ item }}'
+           #sha256sum="{{ item.sha256sum }}"
+  with_items: "{{ extra_files_to_zoneroot }}"
+
+- name: Ensure VM is running
+  vmadm: name="{{ zone_uuid }}" state=started
+
+- name: Wait until VM is installed
+  command: vmadm list -Hpo state uuid="{{ zone_uuid }}"
+  register: result
+  until: result.stdout.find("stopped") != -1
+  retries: 50
+  delay: 5

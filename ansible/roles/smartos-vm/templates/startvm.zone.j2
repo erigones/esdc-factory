@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+exec /smartdc/bin/qemu-exec /smartdc/bin/qemu-system-x86_64 "${@}" {{ qemu_raw_args }}

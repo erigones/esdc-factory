@@ -1,0 +1,17 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine and image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-kube-k3os.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/k3os/kickstart.yml
+    - include: tasks/build/centos/create-image.yml

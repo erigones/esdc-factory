@@ -1,0 +1,22 @@
+---
+- name: Clone k3os repo
+  git:
+    repo: "{{ k3os_repo }}"
+    dest: "{{ k3os_dir }}"
+    force: yes
+    version: "{{ k3os_branch }}"
+
+- name: Build k3os
+  shell: cd "{{ k3os_local_dir }}" && make
+
+- name: Prepare local directory
+  file:
+    path: "{{ k3os_artifacts_local_dir }}"
+    state: directory
+  delegate_to: builder
+
+- name: Download artifacts
+  fetch:
+    src: "{{ k3os_artifacts_dir }}/{{ item }}"
+    dest: "{{ k3os_artifacts_local_dir }}/{{ item }}"
+  with_items: "{{ k3os_artifacts }}"

@@ -1,0 +1,22 @@
+# Dependencies: base.yml, zone.yml
+image_name: generic-centos-7
+image_desc: "Generic CentOS 7 for build purposes"
+image_homepage: "{{ image_contrib_homepage }}/centos-7.rst"
+remove_base_image: true
+#builder_dir: "{{ builder.appliance.dir }}/contrib-generic-centos-7"
+builder_base_centos_imgmanifest: centos-7-latest.imgmanifest
+builder_base_centos_imgfile: centos-7-latest.zfs.gz
+builder_base_centos_imgmanifest_url: "{{ builder.appliance.url }}/contrib-centos-7/{{ builder_base_centos_imgmanifest }}"
+builder_base_centos_imgfile_url: "{{ builder.appliance.url }}/contrib-centos-7/{{ builder_base_centos_imgfile }}"
+base_centos_imgmanifest: "{{ lookup('pipe', 'curl -s {{ builder_base_centos_imgmanifest_url }}') | from_json }}"
+zone_brand: kvm
+zone_vnc_port: "{{ build_vnc_ports.contrib_centos7 | default(build_vnc_port) | mandatory }}"
+zone_uuid: a3be4242-c334-67b8-9456-c93231ab1bd1
+zone_hostname: "{{ image_name }}"
+zone_disks:
+  - boot: true
+    compression: "{{ build_disk_compression | default('lz4') }}"
+    image_size: "{{ base_centos_imgmanifest.image_size }}"
+    image_uuid: "{{ base_centos_imgmanifest.uuid }}"
+    size: 20480
+zone_nic_0_ip: "{{ build_ips.generic_centos7 | default(build_ip) }}"

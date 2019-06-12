@@ -1,0 +1,30 @@
+image_name: kubernetes-k3os
+image_desc: "Kubernetes Rancher K3OS system"
+k3os_branch: "dc-v2.2.1"
+image_version: "2.2.1-0"
+image_homepage: "{{ image_contrib_homepage }}/kubernetes-k3os.rst"
+remove_base_image: false
+builder_dir: "{{ builder.appliance.dir }}/kubernetes-k3os"
+builder_download_dir: "{{ builder_dir }}/_build"
+builder_download_url: "{{ builder.appliance.url }}/kubernetes-k3os/_build"
+zone_brand: kvm
+zone_vnc_port: "{{ build_vnc_ports.contrib_centos7 | default(build_vnc_port) | mandatory }}"
+zone_uuid: 7c0bac5a-1624-6c9f-bb28-80d43876557f
+zone_hostname: "{{ image_name }}"
+zone_memory: 1536
+image_size: 5120
+zone_disks:
+  - boot: true
+    compression: "{{ build_disk_compression | default('lz4') }}"
+    size: "{{ image_size }}"
+    refreservation: "{{ image_size }}"
+zone_nic_0_ip: "{{ build_ips.kube_k3os | default(build_ip) }}"
+zone_autoboot: false
+dont_start_vm: true
+k3os_artifacts_local_dir: "{{ builder_base_dir }}/kube/k3os-artifacts/{{ k3os_branch }}"
+k3os_artifacts_http_dir: "{{ builder_base_url }}/kube/k3os-artifacts/{{ k3os_branch }}"
+k3os_config: "templates/k3os/k3os-cfg-generic.yml"
+qemu_raw_args: '-kernel /k3os-vmlinuz-amd64 -initrd /k3os-initrd-amd64 -append "k3os.mode=install k3os.fallback_mode=install k3os.install.silent=true k3os.install.device=/dev/vda k3os.install.no_format=false k3os.install.config_url={{ builder_download_url }}/k3os.yml k3os.install.iso_url={{ k3os_artifacts_http_dir }}/k3os-amd64.iso"'
+extra_files_to_zoneroot:
+    - k3os-vmlinuz-amd64
+    - k3os-initrd-amd64

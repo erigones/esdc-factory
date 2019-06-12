@@ -11,7 +11,9 @@ BUILD_TARGETS =	base-centos-6 \
 				contrib-centos-7 \
 				contrib-gitlab-ce \
 				contrib-centos-7-desktop \
-				network-access-zone
+				network-access-zone \
+				contrib-kube-k3os-platform \
+				contrib-kube-k3os
 
 define newline
 
@@ -73,6 +75,7 @@ define HELP_TEXT
   env VERSION=\"v4.0\" gmake archive-monitoring
   env VERSION=\"v4.0\" EXTRA_VARS=\"usb_type=hn\" gmake usb-image
   env VERSION=\"v4.0\" EXTRA_VARS=\"usb_type=cn\" gmake usb-image
+  env EXTRA_VARS="skip_check=true" gmake contrib-kube-k3os
 
 endef
 
