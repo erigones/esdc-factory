@@ -2,7 +2,7 @@
 image_name: generic-centos-7
 image_desc: "Generic CentOS 7 for build purposes"
 image_homepage: "{{ image_contrib_homepage }}/centos-7.rst"
-remove_base_image: true
+remove_base_image: false
 #builder_dir: "{{ builder.appliance.dir }}/contrib-generic-centos-7"
 builder_base_centos_imgmanifest: centos-7-latest.imgmanifest
 builder_base_centos_imgfile: centos-7-latest.zfs.gz
@@ -18,5 +18,8 @@ zone_disks:
     compression: "{{ build_disk_compression | default('lz4') }}"
     image_size: "{{ base_centos_imgmanifest.image_size }}"
     image_uuid: "{{ base_centos_imgmanifest.uuid }}"
+  - boot: false
     size: 20480
+    refreservation: 20480
+    compression: "lz4"
 zone_nic_0_ip: "{{ build_ips.generic_centos7 | default(build_ip) }}"

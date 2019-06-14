@@ -7,16 +7,19 @@
     version: "{{ k3os_branch }}"
 
 - name: Build k3os
-  shell: cd "{{ k3os_local_dir }}" && make
+  shell: cd "{{ k3os_dir }}" && make
 
 - name: Prepare local directory
-  file:
+  local_action: file
+  args:
     path: "{{ k3os_artifacts_local_dir }}"
     state: directory
-  delegate_to: builder
 
 - name: Download artifacts
   fetch:
     src: "{{ k3os_artifacts_dir }}/{{ item }}"
-    dest: "{{ k3os_artifacts_local_dir }}/{{ item }}"
+    dest: "{{ k3os_artifacts_local_dir }}/"
+    flat: yes
   with_items: "{{ k3os_artifacts }}"
+  vars:
+    ansible_ssh_pipelining: no

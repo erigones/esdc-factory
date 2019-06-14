@@ -1,0 +1,12 @@
+
+- name: Format /dev/vdb
+  shell: mkfs.ext4 /dev/vdb
+
+- name: Create /data
+  file:
+    path: /data
+    state: directory
+
+- name: Mount /data
+  shell: mount /dev/vdb /data
+

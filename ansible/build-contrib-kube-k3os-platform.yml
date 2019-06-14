@@ -25,6 +25,7 @@
   vars_files:
     - vars/build/os/k3os-artifacts.yml
   tasks:
+    - include: tasks/build/k3os/format-data-disk.yml
     - include: tasks/build/k3os/install-docker-ce.yml
     - include: tasks/build/k3os/build-k3os-artifacts.yml
 

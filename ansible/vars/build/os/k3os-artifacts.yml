@@ -1,9 +1,8 @@
 k3os_repo: "https://github.com/YanChii/k3os.git"
 k3os_branch: "dc-v2.2.1"
-k3os_dir: /root/k3os
+k3os_dir: /data/k3os
 k3os_artifacts_dir: "{{ k3os_dir }}/dist/artifacts"
 k3os_artifacts_local_dir: "{{ builder_base_dir }}/kube/k3os-artifacts/{{ k3os_branch }}"
-k3os_local_dir: /root/k3os
 k3os_artifacts:
   - k3os-amd64.iso
   - k3os-vmlinuz-amd64

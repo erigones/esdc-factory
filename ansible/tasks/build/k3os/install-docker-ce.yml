@@ -22,6 +22,18 @@
     - docker-ce-cli
     - containerd.io
 
+- name: Prepare new docker data dir
+  file:
+    path: /data/docker
+    state: directory
+
+- name: Relocate docker data dir
+  file:
+    src: /data/docker
+    dest: /var/lib/docker
+    force: yes
+    state: link
+
 - name: Start Docker service
   service:
     name: docker
