@@ -1274,7 +1274,7 @@ setup_datasets()
 
 		printf "%-56s" "Creating initial boot environment ${ROOTBE}... "
 		zfs create -o mountpoint=legacy "${SYS_ZPOOL}/${ROOTDS}"
-		platform_version=$(uname -v | sed -e 's|\(.*\)_\(.*\)|\2|')
+		#platform_version=$(uname -v | sed -e 's|\(.*\)_\(.*\)|\2|')
 		zfs create -o mountpoint=/ "${ROOTBE}"
 		printf "%4s\n" "done"
 
@@ -1300,7 +1300,7 @@ setup_datasets()
 		printf "%4s\n" "done"
 
 		printf "%-56s" "Transferring platform image... "
-		/usr/bin/rsync -aq ${USBMNT}/os/${platform_version}/platform/i86pc/amd64 ${TMPROOT}/platform/i86pc || \
+		/usr/bin/rsync -aq ${USBMNT}/platform/i86pc/amd64 ${TMPROOT}/platform/i86pc || \
 			fatal "Failed to transfer platform image"
 		printf "%4s\n" "done"
 
@@ -1424,7 +1424,6 @@ setup_datasets()
 		printf "%4s\n" "done"
 
 		# Create placeholder directory
-		mkdir -p "${TMPROOT}/${SYS_ZPOOL}/boot/grub"
 		printf "%-56s" "Activating boot environment ${DEFBE}... "
 		/usr/sbin/beadm activate -v "${DEFBE}" >&4 2>&4 || fatal "Failed to activate"
 		printf "%4s\n" "done"
