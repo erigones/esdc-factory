@@ -1092,7 +1092,12 @@ promptpool()
 				bootdisk = 0;
 				cmd = "fstyp -v /dev/dsk/" $2 "p1 2>/dev/null";
 				while ((cmd | getline) > 0) {
-					if ($0 ~ /^Volume Label:/ && $3 == "SMARTOSBOOT")
+					if ($0 ~ /^Volume Label:/ && $3 == "ESDC")
+						bootdisk = 1;
+				}
+				cmd = "fstyp -v /dev/dsk/" $2 "s2 2>/dev/null";
+				while ((cmd | getline) > 0) {
+					if ($0 ~ /^Volume Label:/ && $3 == "DANUBECLOUD")
 						bootdisk = 1;
 				}
 				close(cmd);
@@ -1202,7 +1207,7 @@ EOF
 				echo "appropriate layout (2-way mirror or single disk) manually with alternate root"
 				echo "directory \"/.a\" and default dataset mount point \"/zones\" like:"
 				echo
-				echo "  zpool create -R /.a zones mirror c0t0d0 c1t0d0"
+				echo "  zpool create -BR /.a zones mirror c0t0d0 c1t0d0"
 				echo
 			else
 				echo "If the layout suggested does not conform, please create zpool \"zones\" with"
@@ -1428,10 +1433,39 @@ setup_datasets()
 		/usr/sbin/beadm activate -v "${DEFBE}" >&4 2>&4 || fatal "Failed to activate"
 		printf "%4s\n" "done"
 
-		echo 'boot-args="-B smartos=true,computenode=true"' >> ${TMPROOT}/boot/loader.conf
+		cp "${USBMNT}/boot/loader.conf" "${TMPROOT}/boot/loader.conf"
 		echo "7.0" > ${TMPROOT}/.smartdc_version
 	fi
 }
+
+get_zpool_disks()
+{
+	layout="$1"
+	pool="${2:-"zones"}"
+	disks=
+
+	if [[ -f "${layout}" ]]; then
+		disks="$(json -f "${layout}" vdevs | awk -F'"' '/"name":/ {print $4}')"
+	fi
+	if [[ -z "${disks}" ]] || [[ "${layout}" == manual ]]; then
+		# fallback method of getting disk list - iterate over disks 
+		# and check the partition size that equals to EFI partition size
+		# (it must be the first partition on disk and have exactly 256MB)
+		disks="$(zpool status zones | nawk '/^[\t ]*c[0-9]/ {
+			disk = $1;
+			cmd = "prtvtoc /dev/dsk/" disk " 2> /dev/null";
+			while ((cmd | getline) > 0) {
+				if ($1 == "0" && $5 == "524288") {
+					print disk;
+				}
+			}
+			close(cmd);
+		}')"
+	fi
+
+	print "${disks}"
+}
+
 
 create_zpool()
 {
@@ -1448,7 +1482,8 @@ create_zpool()
 	printf "%-56s" "Creating pool $pool... "
 
 	if [[ "${install_to_hdd}" -eq 1 ]]; then
-		rpoolarg="-R ${TMPROOT}"
+		# -B creates EFI partition of size 256MB on each disk
+		rpoolarg="-BR ${TMPROOT}"
 	else
 		rpoolarg=""
 	fi
@@ -1462,6 +1497,58 @@ create_zpool()
 	    fatal "failed to set atime=off for pool ${pool}"
 
 	printf "%4s\n" "done"
+
+	if [[ "${install_to_hdd}" -ne 1 ]]; then
+		return
+	fi
+
+	# see if we have zpool with EFI partitions
+	EFI_SIZE="$(/usr/sbin/zpool get -Hpo value bootsize "${pool}")"
+	if [[ "${EFI_SIZE}" -eq 268435456 ]]; then
+		# we have some disks with EFI partitions to initialize;
+		# the EFI partition size is correct, we can proceed to write
+		#
+		# Our conditions for identifying the EFI partition are:
+		# 1. the disk is part of the zpool
+		# 2. the first partition exists and has exactly 256MB (ZFS default)
+		#
+		# The check 2 is there to filter out slog and cache devices
+		# (because fallback algorithm in get_zpool_disks includes
+		# also those).
+
+		# first get a EFI partition dev of an USB key (it is the first partition - ...s0)
+		usbdev="$(awk '{if($2 == "/mnt/usbkey") { gsub(/s2$/, "s0", $1); print $1 } }' /etc/mnttab)"
+		if [[ -z "${usbdev}" ]]; then
+			echo "Warning: could not detect USB key device. Not writing EFI partitions."
+			return
+		fi
+
+		efidisks="$(get_zpool_disks "${layout}" "${pool}")"
+		if [[ -n "${efidisks}" ]]; then
+			printf "%-56s" "Creating EFI boot partitions on $(echo "${efidisks}" | wc -l) disk(s)... "
+			# duplicate the partiton over all EFI-enabled disks
+
+			while read -r diskdev; do
+				dd bs=1M "if=${usbdev}" "of=/dev/rdsk/${diskdev}s0" &> /dev/null
+				if [[ "$?" -ne 0 ]]; then
+					printf "%4s\n" "error"
+					echo "Error during writing EFI partition on disk ${diskdev}s0!"
+					return
+				fi
+			done <<< "${efidisks}"
+
+			printf "%4s\n" "done"
+		else
+			echo "Warning: no disks found to install EFI partition."
+		fi
+
+	elif [[ "${EFI_SIZE}" == "-" ]]; then
+		echo "WARNING: ${pool} pool was created without -B option, UEFI boot is not possible."
+
+	else
+		echo "WARNING: ${pool} pool was created with EFI partition size other than 256M."
+		echo "If you want to boot using UEFI, you need to format the EFI partition(s) manually."
+	fi
 }
 
 create_zpools()
@@ -2326,6 +2413,9 @@ fi
 echo  >>$tmp_config
 # END: Danube Cloud settings
 printf "%4s\n" "done"
+
+echo "smt_enabled=true" >>$tmp_config
+echo >>$tmp_config
 
 create_zpools "$DISK_LAYOUT"
 
