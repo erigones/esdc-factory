@@ -67,7 +67,7 @@ define HELP_TEXT
 
   EXAMPLES:
   gmake esdc-mon
-  env EXTRA_VARS=\"builder_platform_url=\'http://10.100.10.60/platform-custom\'\" gmake platform
+  env EXTRA_VARS=\"builder_platform_url=\'http://smartos-builder/output\'\" gmake platform
   env VERSION=\"v4.0-beta2\" EXTRA_VARS=\"software_branch=master\" gmake esdc-mgmt
   env VERSION=\"v4.0-rc1\" gmake esdc-mgmt
   env VERSION=\"v4.0\" gmake archive-monitoring
