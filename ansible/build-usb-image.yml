@@ -9,6 +9,13 @@
   hosts: builder
   gather_facts: true  # Because of ansible_distribution check below
 
+  vars:
+    usb_image_size_gb: "{% if usb_type == 'hn' %}4{% else %}2{% endif %}"
+    # name for temporary root fs that we will populate
+    usb_tmp_image_root: "{{ usb_tmp_image }}.rootfs"
+    # https://github.com/joyent/smartos-live/blob/release-20190912/tools/build_boot_image#L290
+    usb_img_bs: 1048576     # (1024 * 1024) = MB
+
   handlers:
     - name: unmount USB image
       shell: umount "{{ usb_tmp_mountpoint }}"
@@ -78,27 +85,18 @@
     - name: Extract platform boot archive
       unarchive: src="{{ platform_boot_archive }}" dest="{{ usb_tmp_stage }}"
 
-    - name: Copy GRUB files
-      copy: src="files/usb/boot/splash.xpm.gz" dest="{{ usb_tmp_stage }}/boot/"
-
-    - name: Create GRUB menu.lst
-      template: src="templates/usb/boot/menu.lst.j2" dest="{{ usb_tmp_stage }}/boot/grub/menu.lst" mode=0444
+    - name: Create boot loader.conf
+      template: src="templates/usb/boot/loader.conf.j2" dest="{{ usb_tmp_stage }}/boot/loader.conf" mode=0644
 
     - name: Extract platform OS archive
       unarchive: src="{{ platform_os_archive }}" dest="{{ usb_tmp_stage }}"
 
-    - name: Create os/{{ platform_version }} folder
-      file: path="{{ usb_tmp_stage }}/os/{{ platform_version }}" state=directory mode=0755
-
-    - name: Move platform folder
-      shell: chdir="{{ usb_tmp_stage }}" mv "platform-{{ platform_version }}" "os/{{ platform_version }}/platform"
+    - name: Rename platform folder
+      shell: chdir="{{ usb_tmp_stage }}" mv "platform-{{ platform_version }}" "platform"
 
     - name: Get platform password
       set_fact: 
-        platform_password: "{{ lookup('file', '{{ usb_tmp_stage }}/os/{{ platform_version }}/platform/root.password') }}"
-
-    - name: Move platform password file
-      shell: chdir="{{ usb_tmp_stage }}" mv "os/{{ platform_version }}/platform/root.password" "private/root.password.{{ platform_version }}"
+        platform_password: "{{ lookup('file', '{{ usb_tmp_stage }}/platform/root.password') }}"
 
     - name: Install prompt-config.sh script
       template: src="templates/usb/scripts/prompt-config.sh.j2" dest="{{ usb_tmp_stage }}/scripts/prompt-config.sh" mode=0755
@@ -150,18 +148,30 @@
     - name: Create USB image mountpoint
       file: path="{{ usb_tmp_mountpoint }}" state=directory mode=0755
 
-    - name: get zonename
+    - name: Prepare empty USB image
+      shell: xz -d -c "files/usb/images/{{ usb_image_size_gb }}gb.img.xz" > "{{ usb_tmp_image }}"
+
+    - name: Get USB root partition size
+      shell: awk '/^root / {print $4}' "files/usb/images/{{ usb_image_size_gb }}gb.partition.map"
+      register: usb_root_size   # in bytes
+
+    - name: Get USB root partition offset
+      shell: awk '/^root / {print $3}' "files/usb/images/{{ usb_image_size_gb }}gb.partition.map"
+      register: usb_root_offset   # in bytes
+
+    - name: get zonename of this SunOS zone
       command: /usr/bin/zonename
       register: zonename
 
-    - name: set delegated dataset name
+    - name: set expected delegated dataset name of this SunOS zone
       set_fact:
         data_image_ds: 'zones/{{ zonename.stdout }}/data'
 
-    - name: discover delegated dataset
-      set_fact:
-        tmp_image_ds: '{{ data_image_ds }}/esdc-usb-image-{{ usb_type }}'
-      when: data_image_ds in (ansible_mounts | map(attribute='device'))
+    # DS mode currently does not work with GPT partitions
+    #- name: set work dataset name (if delegated DS exists)
+    #  set_fact:
+    #    tmp_image_ds: '{{ data_image_ds }}/esdc-usb-image-{{ usb_type }}'
+    #  when: data_image_ds in (ansible_mounts | map(attribute='device'))
 
     # zvol block device nodes are refreshed only after listing the root dev dir
     # (otherwise they remain old when you destroy & re-create dataset with the same name)
@@ -169,8 +179,8 @@
       shell: "ls '/dev/zvol/dsk/{{ data_image_ds }}' '/dev/zvol/rdsk/{{ data_image_ds }}' &> /dev/null"
       when: tmp_image_ds is defined
 
-    - name: create temporary image dataset (DS mode)
-      shell: "zfs create -V {% if usb_type == 'hn' %}4G{% else %}2G{% endif %} -o volblocksize=4k -o sync=disabled {{ tmp_image_ds }}"
+    - name: create temporary dataset for root fs (DS mode)
+      shell: "zfs create -V {{ usb_root_size.stdout }} -o volblocksize=4k -o sync=disabled {{ tmp_image_ds }}"
       when: tmp_image_ds is defined
       #ignore_errors: True      # this can be a lofs fallback implementation in the future (but it's probably not needed)
       #register: zfs_create
@@ -178,32 +188,40 @@
         - unmount USB image
         - remove delegated image dataset
 
-    - name: Prepare empty USB image (DS mode)
-      shell: gzip -d -c "files/usb/images/{{ usb_type }}.img.gz" | gdd of='/dev/zvol/rdsk/{{ tmp_image_ds }}' bs=8M conv=sparse oflag=dsync
+    - name: Format USB root fs (DS mode)
+      shell: gdd bs={{ usb_img_bs }} conv=notrunc conv=sparse oflag=dsync skip=$((usb_root_offset.stdout / {{ usb_img_bs }})) count=$((usb_root_size.stdout / {{ usb_img_bs }})) "if={{ usb_tmp_image }}" "of={{ usb_tmp_image_root }}"
       when: tmp_image_ds is defined
       #when: tmp_image_ds is defined and zfs_create is not failed   # example of lofs fallback
 
     - name: Mount USB image device (DS mode)
-      shell: mount -F pcfs -o noclamptime,noatime '/dev/zvol/dsk/{{ tmp_image_ds }}:c' "{{ usb_tmp_mountpoint }}"
+      shell: mount -F pcfs -o noclamptime,foldcase,noatime '/dev/zvol/dsk/{{ tmp_image_ds }}:c' "{{ usb_tmp_mountpoint }}"
       when: tmp_image_ds is defined
       notify:
         - unmount USB image
         - remove delegated image dataset
 
-    - name: Prepare empty USB image (lofs mode)
-      shell: gzip -d -c "files/usb/images/{{ usb_type }}.img.gz" > "{{ usb_tmp_image }}"
+    - name: Prepare empty root fs (lofs mode)
+      shell: mkfile "{{ usb_root_size.stdout }}" "{{ usb_tmp_image_root }}"
       when: tmp_image_ds is not defined
+      #notify:  # not needed, doing as a task later
+      #  - remove temp root fs image
 
-    - name: Create USB image loopback device (lofs mode)
-      shell: lofiadm -a "{{ usb_tmp_image }}"
+    - name: Create root fs loopback device (lofs mode)
+      shell: lofiadm -a "{{ usb_tmp_image_root }}"
       when: tmp_image_ds is not defined
       register: lofiadm
       notify:
         - unmount USB image
         - remove loopback device
 
+    # mkfs works with 512b blocks
+    # see https://github.com/joyent/smartos-live/blob/release-20190912/tools/build_boot_image#L272
+    - name: Format root fs (lofs mode)
+      shell: mkfs -F pcfs -o "b=DANUBECLOUD,size={{ (usb_root_size.stdout|int / 512)|int }},nofdisk,fat=32" "{{ lofiadm.stdout | replace('/lofi/', '/rlofi/') }}"
+      when: tmp_image_ds is not defined
+
     - name: Mount USB image loopback device (lofs mode)
-      shell: mount -F pcfs -o noclamptime,noatime {{ lofiadm.stdout }}:c "{{ usb_tmp_mountpoint }}"
+      shell: mount -F pcfs -o noclamptime,foldcase,noatime "{{ lofiadm.stdout }}" "{{ usb_tmp_mountpoint }}"
       when: tmp_image_ds is not defined
       notify:
         - unmount USB image
@@ -223,7 +241,19 @@
 
     - meta: flush_handlers  # Unmount USB image and remove loopback device (or remove dataset)
 
-    - name: Save USB image to output directory (lofi mode)
+    # https://github.com/joyent/smartos-live/blob/release-20190912/tools/build_boot_image#L293
+    - name: Integrate root fs into USB image (lofs mode)
+      shell: "gdd bs={{ usb_img_bs }} conv=notrunc conv=sparse oflag=dsync seek={{ (usb_root_offset.stdout|int / usb_img_bs)|int }} count={{ (usb_root_size.stdout|int / usb_img_bs)|int }} if={{ usb_tmp_image_root }} of={{ usb_tmp_image }}"
+      when: tmp_image_ds is not defined
+      register: dd_root2usb
+      # check if exactly usb_root_size bytes were transfered (we can do it because all is alligned to usb_img_bs)
+      failed_when: not "{{ usb_root_size.stdout }} bytes " in dd_root2usb.stderr
+
+    - name: Remove temp root fs image (lofs mode)
+      shell: rm -f "{{ usb_tmp_image_root }}"
+      when: tmp_image_ds is not defined
+
+    - name: Save USB image to output directory (lofs mode)
       shell: gzip -9 -c "{{ usb_tmp_image }}" > "{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}"
       when: tmp_image_ds is not defined
 

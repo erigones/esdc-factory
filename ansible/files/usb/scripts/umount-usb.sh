@@ -10,7 +10,7 @@ else
 	. "${ESLIB}/usb-key.sh"
 fi
 
-usbmnt="$(mount_usb_key)"
+unmount_usb_key
 
-echo "USB key mounted at ${usbmnt}"
+[ $? -eq 0 ] && echo "USB key unmounted"
 

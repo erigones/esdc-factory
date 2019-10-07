@@ -1,7 +1,18 @@
 Bootable USB image
 ##################
 
+HOW TO CREATE BLANK USB IMAGE WITH BSD LOADER AND HYBRID UEFI/MBR BOOT:
+.. code-block:: bash
+    SMARTOS_REPO=/data/compile/smartos-live
+    cd $SMARTOS_REPO
+    gmake live
+    tools/build_boot_image -p 4gb -r .
+    cd proto.images
+    xz 4gb.img
+    # copy 4gb.img.xz and 4gb.partition.map to esdc-factory into ansible/files/usb/images
 
+
+LEGACY USB CREATION WITH GRUB AND MBR BOOT, do not use for new images:
 .. code-block:: bash
     mkdir -p /tmp/usb
     mkfile -n 2000000000 /tmp/usb.img
