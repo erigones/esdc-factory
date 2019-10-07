@@ -259,7 +259,7 @@ function pull_cfgdb_data() {
 	printf_log "%4s\n" "done"
 	printf_log "\r%-64s" "Registering compute node into cfgdb... "
 
-	_zk_noerror rmr --force "/esdc/nodes/hosts/${SYSINFO_UUID}"
+	_zk_noerror --force rmr "/esdc/nodes/hosts/${SYSINFO_UUID}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}" "${SYSINFO_Hostname}"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/headnode" "false"
 	_zk creater "/esdc/nodes/hosts/${SYSINFO_UUID}/hostname" "${SYSINFO_Hostname}"
