@@ -7,7 +7,9 @@ pg_packages:
   - "postgresql{{ pg_version_nodot }}-libs"
   - "postgresql{{ pg_version_nodot }}-server"
   - "postgresql{{ pg_version_nodot }}-contrib"
-  - "python-psycopg2"
+  #- "python-psycopg2"  (revert after migration to python3)
+  # compiled for pg95:
+  - "https://download.erigones.org/rpm/python-psycopg2-dc-2.7.5-1.el7.x86_64.rpm"
 
 pg_datadir: "/var/lib/pgsql/{{ pg_version }}/data/"
 pg_backupdir: "/var/lib/pgsql/{{ pg_version }}/backups"

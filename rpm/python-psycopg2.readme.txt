@@ -1,0 +1,1 @@
+This version is a replacement for python-psycopg2 in pgdg repo to prevent upgrading because the newer version doesn't play well with python2. After migration to python3, it can be reverted back to the upstream version.
