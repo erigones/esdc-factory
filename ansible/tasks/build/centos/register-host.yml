@@ -7,6 +7,7 @@
             ansible_ssh_pass="{{ image_pass }}"
             ansible_connection="ssh"
             ansible_host_key_checking=false
+            ansible_python_interpreter="/usr/bin/python3"
   delegate_to: builder
 - name: Wait for build VM to be reachable via SSH
   wait_for: host="{{ zone_nics[0].ip }}"

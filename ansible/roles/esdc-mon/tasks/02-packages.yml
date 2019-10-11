@@ -4,6 +4,8 @@
   with_items:
     - python-requests
     - python-pip
+    - python36-requests
+    - python36-pip
 
 - name: Install zabbix-api-erigones (zabbix_template module)
   shell: pip install -U zabbix-api-erigones

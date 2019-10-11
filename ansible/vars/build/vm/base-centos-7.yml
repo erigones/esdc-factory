@@ -8,9 +8,9 @@ builder_download_url: "{{ builder.appliance.url }}/base-centos-7/_build"
 centos_mirror: "{{ builder_centos_mirror }}/7/os/x86_64/images/pxeboot"
 centos_files:
   - file: vmlinuz
-    sha256sum: 225fd77bec0f02dd6abba7ad39332ffededb7778d8b01ba3bb921027b468eef8
+    sha256sum: 156ddeaccea0ee51eb9af42b2551f393f84d6adaf7d257fa5b174657d38cead6
   - file: initrd.img
-    sha256sum: 38ac551a17a33410c456d8bde4c9c25464e061239906b2d316882474daeec0ea
+    sha256sum: 8c97a6f32ae8ab59425bdff8321eb8d99827313fb51e5498e2fcb438befa3d83
 zone_brand: kvm
 zone_vnc_port: "{{ build_vnc_ports.base_centos7 | default(build_vnc_port) | mandatory }}"
 zone_uuid: 316ae519-a88e-49e1-8eb3-d55d36aecbbf
