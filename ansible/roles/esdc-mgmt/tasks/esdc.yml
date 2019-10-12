@@ -12,6 +12,11 @@
     - GeoIP
     - python-requests
     - python-httplib2
+    - python36
+    - python36-virtualenv
+    - python36-pip
+    - python36-requests
+    - python36-httplib2
     - libxml2
     - libxslt
     - rsync
@@ -28,6 +33,7 @@
     - make
     - postgresql{{ pg_version_nodot }}-devel
     - python-devel
+    - python36-devel
     - libffi-devel
     - zlib-devel
     - libevent-devel

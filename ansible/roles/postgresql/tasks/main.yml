@@ -69,6 +69,8 @@
     state: "{{ item.value.state | default('present') }}"
   with_dict: "{{ postgresql_users }}"
   when: postgresql_users
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Make sure the PostgreSQL databases are present
   postgresql_db:
@@ -80,6 +82,8 @@
     state: "{{ item.state | default('present') }}"
   with_items: "{{ postgresql_databases }}"
   when: postgresql_databases
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Add hstore to the databases with the requirement
   become: yes
@@ -96,6 +100,8 @@
     state: "{{ item.state | default('present') }}"
   with_items: "{{ postgresql_user_privileges }}"
   when: postgresql_user_privileges
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Install PostgreSQL backup script
   template: src=backup_pgsql.sh.j2 dest=/usr/local/sbin/backup_pgsql.sh mode=0700 owner=root group=root
