@@ -5,8 +5,8 @@ usb_tmp_mountpoint: "{{ usb_tmp_dir }}/esdc-usb-image-{{ usb_type }}"
 usb_tmp_image: "{{ usb_tmp_dir }}/esdc-usb-{{ usb_type }}-{{ version }}.img"
 usb_root_pw: "$5$2HOHRnK3$NvLlm.1KQBbB0WjoP7xcIwGnllhzp2HnT.mDO7DpxYA"  # root
 
-platform_version: "20190924T153108Z"
-platform_upstream_version: "release-20190829"
+platform_version: "20191019T085327Z"
+platform_upstream_version: "release-20191010"
 platform_os_archive: "{{ builder.platform.dir }}/platform-{{ platform_version }}.tgz"
 platform_boot_archive: "{{ builder.platform.dir }}/boot-{{ platform_version }}.tgz"
 
