@@ -497,6 +497,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+4.2
+~~~~~
+
+- Add python3 to CentOS appliances - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
+
 4.0
 ~~~~~
 
@@ -623,6 +628,11 @@ The image supports following metadata:
 
 Changelog
 ---------
+
+4.2
+~~~~~
+
+- Add python3 to CentOS appliances - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
 
 4.0
 ~~~~~

@@ -13,6 +13,11 @@ The image supports following metadata:
 Changelog
 ---------
 
+20191012
+~~~~~~~~
+
+- Add python3 to CentOS appliances - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
+
 20190515
 ~~~~~~~~
 
