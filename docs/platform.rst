@@ -9,7 +9,7 @@ Requirements
 ------------
 
 The build procedure requires either a **SmartOS** or a **Danube Cloud** node.
-You will need **base-multiarch-lts** zone version **14.4.2** (UUID **e69a0918-055d-11e5-8912-e3ceb6df4cf8**) and development tools inside the zone.
+You will need **base-64-lts** zone version **18.4.0** (UUID **c193a558-1d63-11e9-97cf-97bb3ee5c14f**) and development tools inside the zone.
 
 The process
 -----------
@@ -36,11 +36,11 @@ If you do not have *images.joyent.com* source configured, just add it (at this s
 
     # imgadm sources -a https://images.joyent.com/
 
-Now the **base-multiarch-lts** version **14.4.2** can be imported:
+Now the **base-64-lts** version **18.4.0** can be imported:
 
 ::
 
-    # imgadm import e69a0918-055d-11e5-8912-e3ceb6df4cf8
+    # imgadm import c193a558-1d63-11e9-97cf-97bb3ee5c14f
 
 Then you can create a *joyent*-branded VM inside your node (as mentioned above, either SmartOS or Danube Cloud) like following:
 
@@ -50,7 +50,7 @@ Then you can create a *joyent*-branded VM inside your node (as mentioned above, 
       "autoboot": true,
       "brand": "joyent",
       "fs_allowed": "ufs,pcfs,tmpfs,lofs",
-      "image_uuid": "e69a0918-055d-11e5-8912-e3ceb6df4cf8",
+      "image_uuid": "c193a558-1d63-11e9-97cf-97bb3ee5c14f",
       "tmpfs": 8192,
       "hostname": "dc-build",
       "dns_domain": "in.example.com",
@@ -118,10 +118,9 @@ Getting the source code
 
 For Danube Cloud working directory you will need at least 40G of disk space (see above.)
 
-Bootstrap the working directory with source code for the following components:
+Bootstrap the working directory with source code checkout the newest branch and (if needed) update appropriate source branches in `default.configure-projects`:
 
 -  `erigones/smartos-live <https://github.com/erigones/smartos-live>`__
--  `erigones/esdc-erigonos-overlay <https://github.com/erigones/esdc-erigonos-overlay>`__
 
 We do it like this:
 
@@ -130,9 +129,9 @@ We do it like this:
     $ mkdir dc
     $ cd dc
     $ git clone https://github.com/erigones/smartos-live.git smartos-live
-    $ cd smartos-live/overlay
-    $ git clone https://github.com/erigones/esdc-erigonos-overlay.git erigonos
-    $ cd ..
+    $ cd smartos-live
+    $ git checkout new_release_20191010
+    $ vim default.configure-projects
     $ ./configure
 
 **configure** will download and install all the packages and sources required for further build steps.
@@ -144,7 +143,6 @@ Build process is quite straightforward: You just need to run several **gmake** c
 
 ::
 
-    $ gmake world |& tee -a .gmakeworld-out.txt
     $ gmake live |& tee -a .gmakelive-out.txt
 
 After several hours, the process should finish. Check log files (their location will be displayed in the meantime).

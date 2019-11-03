@@ -25,6 +25,16 @@ base-64-es
 Changelog
 ---------
 
+4.2
+~~~~~
+
+- Version bump.
+
+4.1
+~~~~~
+
+- Version bump.
+
 4.0
 ~~~~~
 
@@ -144,6 +154,16 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+4.2
+~~~~~
+
+- Version bump.
+
+4.1
+~~~~~
+
+- Version bump.
+
 4.0
 ~~~~~
 
@@ -262,6 +282,16 @@ The image supports following metadata (in addition to `base-64-es`_ image metada
 Changelog
 ---------
 
+4.2
+~~~~~
+
+- Version bump.
+
+4.1
+~~~~~
+
+- Version bump.
+
 4.0
 ~~~~~
 
@@ -372,6 +402,16 @@ The *esdc-img* appliance is an OS zone based on the `base-64-es`_ image.
 
 Changelog
 ---------
+
+4.2
+~~~~~
+
+- Version bump.
+
+4.1
+~~~~~
+
+- Version bump.
 
 4.0
 ~~~~~
@@ -501,6 +541,11 @@ Changelog
 ~~~~~
 
 - Add python3 to CentOS appliances - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
+
+4.1
+~~~~~
+
+- Version bump.
 
 4.0
 ~~~~~
@@ -633,6 +678,11 @@ Changelog
 ~~~~~
 
 - Add python3 to CentOS appliances - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
+
+4.1
+~~~~~
+
+- Version bump.
 
 4.0
 ~~~~~

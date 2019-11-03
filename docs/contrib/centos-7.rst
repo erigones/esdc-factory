@@ -13,9 +13,10 @@ The image supports following metadata:
 Changelog
 ---------
 
-20191012
+20191103
 ~~~~~~~~
 
+- Version bump to CentOS 7.7 (1908).
 - Add python3 to CentOS appliances - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
 
 20190515
