@@ -25,10 +25,10 @@ Released on 2019-11-03
 
 - Updated to a new platform version - `20191019T085327Z` from upstream/release-20191010
 - Added UEFI boot support - `#450 <https://github.com/erigones/esdc-ce/issues/450>`__
-- Merge ``erigonos-overlay`` repo into ``smartos-live`` and ``illumos-joyent`` - `commit 86e31ac <https://github.com/erigones/smartos-live/commit/c34aca4e9ab1f33b4293938eb509bae83e216cf2>`__ and `commit 5bb7ba6 <https://github.com/erigones/illumos-joyent/commit/366abfe2d36d1f15a09ba90883115311c0faa7d2>__`
-- Fixed multiple calls of functions in sourced ``usb-key.sh`` - `commit af55cb5 <https://github.com/erigones/smartos-live/commit/253fdb1af1dd4896d53ab21e969d8f8e71e61a42>__`
-- ``mkzpool``: add option to create EFI partitions - `commit c34aca4 <https://github.com/erigones/smartos-live/commit/af55cb5517d5edffbea0089f18f3f7477efe3f75>__`
-- Default git project repo sources now point to erigones - `commit  f541315 <https://github.com/erigones/smartos-live/commit/bee88b8172e4668e97d878f553d0f187fe95236a>__`
+- Merge ``erigonos-overlay`` repo into ``smartos-live`` and ``illumos-joyent`` - `commit 86e31ac <https://github.com/erigones/smartos-live/commit/c34aca4e9ab1f33b4293938eb509bae83e216cf2>`__ and `commit 5bb7ba6 <https://github.com/erigones/illumos-joyent/commit/366abfe2d36d1f15a09ba90883115311c0faa7d2>`__
+- Fixed multiple calls of functions in sourced ``usb-key.sh`` - `commit af55cb5 <https://github.com/erigones/smartos-live/commit/253fdb1af1dd4896d53ab21e969d8f8e71e61a42>`__
+- ``mkzpool``: add option to create EFI partitions - `commit c34aca4 <https://github.com/erigones/smartos-live/commit/af55cb5517d5edffbea0089f18f3f7477efe3f75>`__
+- Default git project repo sources now point to erigones - `commit  f541315 <https://github.com/erigones/smartos-live/commit/bee88b8172e4668e97d878f553d0f187fe95236a>`__
 
 
 4.1
@@ -42,10 +42,10 @@ Released on 2019-05-22
 Released on 2019-05-14
 
 - Updated to a new platform version - `20190422T104439Z` from upstream/release-20190328
-- Updated pkgsrc version to 2018Q4 - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
-- Updated archives - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
-- Bumped default gcc version from 4.9 to 7 - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
-- Allow parralel builds of ``hn`` and ``cn`` usb images - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
+- Updated pkgsrc version to 2018Q4 - `#126 <https://github.com/erigones/esdc-factory/pull/126>`__
+- Updated archives - `#126 <https://github.com/erigones/esdc-factory/pull/126>`__
+- Bumped default gcc version from 4.9 to 7 - `#126 <https://github.com/erigones/esdc-factory/pull/126>`__
+- Allow parralel builds of ``hn`` and ``cn`` usb images - `#126 <https://github.com/erigones/esdc-factory/pull/126>`__
 - Fixed CPU monitoring script - `esdc-ce#375 <https://github.com/erigones/esdc-ce/issues/375>`__
 - Fixed ``ike`` service not enabled after reboot - `#124 <https://github.com/erigones/esdc-factory/pull/124>`__
 - Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
