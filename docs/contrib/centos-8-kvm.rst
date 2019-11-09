@@ -22,6 +22,7 @@ Add to `customer_metadata` json this value (please pay attention to spaces count
 
 Cloud-init modules run once:
 ============================
+- disk_setup
 - bootcmd
 - write-files
 - rsyslog
@@ -29,6 +30,8 @@ Cloud-init modules run once:
 - ssh
 - locale
 - set-passwords
+- yum-add-repo
+- package-update-upgrade-install
 - timezone
 - runcmd
 
@@ -39,6 +42,7 @@ Cloud-init modules run at every boot:
 - puppet
 - chef
 - salt-minion
+- phone-home
 
 Networking
 ==========
