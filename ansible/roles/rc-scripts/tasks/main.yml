@@ -10,6 +10,11 @@
 
 - name: Install jq (for parsing sdc:nics mdata)
   yum: name=jq state=present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: Install jq (for parsing sdc:nics mdata)
+  dnf: name=jq state=present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
 
 - name: Create /var/lib/rc-scripts/04-mtu-set.sh
   copy: src=04-mtu-set.sh dest=/var/lib/rc-scripts/04-mtu-set.sh owner=root group=root mode=0755

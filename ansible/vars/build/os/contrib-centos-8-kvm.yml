@@ -1,0 +1,8 @@
+root_pw: ""  # auto-generate password
+
+rc_scripts_after:
+  - zabbix-agent.service
+  - cloud-final.service
+
+selinux_permissive_domains:
+  - zabbix_agent_t
