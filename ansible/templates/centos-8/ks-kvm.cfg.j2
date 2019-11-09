@@ -1,0 +1,110 @@
+#version=RHEL7
+# System authorization information
+auth --enableshadow --passalgo=sha512
+eula --agreed
+# SSH account for anaconda
+sshpw --username=root {{ image_pass }} --plaintext
+
+text
+install
+firstboot --disabled
+ignoredisk --only-use=vda
+# Keyboard layouts
+keyboard --vckeymap=us --xlayouts='us'
+# System language
+lang en_US.UTF-8
+
+# Network information
+network  --bootproto=dhcp --noipv6 --activate --hostname=localhost.localdomain
+# Root password
+rootpw {{ image_pass }}
+timezone Etc/UTC
+# System bootloader configuration
+bootloader --timeout=3 --append="tsc=reliable divider=10 plymouth.enable=0 net.ifnames=0" --location=mbr
+
+# Partition clearing information
+clearpart --all --initlabel --disklabel=gpt
+part biosboot --fstype=biosboot --size=1 #--onbiosdisk
+#part /boot/efi --fstype=efi --size=100 #--ondisk=sda
+part / --fstype=xfs --grow #--size=100 
+
+poweroff
+
+url --url={{ builder_centos_mirror }}/8/BaseOS/x86_64/os/
+repo --name=BaseOS --mirrorlist="http://mirrorlist.centos.org/?release=8&arch=x86_64&repo=BaseOS&infra=$infra"
+repo --name=extras --mirrorlist="http://mirrorlist.centos.org/?release=8&arch=x86_64&repo=extras&infra=$infra"
+#repo --name=epel --baseurl={{ builder_epel_mirror }}/8/Everything/x86_64/
+
+services --enabled="acpid" --disabled="firewalld,chronyd"
+
+logging --level=debug
+
+%packages --ignoremissing --excludedocs
+-kernel-tools
+-kernel-tools-libs
+-mozjs??
+-plymouth*
+-polkit-pkla-compat
+-tuned
+-virt-what
+
+NetworkManager-tui
+acpid
+bzip2
+epel-release
+iptables-services
+man
+net-tools
+python3
+python3-libselinux
+tar
+%end
+
+%post
+dnf remove -yq *-firmware
+if ! ping -q -c 2 google.com > /dev/null; then
+    echo "Network is down!"
+fi
+
+# Linux likes a bit of swap, so we create one
+fallocate -l 2048M /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+# and add it to fstab
+cat << EOF >> /etc/fstab
+/swapfile   swap    swap    defaults    0   0
+
+EOF
+
+# Configure hostname
+rm -f /etc/hostname
+hostnamectl set-hostname localhost.localdomain
+echo localhost.localdomain > /etc/hostname
+
+# Tune Linux vm.dirty_background_bytes
+# The following tuning causes dirty data to begin to be background flushed at
+# 100 Mbytes, so that it writes earlier and more often to avoid a large build
+# up and improving overall throughput.
+echo "Setting vm.dirty_background_bytes"
+echo "vm.dirty_background_bytes=100000000" >> /etc/sysctl.conf
+
+echo "Cleanup"
+dnf clean packages
+rm -rf /root/anaconda-ks.cfg
+
+echo "Add builder SSH key"
+mkdir /root/.ssh
+chmod 0700 /root/.ssh
+echo '{{ builder_ssh_key }}' > /root/.ssh/authorized_keys
+chmod 0600 /root/.ssh/authorized_keys
+
+echo "Include prepare-image"
+curl -o /usr/sbin/prepare-image {{ builder_download_url }}/prepare-image
+chown root:root /usr/sbin/prepare-image
+chmod +x /usr/sbin/prepare-image
+restorecon -RF /usr/sbin/prepare-image
+
+# Cleanup
+/usr/sbin/prepare-image
+
+%end
