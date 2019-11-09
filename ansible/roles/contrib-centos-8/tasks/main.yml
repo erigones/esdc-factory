@@ -1,0 +1,11 @@
+- fail: msg="Invalid OS; Only CentOS 8 is supported."
+  when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "8"
+
+- name: Install additional packages
+  dnf: name="{{ item }}" state=present
+  with_items:
+    - screen
+    - vim
+
+- name: Install /var/lib/rc-scripts/21-zabbix-agent.sh
+  copy: src=zabbix-agent.sh dest=/var/lib/rc-scripts/21-zabbix-agent.sh mode=0750 owner=root group=root

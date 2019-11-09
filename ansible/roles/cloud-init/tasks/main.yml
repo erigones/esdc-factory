@@ -3,19 +3,30 @@
   yum: name=https://download.erigones.org/rpm/pyserial-2.7-1.rhel6.noarch.rpm state=present
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
 
-- name: Install pyserial (EL7)
-  yum: name=pyserial state=present
-  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
-
-- name: Install cloud-init
-  yum: name=cloud-init state=latest
-
-- name: Install additional cloud-init tools (EL7)
-  yum: name={{ item }} state=present
+- name: Install cloud-init (EL6)
+  yum: name="{{ item }}" state=latest
   with_items:
+    - cloud-init
+    - cloud-utils
+    - cloud-utils-growpart
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+- name: Install pyserial and cloud-init (EL7)
+  yum: name="{{ item }}" state=present
+  with_items:
+    - pyserial
+    - cloud-init
     - cloud-utils
     - cloud-utils-growpart
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: Install pyserial and cloud-init (EL8)
+  dnf: name="{{ item }}" state=present
+  with_items:
+    - python3-pyserial
+    - cloud-init
+    - cloud-utils-growpart
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
 
 - name: Create cloud.cfg configuration file
   copy: src={{ ansible_distribution }}-{{ ansible_distribution_major_version }}/cloud.cfg

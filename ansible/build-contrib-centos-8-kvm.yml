@@ -1,0 +1,46 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-centos-8-kvm.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/centos/register-host.yml
+        hostname=contrib-centos-8-kvm python_path='/usr/bin/python3'
+
+- name: Install and configure appliance
+  hosts: contrib-centos-8-kvm
+  gather_facts: true
+  vars_files:
+    - vars/build/os/contrib-centos-8-kvm.yml
+  # Change hostname back to localhost.localdomain
+  pre_tasks:
+    - name: Configure hostname
+      hostname: name=localhost.localdomain
+  roles:
+    - selinux
+    - cloud-init
+    - serial-getty
+    - mdata-client
+    - rc-scripts
+    - qemu-guest-agent
+    - zabbix-agent
+    - contrib-centos-8
+    - passwords
+    - vm-image
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-centos-8-kvm.yml
+  tasks:
+    - include: tasks/build/centos/create-image.yml

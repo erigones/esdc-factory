@@ -10,6 +10,7 @@ BUILD_TARGETS =	base-centos-6 \
 				esdc-node \
 				contrib-centos-6 \
 				contrib-centos-7 \
+				contrib-centos-8-kvm \
 				contrib-gitlab-ce \
 				contrib-centos-7-desktop \
 				network-access-zone
