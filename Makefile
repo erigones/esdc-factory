@@ -1,5 +1,6 @@
 BUILD_TARGETS =	base-centos-6 \
 				base-centos-7 \
+				base-centos-8-kvm \
 				base-64-es \
 				esdc-mon \
 				esdc-mgmt \

@@ -1,0 +1,25 @@
+# Dependencies: base.yml, zone.yml
+image_name: base-centos-8-kvm
+image_size: 10240
+remove_base_image: false
+builder_dir: "{{ builder.appliance.dir }}/base-centos-8-kvm"
+builder_download_dir: "{{ builder_dir }}/_build"
+builder_download_url: "{{ builder.appliance.url }}/base-centos-8-kvm/_build"
+centos_mirror: "{{ builder_centos_mirror }}/8/BaseOS/x86_64/os/images/pxeboot"
+centos_files:
+  - file: vmlinuz
+    sha256sum: 44ac0373e729e06dd52be8ad925d2789f9a6e822aa9508b1694d58593f32d7a6
+  - file: initrd.img
+    sha256sum: 7d2374d0f91c2003b31711dc29f288fcea085af66c5ed639c0a726efe82ca926
+zone_brand: kvm
+zone_vnc_port: "{{ build_vnc_ports.base_centos8 | default(build_vnc_port) | mandatory }}"
+zone_uuid: 83edd9cf-3da9-ef3f-cb5c-f71d23df4236
+zone_qemu_extra_opts: "-kernel /vmlinuz -initrd /initrd.img -append \\\"inst.ks={{ builder_download_url }}/ks.cfg inst.sshd\\\""
+zone_hostname: "{{ image_name }}"
+zone_nic_0_ip: "{{ build_ips.base_centos8 | default(build_ip) }}"
+zone_disks:
+  - boot: true
+    compression: "{{ build_disk_compression | default('lz4') }}"
+    refreservation: "{{ image_size }}"
+    size: "{{ image_size }}"
+zone_memory: 2048
