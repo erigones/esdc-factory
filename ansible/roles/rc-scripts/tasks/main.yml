@@ -18,6 +18,7 @@
 
 - name: Create /var/lib/rc-scripts/04-mtu-set.sh
   copy: src=04-mtu-set.sh dest=/var/lib/rc-scripts/04-mtu-set.sh owner=root group=root mode=0755
+  when: ansible_distribution == "CentOS"
 
 - name: Create rc-scripts systemd service file
   template: src=rc-scripts.service.j2 dest=/etc/systemd/system/rc-scripts.service owner=root group=root mode=0644
@@ -27,3 +28,4 @@
 
 - name: Fix /etc/rc.d/rc.local permissions
   file: dest=/etc/rc.d/rc.local mode=u+x
+  when: ansible_distribution == "CentOS"

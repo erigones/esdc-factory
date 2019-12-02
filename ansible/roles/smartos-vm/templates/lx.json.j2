@@ -1,0 +1,104 @@
+{
+{% if zone_autoboot is defined and zone_autoboot == false %}
+  "autoboot": false,
+{% endif %}
+  "brand": "{{ zone_brand }}",
+  "kernel_version": "{{ lx_kernel_version | default("4.2") }}",
+{% if zone_limit_priv is defined and zone_limit_priv %}
+  "limit_priv": "{{ zone_limit_priv }}",
+{% endif %}
+  "uuid": "{{ zone_uuid | mandatory }}",
+  "image_uuid": "{{ zone_image_uuid }}",
+  "max_physical_memory": {{ zone_memory }},
+  "hostname": "{{ zone_hostname | mandatory }}",
+  "alias": "{{ zone_hostname | mandatory}}",
+  "dns_domain": "{{ zone_dns_domain }}",
+{% if zone_zfs_io_priority is defined and zone_zfs_io_priority %}
+  "zfs_io_priority": {{ zone_zfs_io_priority }},
+{% endif %}
+{% if zone_cpu_shares is defined and zone_cpu_shares %}
+  "cpu_shares": {{ zone_cpu_shares }},
+{% endif %}
+{% if zone_cpu_cap is defined and zone_cpu_cap %}
+  "cpu_cap": {{ zone_cpu_cap }},
+{% endif %}
+{% if zone_maintain_resolvers == true %}
+  "maintain_resolvers": true,
+{% endif %}
+{% if zone_firewall_enabled == true %}
+  "firewall_enabled": true,
+{% endif %}
+{% if zone_fs_allowed is defined and zone_fs_allowed %}
+  "fs_allowed": "{{ zone_fs_allowed | join(",") }}",
+{% endif %}
+{% if zone_resolvers %}
+  "resolvers": [
+{% for item in zone_resolvers %}
+{% if not loop.last %}
+    "{{ item }}",
+{% else %}
+    "{{ item }}"
+{% endif %}
+{% endfor %}
+  ],
+{% endif %}
+{% if zone_nics %}
+  "nics": [
+{% for item in zone_nics %}
+    {
+{% if item.primary is defined and item.primary == true %}
+      "primary": true,
+{% endif %}
+      "mac": "{{ item.mac | default("52:2f:" + '%02x:' | format(256 | random) + '%02x:' | format(256 | random) + '%02x:' | format(256 | random) + '%02x' | format(256 | random)) }}",
+{% if item.vlan_id is defined %}
+      "vlan_id": {{ item.vlan_id }},
+{% endif %}
+      "nic_tag": "{{ item.nic_tag }}",
+      "gateway": "{{ item.gateway }}",
+      "ip": "{{ item.ip }}",
+      "netmask": "{{ item.netmask }}"
+{% if not loop.last %}
+    },
+{% else %}
+    }
+{% endif %}
+{% endfor %}
+  ],
+{% endif %}
+{% if zone_customer_metadata is defined and zone_customer_metadata %}
+  "customer_metadata": {
+{% for item in zone_customer_metadata %}
+    "{{ item.key }}": "{{ item.value }}"{{"," if not loop.last else ''}}
+{% endfor %}
+  },
+{% endif %}
+{% if zone_internal_metadata is defined and zone_internal_metadata %}
+  "internal_metadata": {
+{% for item in zone_internal_metadata %}
+    "{{ item.key }}": "{{ item.value }}"{{"," if not loop.last else ''}}
+{% endfor %}
+  },
+{% endif %}
+{% if zone_tags is defined and zone_tags %}
+  "tags": {
+{% for item in tags %}
+    "{{ item.key }}": "{{ item.value }}"{{"," if not loop.last else ''}}
+{% endfor %}
+  },
+{% endif %}
+  "zpool": "{{ zone_zpool | default("zones") }}",
+  "quota": {{ zone_quota }},
+{% if zone_indestructible_delegated is defined and zone_indestructible_delegated == true %}
+  "indestructible_delegated": true,
+{% endif %}
+{% if zone_indestructible_zoneroot is defined and zone_indestructible_zoneroot == true %}
+  "indestructible_zoneroot": true,
+{% endif %}
+{% if zone_delegate_dataset is defined and zone_delegate_dataset == true %}
+  "delegate_dataset": true,
+  "zfs_data_recsize": {{ zone_zfs_data_recsize }},
+  "zfs_data_compression": "{{ zone_zfs_data_compression }}",
+{% endif %}
+  "zfs_root_recsize": {{ zone_zfs_root_recsize }},
+  "zfs_root_compression": "{{ zone_zfs_root_compression }}"
+}

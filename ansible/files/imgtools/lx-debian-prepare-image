@@ -1,0 +1,187 @@
+#!/bin/bash
+
+set +o errexit
+set +o pipefail
+
+fatal() {
+  printf "(fatal) %s\n" "$@"
+  exit 1
+}
+
+info() {
+  printf "(info) %s\n" "$@"
+}
+
+separator() {
+  for i in {1..78} ; do
+    printf "="
+  done
+  printf "\n"
+}
+
+check_root() {
+  if [[ ${EUID} -ne 0 ]] ; then
+    echo "You must be root to run this command"
+    echo "try again with 'sudo $(basename $0)'"
+    exit 1
+  fi
+}
+
+cleanup_swapfile() {
+  info "cleaning up swapfile"
+  swapoff -a
+  local size=$(stat --format='%s' /swapfile)
+
+  rm -f /swapfile
+  fallocate -l ${size} /swapfile >/dev/null
+
+  chmod 600 /swapfile
+  mkswap -f /swapfile >/dev/null
+}
+
+cleanup_logs() {
+  info "cleaning up logs"
+  find /var/log -type f | xargs rm -f
+
+  # create wtmp - this solves an issue where syslog would not start
+  # without wtmp being created
+  touch /var/log/wtmp
+  chmod 664 /var/log/wtmp
+
+  # create lastlog - this solves the issue, when "login" was trying to
+  # write into nonexisting file resulting in SELinux "denied" logs in
+  # /var/lost/audit/audit.log
+  touch /var/log/lastlog
+  chmod 644 /var/log/lastlog
+}
+
+cleanup_root_home() {
+  info "cleaning up root account"
+  rm -f /root/.bash_history
+  rm -f /root/.viminfo
+
+  rm -f /root/.ssh/known_hosts
+  rm -f /root/.ssh/authorized_keys
+}
+
+cleanup_ssh_host_keys() {
+  info "cleaning up ssh host keys"
+  find /etc/ssh -type f -name "ssh_host_*" | xargs rm -f
+}
+
+cleanup_disks() {
+  info "removing /dev/vdb entries from fstab"
+  sed -i '/^\/dev\/vdb/d' /etc/fstab
+}
+
+cleanup_metadata() {
+  info "cleaning up meta data"
+  rm -f /root/user-script
+  rm -f /root/user-data
+  rm -rf /var/lib/cloud/*
+
+  # user-script
+  rm -f /var/svc/provision*
+  rm -f /var/svc/user-deploy-script
+  rm -f /var/svc/user-startup-script
+  rm -f /var/svc/mdata-user-script
+  rm -f /var/log/.mdata-image.run
+  rm -f /tmp/.mdata-image.run
+
+  # rc-scripts.service
+  rm -f /var/lib/provision_*
+}
+
+cleanup_redhat() {
+  if which package-cleanup 2> /dev/null; then
+    info "cleaning up old kernels"
+    package-cleanup --oldkernels --count=1 -y
+  fi
+
+  info "cleaning up network devices"
+
+  rm -f /etc/udev/rules.d/70-persistent-net.rules
+  find /var/lib/dhclient -type f | xargs rm -f
+
+  rm -f /etc/sysconfig/network-scripts/ifcfg-*
+
+  info "creating network device configuration"
+
+cat > /etc/sysconfig/network-scripts/ifcfg-lo << EOF
+DEVICE=lo
+IPADDR=127.0.0.1
+NETMASK=255.0.0.0
+NETWORK=127.0.0.0
+# If you're having problems with gated making 127.0.0.0/8 a martian,
+# you can change this to something else (255.255.255.255, for example)
+BROADCAST=127.255.255.255
+ONBOOT=yes
+NAME=loopback
+EOF
+
+# Although there is an automatic NIC configuration script in rc.local,
+# this network script is required to ensure that the main NIC is up ASAP
+# (This is important for esdc-mgmt and usually VMs have at least one NIC)
+cat > /etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
+DEVICE="eth0"
+DEVICETYPE="eth"
+ONBOOT="yes"
+BOOTPROTO="dhcp"
+EOF
+
+  info "cleaning up package cache"
+  yum clean all >/dev/null
+}
+
+run_restorecon() {
+  RESTORECON_ARGS="-RF"
+
+  info "running restorecon ${RESTORECON_ARGS} on /"
+  restorecon ${RESTORECON_ARGS} / > /dev/null
+}
+
+cleanup_tmp() {
+  /bin/rm -rf /tmp/*
+}
+
+zeroout_disk() {
+  info "'zero-outing' the disk drive"
+  dd if=/dev/zero of=/EMPTY bs=1M
+  rm -f /EMPTY
+  sync
+}
+
+## MAIN ##
+check_root
+
+separator
+printf "Prepare-image\n"
+separator
+
+case $(uname -s) in
+  Linux)
+    cleanup_root_home
+    cleanup_metadata
+    cleanup_logs
+    cleanup_tmp
+    cleanup_ssh_host_keys
+
+    if [ -f /etc/redhat-release ] ; then
+      cleanup_redhat
+      run_restorecon
+    fi
+
+   ;;
+  *)
+    fatal "OS specific features not implemented"
+    ;;
+esac
+
+
+printf "\n"
+separator
+printf "(info) you may now snapshot your machine\n"
+separator
+printf "\n\n"
+exit 0
+

@@ -1,0 +1,11 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+
+if ${use_color}; then
+	PS1='\[\033[00;36m\]\u\[\033[00;33m\]@\[\033[31m\]\h\[\033[33m\]:\[\033[32m\]\w\[\033[33m\]\$ \[\033[00m\]'
+else
+	PS1='\u@\h:\w\$ '
+fi
+
+alias la='ls -aF'
+alias ll='ls -lFha'
+alias j='jobs'
