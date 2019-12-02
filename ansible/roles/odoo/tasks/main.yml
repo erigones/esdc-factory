@@ -1,0 +1,68 @@
+- name: Add an apt key for postgresql
+  apt_key:
+    id: B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Add apt pg repo
+  apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main
+    state: present
+
+- name: Install postgresql server
+  apt:
+    name: postgresql
+    state: latest
+    update_cache: yes
+
+- name: Install wkhtmltopdf
+  apt:
+    deb: https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.stretch_amd64.deb
+
+- name: Add an apt key for odoo
+  apt_key:
+    id: 5D134C924CB06330DCEFE2A1DEF2A2198183CBB5
+    url: https://nightly.odoo.com/odoo.key
+    state: present
+
+- name: Add apt odoo repo
+  apt_repository:
+    repo: deb http://nightly.odoo.com/12.0/nightly/deb/ ./
+    state: present
+
+- name: Install odoo
+  apt:
+    name: odoo
+    state: latest
+    update_cache: yes
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: latest
+
+- name: Remove default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Place odoo nginx conf
+  copy:
+    src: nginx-odoo.conf
+    dest: /etc/nginx/sites-enabled/odoo
+
+- name: Disable services before provisioning
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  with_items:
+    - odoo
+    - nginx
+
+- name: Place odoo provision script
+  copy:
+    src: 50-odoo.sh
+    dest: /var/lib/rc-scripts/50-odoo.sh
+    mode: 0755
+

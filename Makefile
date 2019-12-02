@@ -2,18 +2,20 @@ BUILD_TARGETS =	base-centos-6 \
 				base-centos-7 \
 				base-centos-8-kvm \
 				base-64-es \
+				base-lx-debian-9 \
 				esdc-mon \
 				esdc-mgmt \
 				esdc-cfgdb \
 				esdc-dns \
 				esdc-img \
 				esdc-node \
+				network-access-zone \
 				contrib-centos-6 \
 				contrib-centos-7 \
 				contrib-centos-8-kvm \
 				contrib-gitlab-ce \
 				contrib-centos-7-desktop \
-				network-access-zone
+				contrib-odoo
 
 define newline
 
