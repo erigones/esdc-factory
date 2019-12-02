@@ -11,6 +11,12 @@
             validate="vmadm validate create kvm -f %s"
   when: zone_brand == "kvm"
 
+- name: Create VM (LX) configuration file
+  template: src=lx.json.j2
+            dest=/tmp/{{ zone_uuid }}.json
+            validate="vmadm validate create kvm -f %s"
+  when: zone_brand == "lx"
+
 - name: Create the virtual machine
   shell: vmadm create -f "{{ item }}"
   with_items:

@@ -1,0 +1,26 @@
+image_name: base-lx-debian-9
+image_desc: "Danube Cloud base LX debian 9 image"
+image_homepage: "{{ image_base_homepage }}#base-lx-debian-9"
+remove_base_image: false
+builder_dir: "{{ builder.appliance.dir }}/base-lx-debian-9"
+zone_brand: lx
+zone_dns_domain: local
+zone_uuid: b442c858-f254-4a1f-a4f5-8fce46913ca6
+zone_image_uuid: 63d6e664-3f1f-11e8-aef6-a3120cf8dd9d # Debian 9 20180404
+zone_hostname: "{{ image_name }}"
+zone_nic_0_ip: "{{ build_ips.base64 | default(build_ip) }}"
+zone_delegate_dataset: false
+zone_zfs_root_recsize: 131072
+zone_zfs_data_recsize: 16384
+zone_zfs_root_compression: "{{ build_disk_compression | default('lz4') }}"
+zone_zfs_data_compression: "{{ build_disk_compression | default('lz4') }}"
+zone_customer_metadata:
+  - key: user-script
+    value: "/usr/sbin/mdata-get root_authorized_keys > /root/.ssh/authorized_keys ;"
+  - key: root_authorized_keys
+    value: "{{ builder_ssh_key }}"
+
+base_image_manifest_url: "{{ builder_imgapi_mirror }}/images/{{ zone_image_uuid }}"
+base_image_manifest_file: "base-lx-debian-9.imgmanifest"
+base_image_file_url: "{{ base_image_manifest_url }}/file"
+base_image_file_file: "base-lx-debian-9.zfs.gz"

@@ -1,0 +1,36 @@
+---
+- name: Update packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+    autoremove: yes
+    autoclean: yes
+
+- name: Place image cleanup script
+  copy:
+    src: files/imgtools/lx-debian-prepare-image
+    dest: /usr/local/bin/prepare-image
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Modify branding files
+  file: path="{{ item.path }}" state="{{ item.state }}"
+  with_items:
+    - { path: /etc/motd, state: absent }
+#    - { path: /etc/product, state: absent }
+    - { path: /etc/motd, state: touch }
+    - { path: /root/.bash_history, state: absent }
+
+- name: Place hostname script (LX zone)
+  copy: src="{{ item.src }}"
+        dest="{{ item.dest }}"
+        mode=0755
+        owner=root
+        group=root
+  with_items:
+    - src: tasks/build/lx/05-set-hostname.sh
+      dest: /var/lib/rc-scripts/05-set-hostname.sh
+    - src: tasks/build/lx/bashrc
+      dest: /root/.bashrc
+
