@@ -113,7 +113,7 @@ EOF
 
 export FACTORY_BASEDIR="${BASEDIR}"
 export PYTHONUNBUFFERED=1
-ansible-playbook "${PLAYBOOK}" --extra-vars="${EXTRA_VARS}" ${VERBOSE}
+ansible-playbook "${PLAYBOOK}" -i hosts.cfg --extra-vars="${EXTRA_VARS}" ${VERBOSE}
 e=$?
 
 if [[ ${e} -eq 0 ]]; then
