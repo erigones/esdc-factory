@@ -1,0 +1,30 @@
+image_name: odoo
+image_desc: "Odoo image on LX Debian 9"
+image_homepage: "{{ image_contrib_homepage }}/odoo.rst"
+remove_base_image: false
+builder_dir: "{{ builder.appliance.dir }}/contrib-odoo"
+
+base_image_name: base-lx-debian-9
+base_image_manifest_file: "{{ base_image_name }}-latest.imgmanifest"
+base_image_manifest_url: "{{ builder.appliance.url }}/{{ base_image_name }}/{{ base_image_manifest_file }}"
+base_image_file_file: "{{ base_image_name }}-latest.zfs.gz"
+base_image_file_url: "{{ builder.appliance.url }}/{{ base_image_name }}/{{ base_image_file_file }}"
+
+zone_brand: lx
+zone_dns_domain: local
+zone_uuid: 2514f1cd-5260-44d8-c67a-fecc1a56423f
+zone_image_uuid: "{{ (lookup('pipe', 'curl -s {{ base_image_manifest_url }}') | from_json)['uuid'] }}"
+
+zone_hostname: "{{ image_name }}"
+zone_nic_0_ip: "{{ build_ips.base64 | default(build_ip) }}"
+zone_delegate_dataset: false
+zone_zfs_root_recsize: 131072
+zone_zfs_data_recsize: 16384
+zone_zfs_root_compression: "{{ build_disk_compression | default('lz4') }}"
+zone_zfs_data_compression: "{{ build_disk_compression | default('lz4') }}"
+zone_customer_metadata:
+  - key: user-script
+    value: "/usr/sbin/mdata-get root_authorized_keys > /root/.ssh/authorized_keys ;"
+  - key: root_authorized_keys
+    value: "{{ builder_ssh_key }}"
+
