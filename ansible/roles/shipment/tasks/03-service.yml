@@ -13,7 +13,7 @@
 
 - name: Import shipment SMF manifest
   command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/gunicorn.xml
-  when: ansible_distribution == "SmartOS" and smf_state|failed
+  when: ansible_distribution == "SmartOS" and smf_state is failed
 
 - name: Ensure shipment is enabled and running
   service: name=gunicorn enabled=yes state=started

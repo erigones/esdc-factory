@@ -16,7 +16,7 @@
 
 - name: Create image folder {{ image_dir }}
   file: path="{{ image_dir }}" state=directory
-  when: test_result|success
+  when: test_result is succeeded
 
 - name: Create manifest and file symlinks in {{ image_dir }}
   file: src="{{ item.src }}"
@@ -27,4 +27,4 @@
       dest: "{{ image_dir }}/manifest"
     - src: "{{ image_file }}"
       dest: "{{ image_dir }}/file"
-  when: test_result|success
+  when: test_result is succeeded

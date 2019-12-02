@@ -31,13 +31,13 @@
 - name: Download latest base image
   get_url: url="{{ item.value.url }}" dest="{{ item.value.file }}" validate_certs=no timeout=30
   with_dict: "{{ base_image }}"
-  when: image_imported|failed
+  when: image_imported is failed
 
 - name: Install latest base image
   shell: imgadm install -f "{{ base_image.file.file }}" -m "{{ base_image.manifest.file }}"
-  when: image_imported|failed
+  when: image_imported is failed
 
 - name: Remove downloaded base image
   file: path="{{ item.value.file }}" state=absent
   with_dict: "{{ base_image }}"
-  when: image_imported|failed
+  when: image_imported is failed
