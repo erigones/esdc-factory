@@ -54,6 +54,7 @@ declare prmpt_str
 declare admin_iface_active
 declare install_to_hdd
 declare nicsup_done
+declare -A answers_out
 
 # Additional NIC tags definitions
 declare -A change_macs
@@ -98,6 +99,47 @@ sig_doshell()
 	echo "Resuming the system configuration tool."
 	echo
 	printf "$prmpt_str"
+}
+
+add_to_answers() {
+	local anskey="$1"
+	local ansval="$2"
+	local ansdefault="$3"
+
+	if [[ -z "${anskey}" ]]; then
+		echo "WARNING: add_to_answers: key is missing"
+		return 1
+	fi
+
+	[[ -z "${ansval}" ]] && ansval="${ansdefault}"
+
+	answers_out["${anskey}"]="${ansval}"
+
+	# keep list order (and omit duplicates)
+	if ! echo "${answers_out["list_order"]}" | grep -qE "(^|,)${anskey},"; then
+		answers_out["list_order"]+="${anskey},"
+	fi
+}
+
+write_answers_json() {
+	local outfile="$1"
+	local comma=""
+
+	printf "{" > "${outfile}"
+	# convert commas in the list to spaces, remove the last comma
+	for i in $(echo "${answers_out["list_order"]}" | sed -e 's/,$//' -e 's/,/ /g'); do
+		printf "${comma}\n  \"${i}\": \"${answers_out["${i}"]}\"";
+		[[ -z "${comma}" ]] && comma=","
+	done >> "${outfile}"
+	printf "\n}\n" >> "${outfile}"
+}
+
+num_to_bool() {
+	if [[ "${val}" -eq 1 ]]; then
+		printf "true"
+	else
+		printf "false"
+	fi
 }
 
 ip_to_num()
@@ -433,11 +475,11 @@ promptbool()
 		val=$(echo "${val}" | tr '[:upper:]' '[:lower:]')
 
 		case "${val}" in
-			"y"|"yes"|"true")
+			"y"|"yes"|"true"|"1")
 				val=1
 				break
 			;;
-			"n"|"no"|"false")
+			"n"|"no"|"false"|"0")
 				val=0
 				break
 			;;
@@ -645,7 +687,11 @@ promptnic()
 		fi
 	fi
 
-	if [[ $nic_cnt -eq 1 ]] && [[ "${tag}" != "admin" || "${advanced_install}" -ne 1 ]]; then
+	# Do the interface autoselect when there's only one interface.
+	# But not on the admin nictag with advanced install enabled if answers.json is not present.
+	# (if we have answer for admin_ip, it means we are running from answers.json
+	# -> consequently we can omit admin_nic in answer.json)
+	if [[ $nic_cnt -eq 1 ]] && [[ "${tag}" != "admin" || "${advanced_install}" -ne 1 || -n "$(getanswer "admin_ip")" ]]; then
 		val="${macs[1]}"
 		nic_val=${nics[1]}
 		printf "Autoselected NIC for ${tag} network: ${nic_val} (${val})\n\n"
@@ -801,10 +847,12 @@ promptnictag_ip()
 	promptbool "Add IP address on ${ntag} interface? (y/n)" "${default_val}" "${ntag}_add_ip"
 
 	if [[ "${val}" -eq 1 ]]; then
+		add_to_answers "${ntag}_add_ip" "true"
 		valid=0
 		while [ $valid -ne 1 ]; do
 			promptnet "(${ntag}) IP address (or dhcp)" "${nictag_ips[${ntag}]}" "${ntag}_ip"
 			nictag_ips["${ntag}"]="${val}"
+			add_to_answers "${ntag}_ip" "${val}"
 
 			if [[ "${nictag_ips[${ntag}]}" != "dhcp" ]]; then
 				# set default value for netmask
@@ -813,6 +861,8 @@ promptnictag_ip()
 				promptnet "(${ntag}) Netmask" "${nictag_netmasks[${ntag}]}" "${ntag}_netmask"
 				# save user value for netmask
 				nictag_netmasks["${ntag}"]="${val}"
+
+				add_to_answers "${ntag}_netmask" "${val}"
 
 				# test netmask validity
 				ip_netmask_to_network "${nictag_ips[${ntag}]}" "${nictag_netmasks[${ntag}]}"
@@ -824,8 +874,10 @@ promptnictag_ip()
 			fi
 			promptvlan "(${ntag}) VLAN ID" "${nictag_vlans[${ntag}]}" "${ntag}_vlan_id"
 			nictag_vlans[${ntag}]="${val}"
+			add_to_answers "${ntag}_vlan_id" "${val}"
 		done
 	else
+		add_to_answers "${ntag}_add_ip" "false"
 		# clear IP from ntag
 		unset nictag_ips["${ntag}"]
 		unset nictag_netmasks["${ntag}"]
@@ -851,8 +903,10 @@ prompt_preserve_mac()
 
 	if [[ "${val}" -eq 1 ]]; then
 		nictag_preserve_mac["${ntag}"]="${val}"
+		add_to_answers "${ntag}_preserve_mac" "true"
 	else
 		unset nictag_preserve_mac["${ntag}"]
+		add_to_answers "${ntag}_preserve_mac" "false"
 	fi
 }
 
@@ -950,6 +1004,15 @@ nicsup()
 			ifconfig "${nictag_ifaces[$ntag]}" ether "${new_mac_addr}"
 			# save MAC address of physical interface for nicsdown()
 			nictag_preserve_mac[${ntag}]="${mac_addr},${new_mac_addr}"
+
+			# if nictag that wants to preserve MAC addr is on the same physical interface
+			# as admin nic, we have to update also admin_nic MAC value
+			# (otherwise OS will not find admin nic)
+			if [[ "${mac_addr}" == "${admin_nic}" ]]; then
+				admin_nic="${new_mac_addr}"
+				# update also answers.json
+				add_to_answers "admin_nic" "${admin_nic}"
+			fi
 		fi
 
 		dladm create-vnic -l "${nictag_ifaces[$ntag]}" $vnic_opts "${ntag}0"
@@ -1166,6 +1229,7 @@ EOF
 		if [[ -n "${layout_answer}" ]]; then
 			prmpt_str+="This storage configuration will be used automatically.\n\n"
 			DISK_LAYOUT=/var/tmp/disklayout.json
+			add_to_answers "disk_layout" "${layout}"
 			return
 		fi
 
@@ -1191,6 +1255,7 @@ EOF
 			layout=""
 		elif [[ $val == "yes" ]]; then
 			DISK_LAYOUT=/var/tmp/disklayout.json
+			add_to_answers "disk_layout" "${layout}"
 			return
 		elif [[ $val == "manual" ]]; then
 			# let the user manually create the zpool
@@ -1758,6 +1823,8 @@ Press [enter] to continue"
 if [[ $(getanswer "skip_instructions") != "true" ]]; then
 	printf "$message"
 fi
+add_to_answers "skip_instructions" "$(getanswer "skip_instructions")" "true"
+add_to_answers "simple_headers" "$(getanswer "simple_headers")" "true"
 
 console=$(getanswer "config_console")
 # If we've asked for automatic configuration, but are not running on the
@@ -1766,6 +1833,7 @@ console=$(getanswer "config_console")
 if [[ -z ${console} || $(tty) != "/dev/console" ]]; then
 	read continue;
 fi
+add_to_answers "config_console" "${console}" "vga"
 
 if [ -f /tmp/config_in_progress ]; then
 	message="
@@ -1785,6 +1853,7 @@ if [[ $(getanswer "accept_eula") != "true" ]]; then
 	printeula
 	prompteula
 fi
+add_to_answers ""accept_eula"" "true"
 
 printheader "Advanced Installation"
 message="
@@ -1797,6 +1866,7 @@ if [[ $(getanswer "skip_instructions") != "true" ]]; then
 fi
 promptbool "Enable advanced installation? (y/n)" "n" "advanced_install"
 advanced_install=${val}
+add_to_answers "advanced_install" "${val}"
 
 #
 # Main loop to prompt for user input
@@ -1815,6 +1885,7 @@ and Danube Cloud installation.\n\n"
 
 	promptval "Enter DC name" "${datacenter_name}" "datacenter_name"
 	datacenter_name="$val"
+	add_to_answers "datacenter_name" "${datacenter_name}"
 {% endif %}
 
 	printheader "Networking"
@@ -1848,12 +1919,14 @@ The configured NIC will be used to access the compute node.\n\n"
 	promptnic "'admin'"
 	admin_nic="$val"
 	admin_iface="$nic_val"
+	add_to_answers "admin_nic" "${admin_nic}"
 
 	valid=0
 	while [ $valid -ne 1 ]; do
 		{% if usb_type == "hn" %}
 		promptnet "(admin) IP address" "$admin_ip" "admin_ip"
 		admin_ip="$val"
+		add_to_answers "admin_ip" "${admin_ip}"
 		# we disallow DHCP on HN install
 		if [[ "${admin_ip}" == "dhcp" ]]; then
 			echo "The first compute node cannot have a dynamic admin IP address during install."
@@ -1863,6 +1936,7 @@ The configured NIC will be used to access the compute node.\n\n"
 		{% else %}
 		promptnet "(admin) IP address (or dhcp)" "$admin_ip" "admin_ip"
 		admin_ip="$val"
+		add_to_answers "admin_ip" "${admin_ip}"
 		{% endif %}
 
 		if [[ "$admin_ip" != "dhcp" ]]; then
@@ -1871,6 +1945,7 @@ The configured NIC will be used to access the compute node.\n\n"
 
 			promptnet "(admin) Netmask" "$admin_netmask" "admin_netmask"
 			admin_netmask="$val"
+			add_to_answers "admin_netmask" "${admin_netmask}"
 			ip_netmask_to_network "$admin_ip" "$admin_netmask"
 			[ $IP_NUM -ne $BCAST_ADDR ] && valid=1
 		else
@@ -1884,6 +1959,7 @@ The configured NIC will be used to access the compute node.\n\n"
 	else
 		admin_vlan_id=""
 	fi
+	add_to_answers "admin_vlan_id" "${admin_vlan_id}"
 
 	printheader "Networking - Network tags"
 	message="
@@ -1902,6 +1978,7 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 	# don't repeat selecting nic tags if they already have been defined in previous run
 	if [[ -z "${!nictag_macs[@]}" ]]; then
 		promptbool "Add another network tag? (y/n)" "y" "add_nictags"
+		add_to_answers "add_nictags" "${val}"
 	else
 		promptbool "Modify network tags? (y/n)" "n" "add_nictags"
 	fi
@@ -1914,7 +1991,9 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 			promptbool "Add NIC tag \"${ntag}\"? (y/n)" "${default_val}" "${ntag}_add_nictag"
 
 			if [[ "${val}" -eq 1 ]]; then
+				add_to_answers "${ntag}_add_nictag" "true"
 				promptnic "'${ntag}'"
+				add_to_answers "${ntag}_nic" "${val}"
 				nictag_macs[${ntag}]="${val}"
 				nictag_ifaces[${ntag}]="${nic_val}"
 
@@ -1928,6 +2007,7 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 					fi
 				fi
 			else
+				add_to_answers "${ntag}_add_nictag" "false"
 				# clear ${ntag}
 				unset nictag_macs["${ntag}"]
 				unset nictag_ifaces["${ntag}"]
@@ -1965,6 +2045,7 @@ Use 'none' if you have no gateway or you rely only on the dhcp.\n\n"
 
 	promptnet "Enter the default gateway IP" "$headnode_default_gateway" "headnode_default_gateway"
 	headnode_default_gateway="${val}"
+	add_to_answers "headnode_default_gateway" "${val}"
 	# if headnode_default_gateway is outside the admin subnet,
 	# we need to ask for the admin gw
 	if ip_from_subnet "$headnode_default_gateway" "$admin_ip" "$admin_netmask"; then
@@ -1978,6 +2059,7 @@ Use 'none' if you have no gateway or you rely only on the dhcp.\n\n"
 			"$admin_gateway" admin_gateway "$admin_ip" "$admin_netmask"
 		admin_gateway="${val}"
 	fi
+	add_to_answers "admin_gateway" "${admin_gateway}"
 
 	# Bring the admin and external nics up now: they need to be for the
 	# connectivity checks in the next section
@@ -2009,6 +2091,11 @@ you use to create virtual machines through Danube Cloud.\n\n"
 		printf "Setting second DNS server to $dns_resolver2\n"
 		printf "Setting DNS search domain to $dns_domain\n"
 	fi
+
+	add_to_answers "dns_resolver1" "${dns_resolver1}"
+	add_to_answers "dns_resolver2" "${dns_resolver2}"
+	add_to_answers "dns_search" "${dns_domain}"
+
 	cat > /etc/resolv.conf <<EOF
 nameserver $dns_resolver1
 nameserver $dns_resolver2
@@ -2036,6 +2123,7 @@ another NTP server.\n"
 		# leaving default settings
 		printf "Setting NTP server to $ntp_hosts\n"
 	fi
+	add_to_answers "ntp_host" "${ntp_hosts}"
 
 	skip_ntp=$(getanswer "skip_ntp_check")
 	if [[ -z ${skip_ntp} || ${skip_ntp} != "true" ]]; then
@@ -2057,6 +2145,7 @@ another NTP server.\n"
 	[[ "${install_to_hdd}" -eq 1 ]] && install_to_hdd_def="y" || install_to_hdd_def="n"
 	promptbool "Install to HDD instead of booting from USB? (y/n)" "${install_to_hdd_def}" "install_to_hdd"
 	install_to_hdd=${val}
+	add_to_answers "install_to_hdd" "$(num_to_bool "${val}")"
 	# END: Danube Cloud install to HDD addition
 
 
@@ -2091,6 +2180,8 @@ setting a hostname.\n\n"
 
 	promptpw "Enter root password" "nolen" "$root_shadow" "root_password"
 	root_shadow="$val"
+	#add_to_answers "root_password" "${val}"
+	add_to_answers "root_password" "<<<changeme>>>"
 
 {% if usb_type == "hn" %}
 	[[ -z "$hostname" && -z "$dns_domain" ]] && hostname="node01.local"
@@ -2101,6 +2192,7 @@ setting a hostname.\n\n"
 {% endif %}
 	prompt_hostname "Enter system hostname" "$hostname" "hostname"
 	hostname="$val"
+	add_to_answers "hostname" "${val}"
 
 
 	printheader "Danube Cloud Management Services"
@@ -2136,10 +2228,12 @@ web management.\n\n"
 
 	promptnet "Management portal IP address" "${mgmt_admin_ip}" "mgmt_admin_ip"
 	mgmt_admin_ip="${val}"
+	add_to_answers "mgmt_admin_ip" "${val}"
 {% else %}
 	[[ -z "${cfgdb_admin_ip}" ]] && cfgdb_admin_ip="$(discover_cfgdb)"
 	prompt_host_ok_val "Configuration database IP address" "${cfgdb_admin_ip}" "cfgdb_admin_ip"
 	cfgdb_admin_ip="${val}"
+	add_to_answers "cfgdb_admin_ip" "${val}"
 	if [[ ${advanced_install} -eq 1 ]] && ! ip_from_subnet "${cfgdb_admin_ip}" "${admin_ip}" "${admin_netmask}" ; then
 		# the CFGDB IP is outside the subnet
 		message="
@@ -2156,6 +2250,7 @@ network) instead of connecting directly using the admin network.\n\n"
 	else
 		remote_node=0
 	fi
+	add_to_answers "remote_node" "$(num_to_bool "${remote_node}")"
 	skip_cfgdb_check=$(getanswer "skip_cfgdb_check")
 	[[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]] && check_cfgdb
 {% endif %}
@@ -2192,9 +2287,12 @@ the first compute node installation.\n\n"
 			echo
 			promptval "Enter remote DC name" "${datacenter_name}" "datacenter_name"
 			datacenter_name="$val"
+			add_to_answers "datacenter_name" "${val}"
 		fi
 	fi
 {% endif %}
+	#add_to_answers "esdc_install_password" "${esdc_install_password}"
+	add_to_answers "esdc_install_password" "<<<changeme>>>"
 
 {% if usb_type == "hn" %}
 	printheader "Administrator's e-mail address"
@@ -2209,6 +2307,7 @@ monitoring alerts.\n\n"
 
 	promptemail "Enter administrator's e-mail address" "${admin_email}" "admin_email"
 	admin_email="${val}"
+	add_to_answers "admin_email" "${admin_email}"
 {% endif %}
 	# END: Danube Cloud management configuration
 
@@ -2228,6 +2327,13 @@ the system will be set up and all data on the disks will be erased.\n\n"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
 		printf "$message"
+	fi
+
+	add_to_answers "skip_final_summary" "$(getanswer "skip_final_summary")" "true"
+	add_to_answers "skip_final_confirm" "$(getanswer "skip_final_confirm")" "true"
+	if [[ ${install_to_hdd} -eq 1 ]]; then
+		# add to answers.json ability to skip reboot prompt (not active by default)
+		add_to_answers "auto_reboot" "$(getanswer "auto_reboot")" "false"
 	fi
 
 	if [[ $(getanswer "skip_final_summary") != "true" ]]; then
@@ -2285,6 +2391,8 @@ the system will be set up and all data on the disks will be erased.\n\n"
 done
 
 echo "==> Initializing new system..."
+
+write_answers_json /tmp/answers.json
 
 printf "%-56s" "Generating config file... "
 # START: Danube Cloud service VM IPs
@@ -2411,16 +2519,20 @@ if [[ -n "${remote_node}" ]]; then
 	echo "remote_node=${remote_node}" >>$tmp_config
 fi
 echo  >>$tmp_config
-# END: Danube Cloud settings
-printf "%4s\n" "done"
-
 echo "smt_enabled=true" >>$tmp_config
 echo >>$tmp_config
+
+# END: Danube Cloud settings
+printf "%4s\n" "done"
 
 create_zpools "$DISK_LAYOUT"
 
 printf "%-56s" "Saving /usbkey/config... "
 mv $tmp_config /usbkey/config || fatal "failed to persist configuration"
+printf "%4s\n" "done"
+
+printf "%-56s" "Saving /usbkey/answers.json... "
+mv /tmp/answers.json /usbkey/answers.json
 printf "%4s\n" "done"
 
 # set the root password
@@ -2447,7 +2559,7 @@ printf "%4s\n" "done"
 sync
 sleep 1
 
-if [[ ${install_to_hdd} -eq 1 ]]; then
+if [[ ${install_to_hdd} -eq 1 ]] && [[ $(getanswer "auto_reboot") != "true" ]]; then
     echo
     echo "==> Please remove the USB flash drive and press [enter] to continue."
     read PAUSE
