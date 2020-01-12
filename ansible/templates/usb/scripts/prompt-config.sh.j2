@@ -2250,7 +2250,7 @@ network) instead of connecting directly using the admin network.\n\n"
 	else
 		remote_node=0
 	fi
-	add_to_answers "remote_node" "$(num_to_bool "${remote_node}")"
+	add_to_answers "remote_node" "${remote_node}"
 	skip_cfgdb_check=$(getanswer "skip_cfgdb_check")
 	[[ -z ${skip_cfgdb_check} || ${skip_cfgdb_check} != "true" ]] && check_cfgdb
 {% endif %}
