@@ -75,6 +75,7 @@ define HELP_TEXT
   env VERSION=\"v4.0-beta2\" EXTRA_VARS=\"software_branch=master\" gmake esdc-mgmt
   env VERSION=\"v4.0-rc1\" gmake esdc-mgmt
   env VERSION=\"v4.0\" gmake archive-monitoring
+  env EXTRA_VARS="appliance_name=esdc-dns appliance_version=latest target_version=20200209" gmake vm-optlocal
   env VERSION=\"v4.0\" EXTRA_VARS=\"usb_type=hn\" gmake usb-image
   env VERSION=\"v4.0\" EXTRA_VARS=\"usb_type=cn\" gmake usb-image
 
@@ -127,3 +128,6 @@ archive-opt-custom opt-custom-archive:
 
 archive-esdc-node esdc-node-archive:
 	@bin/ansible.sh build-archive-esdc-node
+
+vm-optlocal vm-optlocal-archive:
+	@bin/ansible.sh build-vm-optlocal

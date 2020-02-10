@@ -1,6 +1,7 @@
 pdns_config_dir: /opt/local/etc
+pdns_include_dir: /opt/local/etc/pdns.conf.d
 pdns_service: pdns
 
 pdns_packages:
-    - powerdns40
-    - powerdns40-pgsql
+    - powerdns
+    - powerdns-pgsql

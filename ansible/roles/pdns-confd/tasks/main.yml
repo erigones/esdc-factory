@@ -1,0 +1,111 @@
+---
+- name: Check OS
+  fail: msg="Invalid OS; Only SmartOS is supported."
+  when: ansible_distribution != "SmartOS"
+
+- name: Create pdns-confd group
+  group: #gid={{ pdnsconfd_gid }}
+         name={{ pdnsconfd_group }}
+         state=present
+
+- name: Create pdns-confd user
+  user: #uid={{ pdnsconfd_uid }}
+        name={{ pdnsconfd_user }}
+        group={{ pdnsconfd_group }}
+        groups="{{ pdns_group }},{{ pdns_recursor_group }}"
+        home={{ pdnsconfd_home }}
+        shell={{ pdnsconfd_shell }}
+        profile="Primary Administrator"
+        createhome=no
+        state=present
+
+- name: Install pdns-confd dependencies
+  command: pkgin -y install {{ item }}
+  register: res_deps
+  changed_when: "'nothing to do.' not in res_deps.stdout"
+  with_items: "{{ pdnsconfd_dependencies }}"
+
+- name: Ensure that pdns-confd HOME does not exist
+  file: name={{ pdnsconfd_home }}
+        state=absent
+
+- name: Clone pdns-confd source code repository
+  git: repo={{ pdnsconfd_source.repo }}
+       dest={{ pdnsconfd_home }}
+       version={{ pdnsconfd_source.version }}
+       accept_hostkey=yes
+
+#- name: Compile all python code
+#  command: python -m compileall "{{ pdnsconfd_home }}"
+#  # skip if envs is present (it chokes over it)
+#  creates: "{{ pdnsconfd_home }}/envs"
+
+- name: Create python virtualenv
+  pip:
+    chdir: "{{ pdnsconfd_home }}"
+    virtualenv: "{{ pdnsconfd_home }}/envs"
+    #virtualenv_command: "/opt/local/bin/virtualenv-3.7"
+    requirements: "{{ pdnsconfd_home }}/requirements.txt"
+  vars:
+    ansible_python_interpreter: /opt/local/bin/python3
+
+- name: Create pdns.conf.d
+  file:
+    path: "{{ pdns_include_dir }}"
+    owner: "{{ pdnsconfd_user }}"
+    group: "{{ recursor_setgid }}"
+    mode: 0750
+    state: directory
+
+- name: Create recursor.conf.d
+  file:
+    path: "{{ recursor_include_dir }}"
+    owner: "{{ pdnsconfd_user }}"
+    group: "{{ recursor_setgid }}"
+    mode: 0750
+    state: directory
+
+- name: Create empty forward.zones file
+  file:
+    path: "{{ recursor_forward_zones_file }}"
+    owner: "{{ pdnsconfd_user }}"
+    group: "{{ recursor_setgid }}"
+    mode: 0750
+    state: touch
+
+- name: Create pdns-confd configuration file
+  template: src=pdns-confd.ini.j2
+            dest="{{ pdnsconfd_conf }}"
+            owner="{{ pdnsconfd_user }}"
+            group="{{ recursor_setgid }}"
+            mode=0640
+
+- name: Set config file perms
+  file:
+    path: "{{ pdnsconfd_conf }}"
+    owner: "{{ pdnsconfd_user }}"
+    group: "{{ pdnsconfd_group }}"
+    mode: 0640
+
+- name: Create pdns-confd SMF file
+  template: src=pdns-confd.xml.j2
+            dest=/opt/local/lib/svc/manifest/pdns-confd.xml
+            owner=root
+            group=root
+            mode=0644
+
+- name: Check if SMF manifests are imported
+  shell: /usr/bin/svcs -Ho state pdns-confd 2>/dev/null
+  ignore_errors: true
+  register: smf_state
+  changed_when: smf_state.rc != 0
+  when: ansible_distribution == "SmartOS"
+
+- name: Import pdns-confd SMF manifest
+  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns-confd.xml
+  when: ansible_distribution == "SmartOS" and smf_state is failed
+
+# will be enabled by zoneinit script
+- name: Ensure pdns-confd is disabled
+  service: name=pdns-confd enabled=no state=stopped
+

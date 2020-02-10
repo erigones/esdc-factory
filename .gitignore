@@ -18,3 +18,7 @@
 etc/config.yml
 etc/hosts.cfg
 etc/files
+
+# python virtualenvs
+envs
+envs[23]

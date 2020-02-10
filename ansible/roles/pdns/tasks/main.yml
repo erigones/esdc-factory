@@ -44,3 +44,12 @@
             owner=root
             group={{ pdns_setuid }}
             mode=0640
+
+- name: Create include dir pdns.conf.d
+  file:
+    path: "{{ pdns_include_dir }}"
+    owner: "{{ pdns_setuid }}"
+    group: "{{ pdns_setgid }}"
+    mode: 0770
+    state: directory
+

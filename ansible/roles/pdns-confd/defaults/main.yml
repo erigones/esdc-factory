@@ -1,0 +1,26 @@
+---
+pdnsconfd_source:
+  repo: "https://github.com/erigones/pgconfgen.git"
+  version: "{{ pdnsconfd_branc | default('master') }}"
+
+pdnsconfd_user: pdns-confd
+pdnsconfd_group: pdns-confd
+#pdnsconfd_uid: 10000
+#pdnsconfd_gid: 10000
+pdnsconfd_shell: /usr/bin/false
+
+pdnsconfd_home: /opt/pdns-confd
+
+pdnsconfd_conf: /opt/local/etc/pdns-confd.ini
+
+pdnsconfd_dependencies:
+    - py37-virtualenv
+    - git
+    - gcc7
+
+pdns_group: pdns
+pdns_recursor_group: pdns-recursor
+pdns_include_dir: /opt/local/etc/pdns.conf.d
+recursor_setgid: "pdns-recursor"
+recursor_include_dir: /opt/local/etc/recursor.conf.d
+recursor_forward_zones_file: "{{ recursor_include_dir }}/forward.zones"

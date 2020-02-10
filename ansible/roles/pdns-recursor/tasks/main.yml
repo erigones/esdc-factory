@@ -44,3 +44,19 @@
             owner=root
             group={{ recursor_setgid }}
             mode=0640
+
+- name: Create include dir recursor.conf.d
+  file:
+    path: "{{ recursor_include_dir }}"
+    owner: "{{ recursor_setuid }}"
+    group: "{{ recursor_setgid }}"
+    mode: 0770
+    state: directory
+
+- name: Create empty forward.zones file
+  file:
+    path: "{{ recursor_forward_zones_file }}"
+    owner: "{{ recursor_setuid }}"
+    group: "{{ recursor_setgid }}"
+    mode: 0770
+    state: touch

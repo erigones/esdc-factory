@@ -1,0 +1,33 @@
+[main]
+db_connstring = host=@PGSQL_HOST@ port=@PGSQL_PORT@ user=@PGSQL_USER@ password=@PGSQL_PASSWORD@ dbname=pdns connect_timeout=5
+db_retry_timeout=30
+db_keepalive=900
+notify_channel= pdns_notify
+
+[domains_modified]
+jinja_template = {{ pdnsconfd_home }}/contrib/pdns-forward-zones-file.j2
+outfile = {{ recursor_forward_zones_file }}
+outfile_group = pdns-recursor
+outfile_mode = 640
+; requires "Primary Administrator" user profile
+reload_command = /usr/bin/pfexec /opt/local/bin/rec_control reload-zones | grep -vq failed
+sql_table_name = domains
+sql_table_cols =name
+
+[recursor_cfg_modified]
+jinja_template = {{ pdnsconfd_home }}/contrib/generic.conf.j2
+outfile  = {{ recursor_include_dir }}/esdc.conf
+outfile_group = pdns-recursor
+outfile_mode = 640
+reload_command = /usr/bin/pfexec {{ pdnsconfd_home }}/contrib/smartos-reload-smf.sh restart svc:/pkgsrc/pdns-recursor:default
+sql_table_name = cfg_recursor
+sql_table_cols = key, val
+
+[pdns_cfg_modified]
+jinja_template = {{ pdnsconfd_home }}/contrib/generic.conf.j2
+outfile  = {{ pdns_include_dir }}/esdc.conf
+outfile_group = pdns
+outfile_mode = 640
+reload_command = /usr/bin/pfexec {{ pdnsconfd_home }}/contrib/smartos-reload-smf.sh restart svc:/pkgsrc/pdns:default
+sql_table_name = cfg_pdns
+sql_table_cols = key, val
