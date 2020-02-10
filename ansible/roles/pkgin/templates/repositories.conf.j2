@@ -1,2 +1,3 @@
-{{ pkgin_mirror }}/packages/SmartOS/{{ pkgin_release }}/{{ pkgin_arch }}/All
-{% for repo in pkgin_repositories %}{{ repo }}{% endfor %}
+{% for repo in pkgin_repositories %}
+{{ repo }}
+{% endfor %}

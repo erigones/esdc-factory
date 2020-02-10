@@ -26,6 +26,7 @@
     - esdc-common
     - pdns
     - pdns-recursor
+    - pdns-confd
     - zabbix-agent
     - esdc-dns
     - vm-image

@@ -1,5 +1,7 @@
 recursor_config_dir: /opt/local/etc
+recursor_include_dir: /opt/local/etc/recursor.conf.d
+recursor_forward_zones_file: "{{ recursor_include_dir }}/forward.zones"
 recursor_service: pdns-recursor
 
 recursor_packages:
-    - powerdns40-recursor
+    - powerdns-recursor

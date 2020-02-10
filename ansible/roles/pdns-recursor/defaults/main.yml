@@ -2,20 +2,21 @@
 recursor_setuid: "pdns-recursor"
 recursor_setgid: "pdns-recursor"
 
-recursor_allow_from: "127.0.0.0/8, ::1/128"
+#recursor_allow_from: "127.0.0.0/8, ::1/128"
 
-recursor_threads: 2
-recursor_max_cache_entries: 1000000
-recursor_max_cache_ttl: 86400
-recursor_max_mthreads: 2048
-recursor_max_negative_ttl: 3600
-recursor_max_packetcache_entries: 500000
-recursor_network_timeout: 1500
-recursor_packetcache_servfail_ttl: 60
-recursor_packetcache_ttl: 3600
+#recursor_threads: 2
+#recursor_max_cache_entries: 1000000
+#recursor_max_cache_ttl: 86400
+#recursor_max_mthreads: 2048
+#recursor_max_negative_ttl: 3600
+#recursor_max_packetcache_entries: 500000
+#recursor_network_timeout: 1500
+#recursor_packetcache_servfail_ttl: 60
+#recursor_packetcache_ttl: 3600
 
-recursor_local_address: "127.0.0.1"
-recursor_local_port: "5353"
+recursor_local_address: "0.0.0.0, ::"
+recursor_local_port: "53"
+recursor_version_string: "Danube Cloud PDNS Recursor"
 
-recursor_forward_zones: []
-recursor_forward_zones_recurse: []
+#recursor_forward_zones: []
+#recursor_forward_zones_recurse: []

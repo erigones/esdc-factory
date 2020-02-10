@@ -1,15 +1,15 @@
-pdns_allow_axfr_ips: ""
-pdns_disable_axfr: "no"
-pdns_master: "yes"
+#pdns_allow_axfr_ips: ""
+#pdns_disable_axfr: "no"
+#pdns_master: "yes"
 
 pdns_db_host: "@PGSQL_HOST@"
 pdns_db_port: "@PGSQL_PORT@"
 pdns_db_user: "@PGSQL_USER@"
 pdns_db_password: "@PGSQL_PASSWORD@"
-pdns_allow_recursion: "0.0.0.0/0"
+#pdns_allow_recursion: "0.0.0.0/0"
 
-recursor_forward_zones_recurse:
-  - "@PDNS_RECURSOR_FORWARDERS@"
+#recursor_forward_zones_recurse:
+#  - "@PDNS_RECURSOR_FORWARDERS@"
 
 #zbx_agent_Server: "@SERVER@"
 zbx_agent_UserParameter:
