@@ -1,4 +1,12 @@
 ---
+#- name: Debug print image vars
+#  debug:
+#    msg: 
+#      - "{{ base_image_manifest_url }}"
+#      - "{{ base_image_manifest_file }}"
+#      - "{{ base_image_file_url }}"
+#      - "{{ base_image_file_file }}"
+
 - name: Set base image facts for download and import operations (CentOS)
   when: zone_brand == "kvm"
   set_fact:
