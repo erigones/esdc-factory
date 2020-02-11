@@ -1,0 +1,14 @@
+
+- name: Create archive {{ pkg_name }}{{ pkg_ext }} from /opt/local
+  shell: chdir="/zones/{{ zone_image_uuid }}/root/opt" nice gtar -cJf "/var/tmp/{{ pkg_name }}{{ pkg_ext }}" local
+
+- name: Save local archive {{ save_dir }}/{{ pkg_name }}{{ pkg_ext }}
+  fetch: src="/var/tmp/{{ pkg_name }}{{ pkg_ext }}" dest="{{ save_dir }}/" flat=yes fail_on_missing=yes validate_checksum=yes
+
+- name: Remove archive from node
+  file: path="/var/tmp/{{ pkg_name }}{{ pkg_ext }}" state=absent
+
+- name: Remove base image of VM from previous failed build
+  shell: imgadm delete -P zones "{{ zone_image_uuid }}"
+  when: remove_base_image and image_imported is succeeded
+  ignore_errors: true

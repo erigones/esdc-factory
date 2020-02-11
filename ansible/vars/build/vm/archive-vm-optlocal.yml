@@ -1,0 +1,22 @@
+
+appliance_name: "{{ appliance_name | mandatory }}"
+appliance_version: "{{ src_version | default('latest') }}"
+
+remove_base_image: true
+zone_brand: joyent
+zone_uuid: 837d58d0-3e4b-60f9-b318-a1c99b0b894e
+base_image_manifest_file: "{{ appliance_name }}-{{ appliance_version }}.imgmanifest"
+base_image_manifest_url: "{{ builder.appliance.url }}/{{ appliance_name }}/{{ base_image_manifest_file }}"
+zone_image_uuid: "{{ (lookup('pipe', 'curl -s {{ base_image_manifest_url }}') | from_json)['uuid'] }}"
+base_image_file_url: "{{ builder.image.url }}/{{ zone_image_uuid }}/file"
+base_image_file_file: "{{ appliance_name }}-{{ appliance_version }}.zfs.gz"
+
+save_dir: "{{ builder.archive.dir }}"
+
+pkg_base_name: "local-{{ appliance_name }}"
+pkg_desc: "/opt/local directory on {{ appliance_name }}"
+pkg_name: "{{ pkg_base_name }}-{{ version }}"
+pkg_ext: ".txz"
+pkg_link: "{{ pkg_base_name }}-latest"
+pkg_link_exts:
+  - "{{ pkg_ext }}"
