@@ -11,7 +11,7 @@
     mode=0640
 
 - name: Import Ergones pkgsrc gpg key
-  shell: curl -k https://pkgsrc.erigones.org/GPG.key.pub | gpg --no-default-keyring --keyring /opt/local/etc/gnupg/pkgsrc.gpg --import
+  shell: curl -k https://pkgsrc.danube.cloud/GPG.key.pub | gpg --no-default-keyring --keyring /opt/local/etc/gnupg/pkgsrc.gpg --import
 
 - name: Refresh pkgsrc DB
   shell: pkgin -f update

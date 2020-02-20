@@ -1,11 +1,11 @@
 ---
-pkgin_mirror: http://pkgsrc.erigones.org
+pkgin_mirror: "https://pkgsrc.danube.cloud"
 pkgin_release: 2019Q4
 pkgin_arch: x86_64
 
 pkgin_repositories:
-  - "https://pkgsrc.erigones.org/packages/SmartOS/{{ pkgin_release }}/{{ pkgin_arch }}/All"
+  -        "{{ pkgin_mirror }}/packages/SmartOS/{{ pkgin_release }}/{{ pkgin_arch }}/All"
   - "https://pkgsrc.joyent.com/packages/SmartOS/{{ pkgin_release }}/{{ pkgin_arch }}/All"
 
 pkgin_repository_keys:
-  - "https://pkgsrc.erigones.org/GPG.key.pub"
+  - "{{ pkgin_mirror }}/GPG.key.pub"

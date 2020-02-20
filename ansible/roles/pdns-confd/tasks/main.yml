@@ -94,7 +94,7 @@
             group=root
             mode=0644
 
-- name: Check if SMF manifests are imported
+- name: Check if SMF manifest is imported
   shell: /usr/bin/svcs -Ho state pdns-confd 2>/dev/null
   ignore_errors: true
   register: smf_state
