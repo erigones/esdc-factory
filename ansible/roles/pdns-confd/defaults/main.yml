@@ -1,7 +1,7 @@
 ---
 pdnsconfd_source:
   repo: "https://github.com/erigones/pgconfgen.git"
-  version: "{{ pdnsconfd_branc | default('master') }}"
+  version: "{{ pdnsconfd_branch | default('master') }}"
 
 pdnsconfd_user: pdns-confd
 pdnsconfd_group: pdns-confd

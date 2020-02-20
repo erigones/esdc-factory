@@ -75,7 +75,7 @@ define HELP_TEXT
   env VERSION=\"v4.0-beta2\" EXTRA_VARS=\"software_branch=master\" gmake esdc-mgmt
   env VERSION=\"v4.0-rc1\" gmake esdc-mgmt
   env VERSION=\"v4.0\" gmake archive-monitoring
-  env VERSION=\"v4.0\" EXTRA_VARS="appliance_name=esdc-dns src_version=latest" gmake vm-optlocal
+  env VERSION=\"v4.0\" EXTRA_VARS=\"appliance_name=esdc-dns src_version=latest\" gmake vm-optlocal
   env VERSION=\"v4.0\" EXTRA_VARS=\"usb_type=hn\" gmake usb-image
   env VERSION=\"v4.0\" EXTRA_VARS=\"usb_type=cn\" gmake usb-image
 
