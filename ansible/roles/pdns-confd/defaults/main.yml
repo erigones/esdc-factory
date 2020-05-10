@@ -5,8 +5,8 @@ pdnsconfd_source:
 
 pdnsconfd_user: pdns-confd
 pdnsconfd_group: pdns-confd
-#pdnsconfd_uid: 10000
-#pdnsconfd_gid: 10000
+pdnsconfd_uid: 1002
+pdnsconfd_gid: 1002
 pdnsconfd_shell: /usr/bin/false
 
 pdnsconfd_home: /opt/pdns-confd
@@ -18,12 +18,13 @@ pdnsconfd_dependencies:
     - git
     - gcc7
 
-pdns_group: pdns
-pdns_recursor_group: pdns-recursor
-pdns_include_dir: /opt/local/etc/pdns.conf.d
-recursor_setgid: "pdns-recursor"
-recursor_include_dir: /opt/local/etc/recursor.conf.d
-recursor_forward_zones_file: "{{ recursor_include_dir }}/forward.zones"
-dnsdist_group: dnsdist
-dnsdist_include_dir: /opt/local/etc/dnsdist.conf.d
-dnsdist_recurse_nets_file: "{{ dnsdist_include_dir }}/50-recursion-subnets.conf"
+# these vars are present in other pdns-* roles, no need to redefine
+#pdns_group: pdns
+#pdns_recursor_group: pdns-recursor
+#pdns_include_dir: /opt/local/etc/pdns.conf.d
+#recursor_setgid: "pdns-recursor"
+#recursor_include_dir: /opt/local/etc/recursor.conf.d
+#recursor_forward_zones_file: "{{ recursor_include_dir }}/forward.zones"
+#dnsdist_group: dnsdist
+#dnsdist_include_dir: /opt/local/etc/dnsdist.conf.d
+#dnsdist_recurse_nets_file: "{{ dnsdist_include_dir }}/50-recursion-subnets.conf"

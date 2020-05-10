@@ -27,10 +27,12 @@
 
 - name: Create dnsdist group
   group: name={{ dnsdist_setgid }}
+         gid={{ dnsdist_gid }}
          state=present
 
 - name: Create dnsdist user
   user: name={{ dnsdist_setuid }}
+        uid={{ dnsdist_uid }}
         group={{ dnsdist_setgid }}
         shell=/usr/bin/false
         comment="PowerDNS dnsdist daemon user"

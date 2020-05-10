@@ -9,4 +9,6 @@ dnsdist_packages:
 
 dnsdist_setuid: "dnsdist"
 dnsdist_setgid: "dnsdist"
+dnsdist_uid: 1003
+dnsdist_gid: 1003
 
