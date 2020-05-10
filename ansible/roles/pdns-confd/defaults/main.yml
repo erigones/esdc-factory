@@ -24,3 +24,6 @@ pdns_include_dir: /opt/local/etc/pdns.conf.d
 recursor_setgid: "pdns-recursor"
 recursor_include_dir: /opt/local/etc/recursor.conf.d
 recursor_forward_zones_file: "{{ recursor_include_dir }}/forward.zones"
+dnsdist_group: dnsdist
+dnsdist_include_dir: /opt/local/etc/dnsdist.conf.d
+dnsdist_recurse_nets_file: "{{ dnsdist_include_dir }}/50-recursion-subnets.conf"

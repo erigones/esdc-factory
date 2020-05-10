@@ -2,6 +2,7 @@
 db_connstring = host=@PGSQL_HOST@ port=@PGSQL_PORT@ user=@PGSQL_USER@ password=@PGSQL_PASSWORD@ dbname=pdns connect_timeout=5
 db_retry_timeout=30
 db_keepalive=900
+exit_delay = 5
 notify_channel= pdns_notify
 
 [domains_modified]
@@ -31,3 +32,12 @@ outfile_mode = 640
 reload_command = /usr/bin/pfexec {{ pdnsconfd_home }}/contrib/smartos-reload-smf.sh restart svc:/pkgsrc/pdns:default
 sql_table_name = cfg_pdns
 sql_table_cols = key, val
+
+[pdns_recurse_modified]
+jinja_template = {{ pdnsconfd_home }}/contrib/dnsdist-recursion-subnets.conf.j2
+outfile  = {{ dnsdist_recurse_nets_file }}
+outfile_group = dnsdist
+outfile_mode = 640
+reload_command = /usr/bin/pfexec {{ pdnsconfd_home }}/contrib/smartos-reload-smf.sh restart svc:/pkgsrc/pdns-dnsdist:default
+sql_table_name = recurse_networks
+sql_table_cols = subnet, net_name
