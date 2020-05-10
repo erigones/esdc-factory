@@ -29,10 +29,12 @@
 
 - name: Create pdns-recursor group
   group: name={{ recursor_setgid }}
+         gid={{ recursor_gid }}
          state=present
 
 - name: Create pdns-recursor user
   user: name={{ recursor_setuid }}
+        uid={{ recursor_uid }}
         group={{ recursor_setgid }}
         shell=/usr/bin/false
         comment="PowerDNS recursor daemon user"

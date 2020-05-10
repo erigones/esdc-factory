@@ -29,10 +29,12 @@
 
 - name: Create groups
   group: name=pdns
+         gid={{ pdns_gid }}
          state=present
 
 - name: Create pdns user
   user: name={{ pdns_setuid }}
+        uid={{ pdns_uid }}
         group={{ pdns_setgid }}
         shell=/usr/bin/false
         comment="PowerDNS daemon user"
