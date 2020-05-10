@@ -14,8 +14,9 @@ recursor_setgid: "pdns-recursor"
 #recursor_packetcache_servfail_ttl: 60
 #recursor_packetcache_ttl: 3600
 
-recursor_local_address: "0.0.0.0, ::"
-recursor_local_port: "53"
+#recursor_local_address: "0.0.0.0, ::"
+recursor_local_address: "127.0.0.1, ::1"
+recursor_local_port: "5301"
 recursor_version_string: "Danube Cloud PDNS Recursor"
 
 #recursor_forward_zones: []

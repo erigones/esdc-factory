@@ -12,7 +12,7 @@
   user: #uid={{ pdnsconfd_uid }}
         name={{ pdnsconfd_user }}
         group={{ pdnsconfd_group }}
-        groups="{{ pdns_group }},{{ pdns_recursor_group }}"
+        groups="{{ pdns_group }},{{ pdns_recursor_group }},{{ dnsdist_group }}"
         home={{ pdnsconfd_home }}
         shell={{ pdnsconfd_shell }}
         profile="Primary Administrator"
@@ -72,6 +72,14 @@
     group: "{{ recursor_setgid }}"
     mode: 0750
     state: touch
+
+- name: Create dnsdist.conf.d
+  file:
+    path: "{{ dnsdist_include_dir }}"
+    owner: "{{ pdnsconfd_user }}"
+    group: "{{ dnsdist_group }}"
+    mode: 0750
+    state: directory
 
 - name: Create pdns-confd configuration file
   template: src=pdns-confd.ini.j2

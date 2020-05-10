@@ -1,0 +1,12 @@
+---
+dnsdist_config_dir: /opt/local/etc
+dnsdist_include_dir: /opt/local/etc/dnsdist.conf.d
+dnsdist_recurse_nets_file: "{{ dnsdist_include_dir }}/50-recursion-subnets.conf"
+dnsdist_service: pdns-dnsdist
+
+dnsdist_packages:
+    - dnsdist
+
+dnsdist_setuid: "dnsdist"
+dnsdist_setgid: "dnsdist"
+
