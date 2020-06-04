@@ -1,0 +1,13 @@
+---
+- name: Unpack opnsense image
+  shell: bunzip2 -c "{{ opnsense_local_file }}" > "{{ opnsense_local_file }}.unpacked"
+
+- name: Write opnsense image to secondary disk
+  shell: /opt/local/bin/gdd "if={{ opnsense_local_file }}.unpacked" "of=/dev/zvol/rdsk/$(vmadm get {{ zone_uuid }} | json disks.1.zfs_filesystem)" bs=16M conv=sparse oflag=dsync
+
+- name: Remove downloaded opnsense image
+  shell: rm -f "{{ opnsense_local_file }}" "{{ opnsense_local_file }}.unpacked"
+
+- name: Start VM
+  vmadm: uuid={{ zone_uuid }} state=started
+

@@ -15,7 +15,8 @@ BUILD_TARGETS =	base-centos-6 \
 				contrib-centos-8-kvm \
 				contrib-gitlab-ce \
 				contrib-centos-7-desktop \
-				contrib-odoo
+				contrib-odoo \
+				contrib-opnsense
 
 define newline
 

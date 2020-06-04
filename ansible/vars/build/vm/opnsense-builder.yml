@@ -1,0 +1,37 @@
+image_name: opnsense
+image_desc: "OPNSense router image with config.xml initialization using mdata"
+image_homepage: "{{ image_contrib_homepage }}/opnsense.rst"
+remove_base_image: false
+builder_dir: "{{ builder.appliance.dir }}/opnsense"
+zone_brand: kvm
+zone_dns_domain: local
+zone_uuid: "b0bc15bb-d71e-4cd8-b0d5-e47df4590c1a"
+zone_hostname: "{{ image_name }}-builder"
+zone_nic_0_ip: "{{ build_ips.opnsense | default(build_ip) }}"
+fbsd_image_uuid: c6d1d6d0-6691-11e9-9385-1f6fb989898c # freebsd-12 (20190424)
+#fbsd_image_uuid: 37603d78-10c7-11e8-9c60-1f1a4f40d849 # freebsd-11 (2018)
+
+opnsense_version: 20.1
+opnsense_img_source: "https://mirror.dns-root.de/opnsense/releases/{{ opnsense_version }}/OPNsense-{{ opnsense_version }}-OpenSSL-nano-amd64.img.bz2"
+opnsense_local_file: "/var/tmp/{{ opnsense_img_source | basename }}"
+image_version: "{{ opnsense_version }}"
+image_pass:     # don't use image pass (implies ssh key auth)
+
+zone_disks:
+  - boot: true
+    compression: "{{ build_disk_compression | default('lz4') }}"
+    image_size: 10240
+    image_uuid: "{{ fbsd_image_uuid }}"
+  - boot: false
+    size: 3072
+    refreservation: 3072
+    compression: "zle"
+
+image_size: 10240
+image_tags: '"internal": false, "resize": true, "deploy": false'    # json fragment
+image_brand: kvm
+
+base_image_manifest_url: "{{ builder_imgapi_mirror }}/images/{{ fbsd_image_uuid }}"
+base_image_manifest_file: "{{ image_name }}-{{ fbsd_image_uuid }}.imgmanifest"
+base_image_file_url: "{{ base_image_manifest_url }}/file"
+base_image_file_file: "{{ image_name }}-{{ fbsd_image_uuid }}.zfs.gz"

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+CFG=/conf/config.xml
+TMPCFG=/tmp/config.xml.$$
+MDGET=/usr/sbin/mdata-get
+
+if [ ! -f "$CFG" ]; then
+	$MDGET config.xml > "$TMPCFG"
+	if [ $? -ne 0 ] || [ ! -s "$TMPCFG" ]; then
+		echo No config found in metadata
+		rm -f "$TMPCFG"
+		echo Running default configuration importer
+		exec /usr/local/sbin/opnsense-importer.default "$@"
+		exit 0
+	fi
+
+	echo "Bootstrapping config.xml from metadata"
+
+	# ensure config directory structure
+	mkdir -p /conf/backup
+	mkdir -p /conf/sshd
+
+	mv -f "$TMPCFG" "$CFG"
+fi

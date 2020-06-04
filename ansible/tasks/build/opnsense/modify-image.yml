@@ -1,0 +1,49 @@
+---
+- name: Set paths
+  set_fact:
+    mnt: /mnt
+    dev: /dev/vtbd1a
+
+- name: Mount opnsense image
+  mount:
+    src: "{{ dev }}"
+    path: "{{ mnt }}"
+    fstype: ufs
+    state: mounted
+
+- name: Mount opnsense image
+  shell: cp -a "{{ item }}" "{{ mnt }}{{ item }}"
+  with_items:
+    - /usr/sbin/mdata-list
+    - /usr/sbin/mdata-get
+    - /usr/sbin/mdata-put
+
+- name: Rename original opnsense-importer
+  shell: mv "{{ mnt }}/usr/local/sbin/opnsense-importer" "{{ mnt }}/usr/local/sbin/opnsense-importer.default"
+
+- name: Place customized opnsense-importer
+  copy:
+    src: "files/opnsense/opnsense-importer"
+    dest: "{{ mnt }}/usr/local/sbin/opnsense-importer"
+    mode: "0755"
+
+- name: Make videoconsole default
+  lineinfile:
+    path: /mnt/boot/loader.conf
+    regexp: '^console='
+    line: 'console="vidconsole,comconsole"'
+
+# not needed
+#- name: Make videoconsole default
+#  lineinfile:
+#    path: /mnt/boot/loader.conf
+#    regexp: '^boot_serial='
+#    line: 'boot_serial="NO"'
+
+- name: Umount opnsense image
+  mount:
+    src: "{{ dev }}"
+    path: "{{ mnt }}"
+    fstype: ufs
+    state: unmounted
+

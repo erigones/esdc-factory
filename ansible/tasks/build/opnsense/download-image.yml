@@ -1,0 +1,3 @@
+---
+- name: Download opnsense image
+  get_url: url="{{ opnsense_img_source }}" dest="{{ opnsense_local_file }}" validate_certs=no timeout=30

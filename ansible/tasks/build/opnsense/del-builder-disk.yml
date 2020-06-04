@@ -1,0 +1,11 @@
+---
+- name: Stop VM
+  vmadm: uuid="{{ zone_uuid }}" state=stopped
+
+- name: set fact
+  set_fact:
+    json_part1: '{"remove_disks":'
+
+- name: Delete builder boot disk
+  shell: echo  '{{ json_part1 }} ["/dev/zvol/rdsk/{{ zone_uuid }}-disk0"]}' | vmadm update "{{ zone_uuid }}"
+

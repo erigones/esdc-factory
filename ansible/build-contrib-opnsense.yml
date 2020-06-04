@@ -1,0 +1,39 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+# deploy a generic fbsd VM
+# that will be used to build k3os artifacts
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/opnsense-builder.yml
+  pre_tasks:
+    - include: tasks/build/opnsense/download-image.yml
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/prepare-base-image.yml
+  vars:
+    vm_start: false
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/opnsense/write-image.yml
+    - include: tasks/build/centos/register-host.yml
+        hostname=opnsense-builder
+        python_path=/usr/local/bin/python2.7
+
+- name: Modify opnsense image
+  hosts: opnsense-builder
+  gather_facts: false
+  tasks:
+    - include: tasks/build/opnsense/modify-image.yml
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/opnsense-builder.yml
+  tasks:
+    - include: tasks/build/opnsense/create-image.yml
+        ostype=bsd
