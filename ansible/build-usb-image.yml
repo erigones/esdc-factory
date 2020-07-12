@@ -10,7 +10,7 @@
   gather_facts: true  # Because of ansible_distribution check below
 
   vars:
-    usb_image_size_gb: "{% if usb_type == 'hn' %}4{% else %}2{% endif %}"
+    usb_image_size_gb: "{% if usb_type == 'hn' %}6{% else %}2{% endif %}"
     # name for temporary root fs that we will populate
     usb_tmp_image_root: "{{ usb_tmp_image }}.rootfs"
     # https://github.com/joyent/smartos-live/blob/release-20190912/tools/build_boot_image#L290
@@ -142,6 +142,14 @@
     - name: Stage esdc-node archive
       include: tasks/build/usb/esdc-node.yml
 
+    - name: Place additional opnsense templates
+      copy: src="files/opnsense/{{ item }}" dest="{{ usb_tmp_stage }}/zones/opnsense/{{ item }}" mode=0444
+      with_items:
+        - config.xml.tmpl
+        - config-seed-vars.j2.tmpl
+        - j2filters.py
+      when: usb_type == "hn"
+
     - name: Create version file
       copy: content="esdc-{{ release_edition }}-{{ usb_type }}-{{ version }}" dest="{{ usb_tmp_stage }}/version"
 
@@ -167,11 +175,10 @@
       set_fact:
         data_image_ds: 'zones/{{ zonename.stdout }}/data'
 
-    # DS mode currently does not work with GPT partitions
-    #- name: set work dataset name (if delegated DS exists)
-    #  set_fact:
-    #    tmp_image_ds: '{{ data_image_ds }}/esdc-usb-image-{{ usb_type }}'
-    #  when: data_image_ds in (ansible_mounts | map(attribute='device'))
+    - name: set work dataset name (if delegated DS exists)
+      set_fact:
+        tmp_image_ds: '{{ data_image_ds }}/esdc-usb-image-{{ usb_type }}'
+      when: data_image_ds in (ansible_mounts | map(attribute='device'))
 
     # zvol block device nodes are refreshed only after listing the root dev dir
     # (otherwise they remain old when you destroy & re-create dataset with the same name)
@@ -188,14 +195,16 @@
         - unmount USB image
         - remove delegated image dataset
 
+    # root fs is already formatted, just copy it from the image template
     - name: Format USB root fs (DS mode)
-      shell: gdd bs={{ usb_img_bs }} conv=notrunc conv=sparse oflag=dsync skip=$((usb_root_offset.stdout / {{ usb_img_bs }})) count=$((usb_root_size.stdout / {{ usb_img_bs }})) "if={{ usb_tmp_image }}" "of={{ usb_tmp_image_root }}"
+      shell: gdd bs={{ usb_img_bs }} conv=notrunc conv=sparse oflag=dsync skip=$(({{ usb_root_offset.stdout }} / {{ usb_img_bs }})) count=$(({{ usb_root_size.stdout }} / {{ usb_img_bs }})) "if={{ usb_tmp_image }}" "of=/dev/zvol/rdsk/{{ tmp_image_ds }}"
       when: tmp_image_ds is defined
-      #when: tmp_image_ds is defined and zfs_create is not failed   # example of lofs fallback
 
     - name: Mount USB image device (DS mode)
-      shell: mount -F pcfs -o noclamptime,foldcase,noatime '/dev/zvol/dsk/{{ tmp_image_ds }}:c' "{{ usb_tmp_mountpoint }}"
+      shell: mount -F pcfs -o noclamptime,foldcase,noatime '/dev/zvol/dsk/{{ tmp_image_ds }}' "{{ usb_tmp_mountpoint }}"
       when: tmp_image_ds is defined
+      vars:
+        command_warnings: False
       notify:
         - unmount USB image
         - remove delegated image dataset
@@ -223,20 +232,28 @@
     - name: Mount USB image loopback device (lofs mode)
       shell: mount -F pcfs -o noclamptime,foldcase,noatime "{{ lofiadm.stdout }}" "{{ usb_tmp_mountpoint }}"
       when: tmp_image_ds is not defined
+      vars:
+        command_warnings: False
       notify:
         - unmount USB image
         - remove loopback device
 
+    # platform must reside under 4GB in the filesystem...
+    # because there's an issue with Forth loader (it cannot read upper files properly and throws Invalid magic number, refusing to load kernel)
+    # Therefore we copy platform and boot files first.
+    - name: Copy platform files to USB image
+      shell: cd "{{ usb_tmp_stage }}" && /usr/bin/rsync --quiet --archive --no-perms --no-times --no-owner --no-group platform boot "{{ usb_tmp_mountpoint }}/"
+
+    # copy the remaining files
     - name: Copy stage files to USB image
-      #synchronize: src="{{ usb_tmp_stage }}/" dest="{{ usb_tmp_mountpoint }}/" owner=no group=no perms=no times=no
-      shell: /usr/bin/rsync --delay-updates --quiet --archive --no-perms --no-times --no-owner --no-group "{{ usb_tmp_stage }}/" "{{ usb_tmp_mountpoint }}/"
+      shell: cd "{{ usb_tmp_stage }}" && /usr/bin/rsync --delay-updates --quiet --archive --no-perms --no-times --no-owner --no-group --exclude platform --exclude boot . "{{ usb_tmp_mountpoint }}/"
 
     - name: unmount USB image
       shell: umount '{{ usb_tmp_mountpoint }}'
       register: already_unmounted
 
-    - name: Save USB image to output directory (DS mode)
-      shell: gdd "bs={% if usb_type == 'hn' %}4000000{% else %}2000000{% endif %}" count=1000 'if=/dev/zvol/rdsk/{{ tmp_image_ds }}' | gzip -9 -c > "{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}"
+    - name: Reintegrate root fs into USB image (DS mode)
+      shell: "gdd bs={{ usb_img_bs }} conv=notrunc conv=sparse oflag=dsync seek={{ (usb_root_offset.stdout|int / usb_img_bs)|int }} count={{ (usb_root_size.stdout|int / usb_img_bs)|int }} if=/dev/zvol/rdsk/{{ tmp_image_ds }} of={{ usb_tmp_image }}"
       when: tmp_image_ds is defined
 
     - meta: flush_handlers  # Unmount USB image and remove loopback device (or remove dataset)
@@ -253,9 +270,9 @@
       shell: rm -f "{{ usb_tmp_image_root }}"
       when: tmp_image_ds is not defined
 
-    - name: Save USB image to output directory (lofs mode)
+    - name: Save USB image to output directory
       shell: gzip -9 -c "{{ usb_tmp_image }}" > "{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}"
-      when: tmp_image_ds is not defined
+      #when: tmp_image_ds is not defined
 
     - name: Stat USB image file
       stat: path="{{ builder.usb.dir }}/{{ release_type }}/esdc-{{ release_edition }}-{{ usb_type }}-{{ version | mandatory }}{{ builder.usb.ext }}" checksum_algorithm="sha1"

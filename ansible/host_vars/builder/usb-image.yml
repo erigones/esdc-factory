@@ -5,12 +5,15 @@ usb_tmp_mountpoint: "{{ usb_tmp_dir }}/esdc-usb-image-{{ usb_type }}"
 usb_tmp_image: "{{ usb_tmp_dir }}/esdc-usb-{{ usb_type }}-{{ version }}.img"
 usb_root_pw: "$5$2HOHRnK3$NvLlm.1KQBbB0WjoP7xcIwGnllhzp2HnT.mDO7DpxYA"  # root
 
-platform_version: "20191019T085327Z"
-platform_upstream_version: "release-20191010"
+platform_version: "20200628T235846Z"
+platform_upstream_version: "release-20200618"
 platform_os_archive: "{{ builder.platform.dir }}/platform-{{ platform_version }}.tgz"
 platform_boot_archive: "{{ builder.platform.dir }}/boot-{{ platform_version }}.tgz"
 
 usb_vms:
+  - name: opnsense
+    version: "latest"
+    edition: ""
   - name: esdc-cfgdb
     version: "{{ release_version }}"
     edition: ""
@@ -47,6 +50,8 @@ usb_images:
   - name: esdc-mgmt
     version: "{{ release_version }}"
     edition: "-{{ release_edition }}"
+  - name: opnsense
+    version: latest
 
 usb_archives:
   # opt-custom must be before monitoring because monitoring adds SMF manifests into /opt/custom

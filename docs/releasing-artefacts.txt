@@ -1,0 +1,17 @@
+This is a list of artefacts (with commands) that need to be uploaded to download servers after new release.
+
+- in ~/bin/
+release-archives.sh
+release-public-appliances.sh
+release-public-usb.sh
+
+- upgrade of /opt/local
+scp /data/archives/local-esdc-dns-v4.3-beta2.txz root@10.100.10.30:/data/www/download.erigones.org/esdc/factory/archives/
+
+- future plans
+build-public-images.sh
+
+
+Other release steps
+- tag repos
+- update docs.danubecloud.org
