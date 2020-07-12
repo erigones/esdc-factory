@@ -12,6 +12,11 @@ recursive_ips = newNMG()
 
 includeDirectory('/opt/local/etc/dnsdist.conf.d')
 
+-- drop incoming queries containing XPF record to prevent spoofing
+-- https://web1.powerdns.com/advanced/xpf.html
+addAction(RecordsTypeCountRule(DNSSection.Additional, 65280, 1, 65535), DropAction())
+
+-- route according to recurse-allowed subnets (subnets present in local Danube installation)
 addAction(NetmaskGroupRule(recursive_ips), PoolAction('recursor'))
 addAction(AllRule(), PoolAction('authoritative'))
 
