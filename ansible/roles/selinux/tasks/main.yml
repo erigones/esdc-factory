@@ -1,7 +1,11 @@
 ---
-- name: Install policycoreutils-python-utils
+- name: Install policycoreutils-python-utils (C7)
+  yum: name=policycoreutils-python state=latest
+  when: ansible_distribution_major_version == "7" and selinux_permissive_domains is defined and selinux_state != "disabled"
+
+- name: Install policycoreutils-python-utils (C8)
   dnf: name=policycoreutils-python-utils state=latest
-  when: selinux_permissive_domains is defined and selinux_state != "disabled"
+  when: ansible_distribution_major_version == "8" and selinux_permissive_domains is defined and selinux_state != "disabled"
 
 - name: Ensure SELinux is in {{ selinux_state }} state
   selinux: state={{ selinux_state }} policy={{ selinux_policy }}

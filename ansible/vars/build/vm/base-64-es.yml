@@ -8,6 +8,7 @@ zone_brand: joyent
 zone_dns_domain: local
 zone_uuid: b442c858-f254-4a1f-a4f5-8fce46913ca6
 zone_image_uuid: e75c9d82-3156-11ea-9220-c7a6bb9f41b6 # base-64-lts 19.4.0
+#zone_image_uuid: 064508d4-73fa-11ea-84d8-b3f1f91c535e # base-64 20.1.0
 zone_hostname: "{{ image_name }}"
 zone_nic_0_ip: "{{ build_ips.base64 | default(build_ip) }}"
 zone_delegate_dataset: false

@@ -4,8 +4,8 @@
   with_items:
     - nodejs
 
-- name: Marking python27 as non auto-removable
-  shell: pkgin keep python27
+#- name: Marking python27 as non auto-removable
+#  shell: pkgin keep python27
 
 - name: Update package cache
   shell: pkgin -y update
