@@ -23,4 +23,4 @@ shipment_graceful_timeout: 10
 shipment_nginx: true
 
 shipment_dependencies:
-    - py27-virtualenv
+    - py37-virtualenv

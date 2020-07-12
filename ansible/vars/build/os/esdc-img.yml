@@ -1,6 +1,7 @@
 shipment_source:
   repo: "https://github.com/erigones/esdc-shipment.git"
-  version: "{{ software_branch }}"
+  #version: "{{ software_branch }}"
+  version: "master"
 
 #zbx_agent_Server: "@SERVER@"
 zbx_agent_UserParameter:

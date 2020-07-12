@@ -25,6 +25,8 @@
   pip: chdir={{ shipment_home }}
        virtualenv={{ shipment_home }}/envs
        requirements={{ shipment_home }}/doc/requirements.txt
+  vars:
+       ansible_python_interpreter: /opt/local/bin/python3
 
 - name: Copy nginx configration file
   copy: src={{ shipment_home }}/doc/nginx-vhost.conf
