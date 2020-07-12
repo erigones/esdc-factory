@@ -3,6 +3,10 @@
 # Danube Cloud OS dependencies
 #
 
+# postgresql12-devel requires llvm-toolset-7-clang from scl
+- name: Add Centos SCL repo
+  yum: name=centos-release-scl state=latest
+
 - name: Ensure Danube Cloud dependencies are installed
   yum: name={{ item }} state=latest
   with_items:
@@ -31,7 +35,7 @@
     - git
     - gcc
     - make
-    - postgresql{{ pg_version_nodot }}-devel
+    - postgresql{{ pg_version }}-devel
     - python-devel
     - python36-devel
     - libffi-devel
@@ -186,12 +190,19 @@
 # Configure other services related to Danube Cloud
 #
 
+#- name: Deploy esDC init scripts
+#  command: creates={{ item.dest }} /bin/cp -p {{ item.src }} {{ item.dest }}
+#  with_items:
+#    - { src: "/opt/erigones/etc/init.d/erigonesd.service", dest: "/etc/systemd/system/erigonesd.service" }
+#    - { src: "/opt/erigones/etc/init.d/erigonesd-beat.service", dest: "/etc/systemd/system/erigonesd-beat.service" }
+#    - { src: "/opt/erigones/etc/init.d/esdc@.service", dest: "/etc/systemd/system/esdc@.service" }
+
 - name: Deploy esDC init scripts
-  command: creates={{ item.dest }} /bin/cp -p {{ item.src }} {{ item.dest }}
+  shell: sed -e 's/postgresql-9.5.service/postgresql-12.service/g' '/opt/erigones/etc/init.d/{{ item }}' > '/etc/systemd/system/{{ item }}'
   with_items:
-    - { src: "/opt/erigones/etc/init.d/erigonesd.service", dest: "/etc/systemd/system/erigonesd.service" }
-    - { src: "/opt/erigones/etc/init.d/erigonesd-beat.service", dest: "/etc/systemd/system/erigonesd-beat.service" }
-    - { src: "/opt/erigones/etc/init.d/esdc@.service", dest: "/etc/systemd/system/esdc@.service" }
+    - erigonesd.service
+    - erigonesd-beat.service
+    - esdc@.service
 
 - name: Copy application stack service configurations
   copy: src="{{ item }}" dest="/etc/{{ item }}" mode=0644

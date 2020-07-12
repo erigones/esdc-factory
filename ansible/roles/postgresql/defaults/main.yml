@@ -1,5 +1,4 @@
-pg_version: '9.5'
-pg_version_nodot: "{{ pg_version.replace('.', '') }}"
+pg_version: '12'
 pg_encoding: 'UTF-8'
 pg_locale: 'en_US.UTF-8'
 

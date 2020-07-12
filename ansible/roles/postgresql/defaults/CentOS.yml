@@ -1,12 +1,11 @@
 ---
-pg_repo_el6: "http://yum.postgresql.org/{{ pg_version }}/redhat/rhel-6-x86_64/pgdg-redhat{{ pg_version_nodot }}-{{ pg_version }}-1.noarch.rpm"
-pg_repo_el7: "http://yum.postgresql.org/{{ pg_version }}/redhat/rhel-7-x86_64/pgdg-centos{{ pg_version_nodot }}-{{ pg_version }}-3.noarch.rpm"
+pg_repo_el7: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
 
 pg_packages:
-  - "postgresql{{ pg_version_nodot }}"
-  - "postgresql{{ pg_version_nodot }}-libs"
-  - "postgresql{{ pg_version_nodot }}-server"
-  - "postgresql{{ pg_version_nodot }}-contrib"
+  - "postgresql{{ pg_version }}"
+  - "postgresql{{ pg_version }}-libs"
+  - "postgresql{{ pg_version }}-server"
+  - "postgresql{{ pg_version }}-contrib"
   - "python-psycopg2"
   - "python36-psycopg2"
 
