@@ -27,6 +27,8 @@ VM_DEPLOY_TIMEOUT=600
 ERIGONES_HOME="/opt/erigones"
 ESDC_VERSION="/opt/custom/esdc.version"
 CTLSH="${ERIGONES_HOME}/bin/ctl.sh"
+ESLIB="${ERIGONES_HOME}/bin/eslib"
+PY_ENVS_PATH="${ERIGONES_HOME}/envs"
 OPENSSL="/opt/local/bin/openssl"
 OPENSSL_HOME="/opt/local/etc/openssl"
 SVC_CERT_FILE_NAME="dc-erigonesd.pem"
@@ -40,6 +42,8 @@ SVC_CERT=
 SVC_KEY=
 SVC_CERT_TMPFILE="/opt/custom/etc/esdc_svc_tmp_cert.pem"
 SVC_KEY_TMPFILE="/opt/custom/etc/esdc_svc_tmp_key.pem"
+SVC_CERT_BASE64=
+SVC_KEY_BASE64=
 
 
 # Helper functions
@@ -115,19 +119,24 @@ function configure_imgadm() {
 }
 
 # change all newlines to '\n'
-function escape_cert_data() {
-	local certfile="$1"
+# reads file and prints converted to stdout
+# Usages:
+# escape_newlines /my/file > /my/converted_file
+# CONVERTED_STRING="$(escape_newlines "<(echo "${MULTILINE_STRING}")")"
+function escape_newlines() {
+	local inputfile="$1"
 
-	if [[ -f "${certfile}" ]]; then
-		sed -re 's/$/\\\\n/g' "${certfile}" | tr -d '\n'
-	fi
+	[[ -r "${inputfile}" ]] || fatal "File not readable: ${inputfile}"
+	awk -v ORS='\\\\n' '1' "${inputfile}"
 }
 
 function generate_svc_ssl_cert() {
 	if [[ -s "${SVC_CERT_TMPFILE}" && -s "${SVC_KEY_TMPFILE}" ]]; then
 		# certificates are already generated, just load them
-		SVC_CERT="$(escape_cert_data "${SVC_CERT_TMPFILE}")"
-		SVC_KEY="$(escape_cert_data "${SVC_KEY_TMPFILE}")"
+		SVC_CERT="$(escape_newlines "${SVC_CERT_TMPFILE}")"
+		SVC_KEY="$(escape_newlines "${SVC_KEY_TMPFILE}")"
+		SVC_CERT_BASE64="$(/opt/local/bin/base64 -w 0 < "${SVC_CERT_TMPFILE}")"
+		SVC_KEY_BASE64="$(/opt/local/bin/base64 -w 0 < "${SVC_KEY_TMPFILE}")"
 		return 0
 	fi
 
@@ -150,8 +159,10 @@ EOF
 		fatal "Services SSL cert was not generated properly"
 	fi
 
-	SVC_CERT="$(escape_cert_data "${SVC_CERT_TMPFILE}")"
-	SVC_KEY="$(escape_cert_data "${SVC_KEY_TMPFILE}")"
+	SVC_CERT="$(escape_newlines "${SVC_CERT_TMPFILE}")"
+	SVC_KEY="$(escape_newlines "${SVC_KEY_TMPFILE}")"
+	SVC_CERT_BASE64="$(/opt/local/bin/base64 -w 0 < "${SVC_CERT_TMPFILE}")"
+	SVC_KEY_BASE64="$(/opt/local/bin/base64 -w 0 < "${SVC_KEY_TMPFILE}")"
 
 	# save the public cert into our location and link to openssl trusted certs
 	cp -f "${SVC_CERT_TMPFILE}" "${SVC_CERT_FILE}"
@@ -337,6 +348,72 @@ function _build_vmmanifest() {
 				-e "s|@ZABBIX_SMTP_EMAIL@|${ZABBIX_SMTP_EMAIL}|" \
 				"${template}" > "${manifest}"
 		;;
+
+		opnsense)
+			# We perform multiple iterations of templating here:
+			# opnsense config vars + OPNSENSE_CONFIG_XML_J2SEED_VARS_TEMPLATE --(sed)-->
+			# OPNSENSE_CONFIG_XML_J2SEED_VARS
+			#
+			# OPNSENSE_CONFIG_XML_J2SEED_VARS + OPNSENSE_CONFIG_XML_TEMPLATE --(j2)-->
+			# OPNSENSE_CONFIG_XML
+			# 
+			# Embed OPNSENSE_CONFIG_XML into var in this script (+ escape newlines).
+			#
+			# (VM config vars, OPNSENSE_CONFIG_XML) + ${template} --(sed)-->
+			# ${manifest}
+			#
+			# Final ${manifest} file contains embedded config.xml seed inside customer_metadata
+			# which is processed by configuration-importer inside opnsense VM.
+			#
+			# The customer_metadata also contain opnsense API keys for easier API access.
+			# 
+			# 
+			OPNSENSE_TEMPLATE_DIR="${template%/*}"
+			OPNSENSE_CONFIG_XML="${OPNSENSE_TEMPLATE_DIR}/config.xml"
+			OPNSENSE_CONFIG_XML_TEMPLATE="${OPNSENSE_CONFIG_XML}.tmpl"
+			OPNSENSE_CONFIG_XML_J2SEED_VARS="${OPNSENSE_TEMPLATE_DIR}/config-seed-vars.j2"
+			OPNSENSE_CONFIG_XML_J2SEED_VARS_TEMPLATE="${OPNSENSE_CONFIG_XML_J2SEED_VARS}.tmpl"
+			OPNSENSE_CONFIG_XML_J2_CUSTOM_FILTERS="${OPNSENSE_TEMPLATE_DIR}/j2filters.py"	# base64 filters
+
+			# generate OPNSENSE_CONFIG_XML_J2SEED_VARS_TEMPLATE for config.xml templating
+			sed -e "s|@MON_IP@|${MON_IP}|" \
+				-e "s|@DNS_IP@|${DNS_IP}|" \
+				-e "s|@CFGDB_IP@|${CFGDB_IP}|" \
+				-e "s|@MGMT_IP@|${MGMT_IP}|" \
+				-e "s|@ROOT_HASH@|${OPNSENSE_ROOT_HASH}|" \
+				-e "s|@ESDC_ADMIN_EMAIL@|${OPNSENSE_ADMIN_EMAIL}|" \
+				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
+				-e "s|@TIMESERVER@|${OPNSENSE_TIMESERVER}|" \
+				-e "s|@OPNSENSE_API_KEY@|${OPNSENSE_API_KEY}|" \
+				-e "s|@OPNSENSE_API_SECRET@|$(hash_opnsense_passwd "${OPNSENSE_API_SECRET}")|" \
+				-e "s|@OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL@|${OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL}|" \
+				-e "s|@WEB_CERT@|${SVC_CERT_BASE64}|" \
+				-e "s|@WEB_KEY@|${SVC_KEY_BASE64}|" \
+				"${OPNSENSE_CONFIG_XML_J2SEED_VARS_TEMPLATE}" > "${OPNSENSE_CONFIG_XML_J2SEED_VARS}"
+			# generate OPNSENSE_CONFIG_XML
+			run_in_virtualenv j2 --customize "${OPNSENSE_CONFIG_XML_J2_CUSTOM_FILTERS}" -f json "${OPNSENSE_CONFIG_XML_TEMPLATE}" "${OPNSENSE_CONFIG_XML_J2SEED_VARS}" > "${OPNSENSE_CONFIG_XML}"
+
+			# generate vmmanifest
+			if [[ -z "${OPNSENSE_EXTERNAL_MAC}" ]]; then
+				OPNSENSE_EXTERNAL_MAC_PLACEHOLDER=""
+			else
+				OPNSENSE_EXTERNAL_MAC_PLACEHOLDER="\"mac\": \"${OPNSENSE_EXTERNAL_MAC}\","
+			fi
+			sed -e "s|@MON_IP@|${MON_IP}|" \
+				-e "s|@ADMIN_IP@|${OPNSENSE_ADMIN_IP}|" \
+				-e "s|@ADMIN_NETMASK@|${OPNSENSE_ADMIN_NETMASK}|" \
+				-e "s|@ADMIN_VLAN_ID@|${OPNSENSE_ADMIN_VLAN_ID}|" \
+				-e "s|@EXTERNAL_IP@|${OPNSENSE_EXTERNAL_IP}|" \
+				-e "s|@EXTERNAL_NETMASK@|${OPNSENSE_EXTERNAL_NETMASK}|" \
+				-e "s|@EXTERNAL_MAC_PLACEHOLDER@|${OPNSENSE_EXTERNAL_MAC_PLACEHOLDER}|" \
+				-e "s|@EXTERNAL_GATEWAY@|${OPNSENSE_EXTERNAL_GATEWAY}|" \
+				-e "s|@EXTERNAL_VLAN_ID@|${OPNSENSE_EXTERNAL_VLAN_ID}|" \
+				-e "s|@OPNSENSE_API_KEY@|${OPNSENSE_API_KEY}|" \
+				-e "s|@OPNSENSE_API_SECRET@|${OPNSENSE_API_SECRET}|" \
+				-e "s|@CONFIG_XML@|$(escape_newlines "${OPNSENSE_CONFIG_XML}" | sed -e 's/"/\\\\"/g')|" \
+				"${template}" > "${manifest}"
+
+		;;
 	esac
 
 	json --validate -q -f "${manifest}" &> /dev/null || fatal "VM manifest validation failed for ${vm}"
@@ -360,6 +437,8 @@ function create_vm() {
 		[[ ! -f ${ds_manifest} ]] && fatal "No manifest found at ${ds_manifest}"
 
 		ds_basename="${ds_name%.imgmanifest}"
+
+
 		ds_filename="${USB_COPY}/datasets/${ds_basename}.zfs.gz"
 		[[ ! -f ${ds_filename} ]] && fatal "No filename found for ${ds_name}"
 
@@ -422,6 +501,12 @@ function create_vm() {
 				break  # Unknown brand
 			;;
 		esac
+
+		if [[ "${CONFIG_coal}" == "true" && "${vm}" == "opnsense" ]]; then
+			# opnsense doesn't boot in nested virtualization in vmware
+			# so don't wait for it
+			break
+		fi
 
 		if [[ ${seconds} -gt ${VM_DEPLOY_TIMEOUT} ]]; then
 			timeout="true"
@@ -687,7 +772,78 @@ function get_password() {
 
 function random_string() {
 	local length="${1:-24}"
-	openssl rand -base64 "${length}" | tr -dc _A-Z-a-z-0-9
+	local options="${2:-none}"
+	local rand=
+
+	rand="$(openssl rand -base64 "${length}")"
+	if [[ "${options}" == "nostrip" ]]; then
+		tr -d "\n" <<< "${rand}"
+	else
+		# strip awkward characters
+		tr -dc _A-Z-a-z-0-9 <<< "${rand}"
+	fi
+}
+
+#!! git merge opnsense !!
+# opnsense API keys
+# key="$(random_string 60 nostrip)"
+# secret="$(hash_opnsense_passwd "$(random_string 60 nostrip)")"
+#2DO:
+# generate opnsense-template_vars.json from opnsense-template_vars.json-tmpl
+# generate config.xml from config.xml-pre-deploy2 using j2
+	# . /opt/erigones/envs/bin/activate
+	# j2 --customize /usbkey/.../customize.py -f json config.xml-pre-deploy template_vars-j2dc.json | sed -e 's/\n/\\n/g' > config.xml-generated-j2dc
+# create zones/esdc-opnsense/vmmanifest.tmpl
+# add opnsense section to _build_vmmanifest (create vmmanifest) 
+# add opnsense info to cfgdb (raw api secret?, zisiel by sa aj v mgmt db (dat len tak do mdata?))
+# skusit pridat do opnsense zabbix_agenta?
+# build esdc-opnsense (add creating customer_metadata.esdc_vm_installed mdata in opnsense-importer) # alternativa: urobit len 1 image a dat tam vyhybku ak nieco uvidi v mdata, tak pushne mdata
+# pridat opnsense do usb_vms
+# pridat do fw cfg vypnute forwardy pre cfgdb & mon01?
+
+# using older hash (5) because opnsense doesn't understand the newest one (6)
+function hash_opnsense_passwd() {
+	local pass="$1"
+	local tmpconf="/tmp/policy.conf.$$"
+
+	cp /etc/security/policy.conf "${tmpconf}"
+	sed -i '' 's/^CRYPT_DEFAULT=.*$/CRYPT_DEFAULT=5/' "${tmpconf}"
+	mount -F lofs "${tmpconf}" /etc/security/policy.conf
+	/usr/lib/cryptpass "${pass}"
+	umount /etc/security/policy.conf
+	rm -f "${tmpconf}"
+}
+
+# Usage: exec_from_eslib prog arg1 arg2 arg3 ...
+function exec_from_eslib() {
+	local app="$1"
+
+	cd "${ESLIB}"
+	[[ -x "${app}" ]] || fatal "File is not executable: ${ESLIB}/${app}"
+
+	shift
+	"${app}" "$@"
+}
+
+# block private networks if external IP is public
+function opnsense_compute_block_privnets() {
+	local ip="$1"
+
+	if [[ "$(exec_from_eslib ip_is_private.py "${ip}")" == "True" ]]; then
+		printf "0"
+	else
+		printf "1"
+	fi
+}
+
+# run specified command with loaded esdc envs
+function run_in_virtualenv() {
+	[[ -z "$*" ]] && fatal "No commands provided for run_in_virtualenv()"
+	[[ ! -d "${PY_ENVS_PATH}" ]] && fatal "Virtualenv not found: ${PY_ENVS_PATH}"
+
+	. "${PY_ENVS_PATH}/bin/activate"
+	"$@"
+	deactivate
 }
 
 #
@@ -726,6 +882,23 @@ DNS_RESOLVERS="${CONFIG_dns_resolvers}"
 domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
 [[ -z "${domainname}" ]] && domainname="example.com"
 ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"zabbix@mon01.local"}"
+OPNSENSE_ADMIN_IP="${CONFIG_admin_gateway}"
+OPNSENSE_ADMIN_NETMASK="${CONFIG_admin_netmask}"
+OPNSENSE_ADMIN_VLAN_ID="${CONFIG_admin_vlan_id:-0}"
+OPNSENSE_EXTERNAL_IP="${CONFIG_opnsense_external_ip}"
+OPNSENSE_EXTERNAL_NETMASK="${CONFIG_opnsense_external_netmask}"
+OPNSENSE_EXTERNAL_MAC="${CONFIG_opnsense_external_mac}"
+OPNSENSE_EXTERNAL_GATEWAY="${CONFIG_opnsense_external_gw}"
+OPNSENSE_EXTERNAL_VLAN_ID="${CONFIG_opnsense_external_vlan:-0}"
+OPNSENSE_ROOT_HASH="${CONFIG_opnsense_root_shadow}"
+OPNSENSE_ADMIN_EMAIL="${CONFIG_admin_email:-""}"
+OPNSENSE_TIMESERVER="$(awk -F, '{print $1}' <<< "${CONFIG_ntp_hosts}")"
+OPNSENSE_API_KEY="$(random_string 60 nostrip)"
+OPNSENSE_API_SECRET="$(random_string 60 nostrip)"
+OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL="$(opnsense_compute_block_privnets "${OPNSENSE_EXTERNAL_IP}")"
+OPNSENSE_WEB_CERT=
+OPNSENSE_WEB_KEY=
+
 
 generate_svc_ssl_cert
 configure_erigonesd

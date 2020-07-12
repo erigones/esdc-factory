@@ -54,6 +54,7 @@ declare prmpt_str
 declare admin_iface_active
 declare install_to_hdd
 declare nicsup_done
+declare nicsup_opnsense_done=0
 declare -A answers_out
 
 # Additional NIC tags definitions
@@ -172,7 +173,27 @@ num_to_ip()
 
 	ip_addr="$fld_a.$fld_b.$fld_c.$fld_d"
 }
+{% raw %}
+# converts IP prefix to netmask
+# e.g. 24 -> 255.255.255.0
+cdr2mask ()
+{
+	[[ -z "$1" ]] && return 1
+	# Number of args to shift, 255..255, first non-255 byte, zeroes
+	set -- $(( 5 - ($1 / 8) )) 255 255 255 255 $(( (255 << (8 - ($1 % 8))) & 255 )) 0 0 0
+	[ $1 -gt 1 ] && shift $1 || shift
+	echo ${1-0}.${2-0}.${3-0}.${4-0}
+}
 
+mask2cdr ()
+{
+   # Assumes there's no "255." after a non-255 byte in the mask
+   local x=${1##*255.}
+   set -- 0^^^128^192^224^240^248^252^254^ $(( (${#1} - ${#x})*2 )) ${x%%.*}
+   x=${1%%$3*}
+   echo $(( $2 + (${#x}/4) ))
+}
+{% endraw %}
 #
 # Converts an IP and netmask to their numeric representation.
 # Sets the global variables IP_NUM, NET_NUM, NM_NUM and BCAST_ADDR to their
@@ -611,16 +632,21 @@ init_etherstubs()
 }
 
 # Input must be a valid network number (see is_net())
+# extra: comma separated values that are considered valid besides the MAC addr
 promptnet()
 {
 	val=""
 	def="$2"
 	key="$3"
+	extra="$4"
 
 	if [[ -n ${key} ]]; then
 		val=$(getanswer "${key}")
 		if [[ ${val} == "<default>" && -n ${def} ]]; then
 			val=${def}
+		fi
+		if is_in_vals "${val}" "${extra}"; then
+			return 0
 		fi
 		if [[ ${val} != "none" && ${val} != "dhcp" ]]; then
 			is_net "$val" || val=""
@@ -636,11 +662,108 @@ promptnet()
 		printf "$prmpt_str"
 		read val
 		[ -z "$val" ] && val="$def"
+		is_in_vals "${val}" "${extra}" && break
 		if [[ ${val} != "none" && ${val} != "dhcp" ]]; then
 			is_net "$val" || val=""
 		fi
 		[ -n "$val" ] && break
 		echo "A valid network number (n.n.n.n) or 'dhcp' must be provided."
+	done
+}
+
+# get lowest usable IP in the given network
+compute_def_gw()
+{
+	local ip="$1"
+	local netmask="$2"
+
+	ip_netmask_to_network "$ip" "$netmask"
+	val="$(num_to_ip $((NET_NUM+1)); echo $ip_addr)"
+}
+
+# key: string
+# vals: comma separated possible values
+is_in_vals()
+{
+	local key="$1"
+	local vals="$2"
+
+	if [[ -n "${key}" ]] && [[ -n "${vals}" ]] && [[ ",${vals}," =~ ,${key}, ]]; then
+		# found
+		return 0
+	else
+		return 1
+	fi
+}
+
+prompt_select()
+{
+	local vals="$1"
+	local def="$2"
+	local key="$3"
+
+	val=""
+	while [ -z "${val}" ]; do
+		promptval "Enter your choice" "${def}" "${key}"
+		is_in_vals "${val}" "${vals}" && break
+		prinf "Invalid input '${val}'. Valid choices: ${vals}\n"
+		val=""
+	done
+	return 1
+}
+
+is_mac()
+{
+	local mac="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
+
+	if [[ "${mac}" =~ ^[0-9a-f]{2}(:[0-9a-f]{2}){5}$ ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+# Input must be a valid MAC address
+# extra: comma separated values that are considered valid besides the MAC addr
+promptmac()
+{
+	val=""
+	def="$2"
+	key="$3"
+	extra="$4"
+
+	if [[ -n ${key} ]]; then
+		val=$(getanswer "${key}")
+		if [[ ${val} == "<default>" && -n ${def} ]]; then
+			val=${def}
+		fi
+
+		if is_in_vals "${val}" "${extra}"; then
+			return 0
+
+		elif [[ -n ${val} ]]; then
+			is_mac "$val" || val=""
+		fi
+	fi
+
+	while [ -z "${val}" ]; do
+		if [[ -n "${def}" ]]; then
+			prmpt_str="$1 [${def}]: "
+		else
+			prmpt_str="$1: "
+		fi
+		printf "${prmpt_str}"
+		read val
+		[ -z "${val}" ] && val="${def}"
+
+		is_in_vals "${val}" "${extra}" && break
+		is_mac "${val}" || val=""
+		[ -n "${val}" ] && break
+
+		errstr="A valid MAC address (xx:xx:xx:xx:xx:xx)"
+		[ -n "${extra}" ] && errstr="${errstr} or one of '${extra}'"
+		errstr="${errstr} must be provided."
+		echo "${errstr}"
 	done
 }
 
@@ -650,10 +773,10 @@ printnics()
 
 	i=1
 	printf "%-6s %-9s %-18s %-7s %-10s\n" "Number" "Link" "MAC Address" \
-	    "State" "Network"
+		"State" "Network"
 	while [ $i -le $nic_cnt ]; do
 		printf "%-6d %-9s %-18s %-7s %-10s\n" $i ${nics[$i]} \
-		    ${macs[$i]} ${states[$i]} ${assigned[i]}
+			${macs[$i]} ${states[$i]} ${assigned[i]}
 		((i++))
 	done
 
@@ -1027,10 +1150,11 @@ nicsup()
 		fi
 	done
 
-	if [[ -n ${headnode_default_gateway}
-	    && ${headnode_default_gateway} != "none" ]]; then
+	if [[ -n "${headnode_default_gateway}"
+		&& "${headnode_default_gateway}" != "none"
+		&& "${nicsup_opnsense_done:-0}" -eq 0 ]]; then
 
-		route add default $headnode_default_gateway >/dev/null
+		route add default "${headnode_default_gateway}" >/dev/null
 	fi
 
 	nicsup_done=1
@@ -1064,6 +1188,99 @@ nicsdown()
 	done
 
 	nicsup_done=0
+}
+
+nicsup_opnsense()
+{
+	[[ "${nicsup_opnsense_done:-0}" -eq 1 ]] && return
+
+	local vnic_opts=""
+	local ntag=external
+
+	printf "\n\nBringing up fake opnsense interface...\n"
+
+	if [[ -n "${opnsense_external_vlan}" ]]; then
+		vnic_opts="-v ${opnsense_external_vlan}"
+	fi
+
+	if [[ "${opnsense_external_mac_type}" == "manual" ]]; then
+		vnic_opts="-m ${opnsense_external_mac} ${vnic_opts}"
+
+	elif [[ "${opnsense_external_mac_type}" == "node" ]]; then
+		# we have to swap the MAC addresses
+
+		new_mac_addr="$(generate_mac)"
+		vnic_opts="-m ${opnsense_external_mac} ${vnic_opts}"
+
+		# change MAC address of physical interface to something random
+		ifconfig "${nictag_ifaces[$ntag]}" ether "${new_mac_addr}"
+
+		nictag_preserve_mac[opnsense]="${opnsense_external_mac},${new_mac_addr}"
+	fi
+
+	dladm create-vnic -l "${nictag_ifaces[$ntag]}" $vnic_opts "opnsense0"
+
+	#ifconfig "opnsense0" plumb
+	ipadm create-if "opnsense0"
+	if [[ "${opnsense_external_ip}" == "dhcp" ]]; then
+		#ifconfig "opnsense0" up
+		#ifconfig "opnsense0" dhcp
+		ipadm create-addr -t -T dhcp opnsense0/v4
+
+		# get vars from DHCP data
+		ipadm_addr="$(ipadm show-addr -po addr opnsense0/v4)"
+		printf "OPNSense DHCP IP: ${ipadm_addr}\n"
+		opnsense_external_ip="${ipadm_addr%/*}"
+		opnsense_external_netmask="$(cdr2mask "${ipadm_addr##*/}")"
+		opnsense_external_gw="$(netstat -rn | awk '/^default .* opnsense0 *$/ {print $2}')"
+
+		if [[ -z "${opnsense_external_ip}" ]] || [[ -z "${opnsense_external_netmask}" ]]; then
+		  printf "Error: failed to get proper IP address from dhcp\n"
+	fi
+	if [[ -z "${opnsense_external_gw}" ]]; then
+		printf "Error: failed to get external default gateway address from dhcp\n"
+		elif [[ "${headnode_default_gateway}" == "opnsense" ]]; then
+			# get external gw from opnsense's external dhcp
+			headnode_default_gateway="${opnsense_external_gw}"
+		fi
+	else
+		#ifconfig "opnsense0" inet "${opnsense_external_ip}" netmask "${opnsense_external_netmask}" up
+		ipadm create-addr -t -T static -a "${opnsense_external_ip}/$(mask2cdr "${opnsense_external_netmask}")" opnsense0/v4
+		route add default "${opnsense_external_gw}" >/dev/null
+	fi
+
+	nicsup_opnsense_done=1
+}
+
+nicsdown_opnsense()
+{
+	[[ "${nicsup_opnsense_done:-0}" -eq 0 ]] && return
+	printf "\n\nBringing down the opnsense interface...\n"
+	local ntag=external
+	
+	#ifconfig "opnsense0" inet down unplumb
+	ipadm delete-if opnsense0
+	dladm delete-vnic "opnsense0"
+
+	if [[ "${opnsense_external_mac_type}" == "node" ]]; then
+		# restore MAC address
+		ifconfig "${nictag_ifaces[$ntag]}" ether "${opnsense_external_mac}"
+	fi
+
+	nicsup_opnsense_done=0
+}
+
+# using older hash (5) because opnsense doesn't understand the newest one (6)
+function hash_opnsense_passwd() {
+	local pass="$1"
+	local tmpconf="/tmp/policy.conf.$$"
+
+	cp /etc/security/policy.conf "${tmpconf}"
+	sed -i '' 's/^CRYPT_DEFAULT=.*$/CRYPT_DEFAULT=5/' "${tmpconf}"
+	mount -F lofs "${tmpconf}" /etc/security/policy.conf
+	/usr/lib/cryptpass "${pass}"
+	umount /etc/security/policy.conf
+	rm -f "${tmpconf}"
 }
 
 printdisklayout()
@@ -1322,7 +1539,7 @@ create_dump()
 
 	# Create the dump zvol
 	zfs create -V ${dumpsize}mb -o checksum=noparity ${SYS_ZPOOL}/dump || \
-	    fatal "failed to create the dump zvol"
+		fatal "failed to create the dump zvol"
 	dumpadm -d /dev/zvol/dsk/${SYS_ZPOOL}/dump >/dev/null
 	[[ $? -eq 0 ]] || fatal "failed to enable dump device"
 }
@@ -1466,7 +1683,7 @@ setup_datasets()
 
 		size=${SYSINFO_MiB_of_Memory}
 		zfs create -V ${size}mb ${SWAPVOL} || fatal \
-		    "failed to create swap partition"
+			"failed to create swap partition"
 
 		swap -a /dev/zvol/dsk/${SWAPVOL}
 		printf "%4s\n" "done"
@@ -1556,10 +1773,10 @@ create_zpool()
 	# If this is not a manual layout, then we've been given
 	# a JSON file describing the desired pool, so use that:
 	mkzpool -f ${rpoolarg} "${pool}" "${layout}" || \
-	    fatal "failed to create pool ${pool}"
+		fatal "failed to create pool ${pool}"
 
 	zfs set atime=off ${pool} || \
-	    fatal "failed to set atime=off for pool ${pool}"
+		fatal "failed to set atime=off for pool ${pool}"
 
 	printf "%4s\n" "done"
 
@@ -1892,11 +2109,13 @@ and Danube Cloud installation.\n\n"
 	message="
 To set up networking you must first configure network tags. A network tag
 refers to a physical NIC or an aggregation. Virtual machines will be created on
-top of a network tag. Setup will first create an admin network tag and
+top of a network tags. Setup will first create an admin network tag and
 configure a NIC so that you can access the Danube Cloud node. Then you will
 have the option to create additional network tags and to configure
 additional NICs for accessing the compute node or virtual machines.
+{% if usb_type == "hn" %}You will also be asked whether to deploy OPNSense VM as a router from admin network.
 
+{% endif %}
 Press [enter] to continue"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
@@ -1965,11 +2184,18 @@ The configured NIC will be used to access the compute node.\n\n"
 	message="
 By using additional network tags, you can easily identify multiple physical
 network interconnections between compute nodes.
+
 There are $(echo $nictag_list | wc -w | tr -d "[:space:]") configurable network tags:
 $nictag_list
 
 One physical NIC can have multiple network tags.
-The tags can be added or modified also later by the nictagadm command.\n\n"
+The tags can be added or modified also later by the nictagadm command.
+
+{% if usb_type == "hn" -%}
+If you want to deploy OPNSense router during this install,
+you have to add 'external' network tag now.
+\n"
+{% endif %}
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
 		printf "$message"
@@ -2021,45 +2247,212 @@ The tags can be added or modified also later by the nictagadm command.\n\n"
 		done
 	fi
 
-	printheader "Networking - default gateway"
-	message="
+{# omit whole condition about opnsense if not HN #}
+{% if usb_type == "hn" %}
+	if [[ -z "${nictag_ifaces[external]}" ]]; then
+		printf "\nNo external network tag defined, disabling OPNSense.\n"
+		sleep 1
+		deploy_opnsense=n
+	else
+		printheader "Networking - routing from admin network"
+		message="
+(experimental)
+If you don't have external router that can be used to connect the admin
+network to the internet, you can choose to deploy OPNSense appliance
+to serve as a router from 'admin' to 'external' network.
+\n"
+		if [[ $(getanswer "skip_instructions") != "true" ]]; then
+			printf "$message"
+		fi
+
+		[[ -z "${deploy_opnsense}" ]] && deploy_opnsense=n
+		promptbool "Deploy OPNSense VM? (y/n)" "${deploy_opnsense}" "deploy_opnsense"
+		deploy_opnsense="$val"
+		add_to_answers deploy_opnsense "${deploy_opnsense}"
+	fi
+
+	if [[ "${deploy_opnsense}" =~ ^1$|^y|^true$ ]]; then
+
+		# we already know admin_ip, admin_netmask and admin_vlan_id
+		if [[ -z "$opnsense_admin_ip" ]]; then
+			# set default value
+			compute_def_gw "$admin_ip" "$admin_netmask"
+			opnsense_admin_ip="${val}"
+		fi
+
+		while : ;do
+			promptnet "\nEnter OPNSense admin network IP (= default gw for admin net)" "$opnsense_admin_ip" "opnsense_admin_ip"
+			if [[ "${val}" == "dhcp" ]] || [[ "${val}" == "none" ]]; then
+				printf "Error: '${val}' is not a valid option here.\n"
+				continue
+			fi
+			opnsense_admin_ip="${val}"
+			add_to_answers "opnsense_admin_ip" "${opnsense_admin_ip}"
+			admin_gateway="${opnsense_admin_ip}"
+			break
+		done
+
+		[[ -z "$opnsense_external_ip" ]] && opnsense_external_ip="dhcp"	# default
+		while : ;do
+			promptnet "Enter OPNSense external network IP" "$opnsense_external_ip" "opnsense_external_ip"
+			if [[ "${val}" == "${nictag_ips[external]}" && "${val}" != "dhcp" ]]; then
+				printf "This address is already used by external node interface. Please choose other IP.\n"
+				continue
+			fi
+			opnsense_external_ip="${val}"
+			add_to_answers "opnsense_external_ip" "${opnsense_external_ip}"
+			break
+		done
+
+		if [[ "${opnsense_external_ip}" != "dhcp" ]]; then
+			if [[ -z "${opnsense_external_netmask}" ]]; then # set default
+			 	if [[ -z "${nictag_netmasks[external]}" || "${nictag_netmasks[external]}" == "N/A" ]]; then
+					# either external node IP is not set
+				 	# or in case of DHCP, nictag_netmasks[external] is set to N/A
+					opnsense_external_netmask="255.255.255.0"
+				else
+					opnsense_external_netmask="${nictag_netmasks[external]}"
+				fi
+			fi
+			promptnet "Enter OPNSense external network netmask" "$opnsense_external_netmask" "opnsense_external_netmask"
+			opnsense_external_netmask="${val}"
+			add_to_answers "opnsense_external_netmask" "${opnsense_external_netmask}"
+		fi
+
+		if [[ ${advanced_install} -eq 1 ]] && [[ "${opnsense_external_ip}" != "dhcp" ]]; then
+			if [[ -z "${nictag_vlans[external]}" ]]; then
+				[[ -z "$opnsense_external_vlan" ]] && opnsense_external_vlan="none"
+				promptvlan "Enter OPNSense external network vlan" "$opnsense_external_vlan" "opnsense_external_vlan"
+				opnsense_external_vlan="${val}"
+				add_to_answers "opnsense_external_vlan" "${opnsense_external_vlan}"
+			else
+				opnsense_external_vlan="${nictag_vlans[external]}"
+				printf "OPNSense external network vlan set to ${opnsense_external_vlan}"
+				add_to_answers "opnsense_external_vlan" "${opnsense_external_vlan}"
+			fi
+		fi
+
+		if [[ "${opnsense_external_ip}" != "dhcp" ]]; then
+			if [[ -z "$opnsense_external_gw" ]]; then	# compute proposal
+				compute_def_gw "$opnsense_external_ip" "$opnsense_external_netmask"
+				opnsense_external_gw="${val}"
+			fi
+
+			promptnet "Enter OPNSense external default gw IP" "$opnsense_external_gw" "opnsense_external_gw"
+			opnsense_external_gw="${val}"
+			add_to_answers "opnsense_external_gw" "${opnsense_external_gw}"
+		fi
+
+		if [[ ${advanced_install} -eq 1 ]]; then
+			if [[ $(getanswer "skip_instructions") != "true" ]]; then
+				printf "\nSome providers require a specific MAC to be set.\n"
+				printf "You can set the MAC address here or leave it to 'auto'\n"
+				printf "You can enter 'node' to take the MAC address from this node's external interface\n"
+				printf "(mutually exclusive with preserving MAC address on node's external interface).\n\n"
+			fi
+			[[ -z "$opnsense_external_mac" ]] && opnsense_external_mac="auto"
+
+			promptmac "Enter OPNSense external nic MAC addr" "$opnsense_external_mac" "opnsense_external_mac" "auto,node"
+			opnsense_external_mac="${val}"
+			add_to_answers "opnsense_external_mac" "${opnsense_external_mac}"
+			opnsense_external_mac_type="${opnsense_external_mac}"
+			is_mac "${opnsense_external_mac_type}" && opnsense_external_mac_type=manual
+
+			if [[ "${opnsense_external_mac_type}" == node ]]; then
+				opnsense_external_mac="${nictag_macs[external]}"
+				if [[ -n "${nictag_preserve_mac[external]}" ]]; then
+						printf "Disabling previously selected option of preserving node MAC address and assigning the external interface's MAC to opnsense."
+						add_to_answers "${ntag}_preserve_mac" "false"
+						unset nictag_preserve_mac[external]
+				fi
+			fi
+		else
+			opnsense_external_mac_type="auto"
+			opnsense_external_mac="auto"
+		fi
+
+		if [[ -n "${nictag_ips[external]}" ]]; then
+			if [[ $(getanswer "skip_instructions") != "true" ]]; then
+				printf "\nWhere to set the default gw for compute node? (the node itself, not the opnsense) \n"
+				printf "It can be 'admin' or 'external' network.\n"
+			fi
+			[[ -z "$headnode_default_network" ]] && headnode_default_network=external
+			prompt_select "admin,external" "$headnode_default_network" "headnode_default_network"
+			headnode_default_network="$val"
+			add_to_answers "headnode_default_network" "${headnode_default_network}"
+
+			if [[ "$headnode_default_network" == "admin" ]]; then
+				headnode_default_gateway="${admin_gateway}"
+			elif [[ "$headnode_default_network" == "external" ]] && [[ "${nictag_ips[external]}" == "dhcp" ]]; then
+				# node's def gw will be set by dhcp
+				headnode_default_gateway="none"
+			elif [[ "$headnode_default_network" == "external" ]] && [[ "${opnsense_external_ip}" == "dhcp" ]]; then
+				# will be set when dhcp comes up
+				headnode_default_gateway="opnsense"
+			else
+				headnode_default_gateway="${opnsense_external_gw}"
+			fi
+
+		else
+			headnode_default_gateway="${admin_gateway}"
+			headnode_default_network="admin"
+		fi
+
+		# enable opnsense network configuration now to be able to connect to the internet
+		nicsup_opnsense
+
+	else	# no opnsense
+{% endif %}
+		printheader "Networking - default gateway"
+		message="
 The default gateway will determine which router will be used to connect
 this compute node to other networks. This is probably the router
 connected to your 'admin' or 'external' network.
-Use 'none' if you have no gateway or you rely only on the dhcp.\n\n"
 
-	if [[ $(getanswer "skip_instructions") != "true" ]]; then
-		printf "$message"
-	fi
-
-	# default to external_gateway if that's set, if not, use 'none'
-	[[ -z "$headnode_default_gateway" && -n ${external_gateway} ]] && \
-		headnode_default_gateway="$external_gateway"
-	if [[ -z "$headnode_default_gateway" && "$admin_ip" != "dhcp" ]]; then
-		# re-assign admin IPs to global variables and set default suggestion
-		ip_netmask_to_network "$admin_ip" "$admin_netmask"
-		headnode_default_gateway="$(num_to_ip $((NET_NUM+1)); echo $ip_addr)"
-	fi
-	[[ -z "$headnode_default_gateway" ]] && \
-		headnode_default_gateway="none"
-
-	promptnet "Enter the default gateway IP" "$headnode_default_gateway" "headnode_default_gateway"
-	headnode_default_gateway="${val}"
-	add_to_answers "headnode_default_gateway" "${val}"
-	# if headnode_default_gateway is outside the admin subnet,
-	# we need to ask for the admin gw
-	if ip_from_subnet "$headnode_default_gateway" "$admin_ip" "$admin_netmask"; then
-		admin_gateway="$headnode_default_gateway"
-	else
-		if [[ -z "$admin_gateway" ]]; then
-			# set default value
-			admin_gateway=$(num_to_ip $(($NET_NUM + 1)) && echo $ip_addr)
+Use 'none' if you have no gateway or you rely only on the dhcp.
+\n"
+		if [[ $(getanswer "skip_instructions") != "true" ]]; then
+			printf "$message"
 		fi
-		prompt_ip_from_subnet "Enter the default gateway of the admin network"\
-			"$admin_gateway" admin_gateway "$admin_ip" "$admin_netmask"
-		admin_gateway="${val}"
+
+		# default to external gateway if external IP is configured
+		if [[ -z "$headnode_default_gateway" && -n "${nictag_ips[external]}" ]]; then
+			compute_def_gw "${nictag_ips[external]}" "${nictag_netmasks[external]}"
+			headnode_default_gateway="${val}"
+		fi
+		# fallback to admin network
+		if [[ -z "$headnode_default_gateway" && "$admin_ip" != "dhcp" ]]; then
+			# re-assign admin IPs to global variables and set default suggestion
+			compute_def_gw "$admin_ip" "$admin_netmask"
+			headnode_default_gateway="${val}"
+		fi
+		# 'none' if dhcp
+		[[ -z "$headnode_default_gateway" ]] && \
+			headnode_default_gateway="none"
+
+
+		promptnet "Enter the default gateway IP" "$headnode_default_gateway" "headnode_default_gateway"
+		headnode_default_gateway="${val}"
+		add_to_answers "headnode_default_gateway" "${val}"
+
+		# if headnode_default_gateway is outside the admin subnet,
+		# we need to ask for the admin gw
+		if ip_from_subnet "$headnode_default_gateway" "$admin_ip" "$admin_netmask"; then
+			admin_gateway="$headnode_default_gateway"
+		else
+			if [[ -z "$admin_gateway" ]]; then
+				# set default value
+				admin_gateway=$(num_to_ip $(($NET_NUM + 1)) && echo $ip_addr)
+			fi
+			prompt_ip_from_subnet "Enter the default gateway of the admin network"\
+				"$admin_gateway" admin_gateway "$admin_ip" "$admin_netmask"
+			admin_gateway="${val}"
+		fi
+		add_to_answers "admin_gateway" "${admin_gateway}"
+{% if usb_type == "hn" %}
 	fi
-	add_to_answers "admin_gateway" "${admin_gateway}"
+	# End of block: opnsense vs direct default gw
+{% endif %}
 
 	# Bring the admin and external nics up now: they need to be for the
 	# connectivity checks in the next section
@@ -2313,6 +2706,7 @@ monitoring alerts.\n\n"
 
 	# Bring the admin and external nics down now: we don't need them anymore
 	nicsdown
+	nicsdown_opnsense
 
 	# Save MAC address dictionary when changing MACs
 	change_macs=()
@@ -2364,6 +2758,7 @@ the system will be set up and all data on the disks will be erased.\n\n"
 		printf "Search Domain: %s\n" "$dns_domain"
 		printf "Hostname: %s\n" "$hostname"
 		printf "Default gateway: %s\n" "$headnode_default_gateway"
+		[[ -n "${opnsense_external_gw}" ]] && printf "OPNSense default gateway: %s\n" "$opnsense_external_gw"
 		printf "NTP server: %s\n" "$ntp_hosts"
 		echo
 		[[ "${install_to_hdd}" -eq 1 ]] && tohdd="Yes" || tohdd="No"
@@ -2372,6 +2767,10 @@ the system will be set up and all data on the disks will be erased.\n\n"
 		printf "Datacenter name: %s\n" "$datacenter_name"
 {% if usb_type == "hn" %}
 		printf "Management portal IP address: %s\n" "${mgmt_admin_ip}"
+		if [[ -n "${opnsense_external_ip}" ]]; then
+				printf "Management portal external URL: %s\n" "https://${opnsense_external_ip}/"
+				printf "OPNSense management URL: %s\n" "https://${opnsense_external_ip}:444/"
+		fi
 		printf "Administrator's e-mail address: %s\n" "${admin_email}"
 {% else %}
 		printf "Configuration database IP address: %s\n" "${cfgdb_admin_ip}"
@@ -2443,6 +2842,23 @@ fi
 # transfer nictag_preserve_mac to the change_mac config option
 if [[ -n "${!nictag_preserve_mac[@]}" ]]; then
 	echo "change_mac=$(echo "${nictag_preserve_mac[@]}" | tr " " ";")" >>$tmp_config
+{% if usb_type == "hn" %}
+	if [[ -n "${nictag_preserve_mac[opnsense]}" ]]; then
+			# we have to swap mac addresses for all nic tags that point to node's external nic
+			# (it is possible that multiple nic tags (even admin) share the same nic
+			orig_mac="$(cut -d, -f1 <<< "${nictag_preserve_mac[opnsense]}")"
+			virt_mac="$(cut -d, -f2 <<< "${nictag_preserve_mac[opnsense]}")"
+			for ntag in "${!nictag_ips[@]}"; do
+					if [[ "${nictag_macs[$ntag]}" == "${orig_mac}" ]]; then
+							nictag_macs[$ntag]="${virt_mac}"
+					fi
+			done
+			# admin interface is not part of nictag_macs
+			if [[ "${admin_nic}" == "${orig_mac}" ]]; then
+					admin_nic="${virt_mac}"
+			fi
+	fi
+{% endif %}
 fi
 
 echo >>$tmp_config
@@ -2514,6 +2930,22 @@ echo "img_admin_ip=${img_admin_ip}" >>$tmp_config
 {% endif %}
 echo "cfgdb_admin_ip=${cfgdb_admin_ip}" >>$tmp_config
 echo "esdc_install_password='${esdc_install_password}'" >>$tmp_config
+echo >>$tmp_config
+{% if usb_type == "hn" %}
+if [[ -n "${opnsense_admin_ip}" ]]; then
+	echo "opnsense_external_ip='${opnsense_external_ip}'" >>$tmp_config
+	echo "opnsense_external_netmask='${opnsense_external_netmask}'" >>$tmp_config
+	echo "opnsense_external_gw='${opnsense_external_gw}'" >>$tmp_config
+	if [[ -n "${opnsense_external_vlan}" ]]; then
+		echo "opnsense_external_vlan='${opnsense_external_vlan}'" >>$tmp_config
+	fi
+	if is_mac "${opnsense_external_mac}"; then
+		echo "opnsense_external_mac=${opnsense_external_mac}" >>$tmp_config
+	fi
+	echo "opnsense_root_shadow='$(hash_opnsense_passwd "$root_shadow")'" >>$tmp_config
+	echo >>$tmp_config
+fi
+{% endif %}
 echo "install_to_hdd=${install_to_hdd}" >>$tmp_config
 if [[ -n "${remote_node}" ]]; then
 	echo "remote_node=${remote_node}" >>$tmp_config

@@ -1,0 +1,57 @@
+{
+  "autoboot": true,
+  "brand": "kvm",
+  "vcpus": 1,
+  "cpu_cap": 150,
+  "vnc_port": 20002,
+  "disks": [
+    {
+      "image_uuid": "{{ IMAGE_UUID }}",
+      "image_size": 10240,
+      "boot": true,
+      "model": "virtio",
+      "media": "disk",
+      "compression": "lz4"
+    }
+  ],
+  "nics": [
+    {
+      @EXTERNAL_MAC_PLACEHOLDER@
+      "nic_tag": "admin",
+      "gateway": "@EXTERNAL_GATEWAY@",
+      "ip": "@EXTERNAL_IP@",
+      "netmask": "@EXTERNAL_NETMASK@",
+      "vlan_id": "@EXTERNAL_VLAN_ID@",
+      "network_uuid": "0e1a84da-0222-cefe-e53c-ddc254179888",
+      "model": "virtio",
+      "primary": true
+    },
+    {
+      "nic_tag": "admin",
+      "ip": "@ADMIN_IP@",
+      "netmask": "@ADMIN_NETMASK@",
+      "vlan_id": "@ADMIN_VLAN_ID@",
+      "network_uuid": "d42bc4c3-ba17-43ee-a02a-74e667bd41fa",
+      "model": "virtio"
+    }
+  ],
+  "ram": 512,
+  "hostname": "opnsense01.local",
+  "alias": "opnsense01.local",
+  "uuid": "ccb71fd2-52f1-6589-bdfe-9859631ab0dd",
+  "customer_metadata": {
+    "opnsense_api_key": "@OPNSENSE_API_KEY@",
+    "opnsense_api_secret": "@OPNSENSE_API_SECRET@",
+    "config.xml": "@CONFIG_XML@"
+  },
+  "internal_metadata": {
+    "author": "Erigones",
+    "installed": true,
+    "alias": "opnsense01",
+    "ostype": 3,
+    "mon_ip": "@MON_IP@"
+  },
+  "owner_uuid": "1",
+  "qemu_extra_opts": "-chardev socket,path=/tmp/vm.qga,server,nowait,id=qga0 -device virtio-serial -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0",
+  "indestructible_zoneroot": true
+}

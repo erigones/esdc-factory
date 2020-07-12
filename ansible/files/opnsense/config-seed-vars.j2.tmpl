@@ -1,0 +1,27 @@
+{
+  "hostname": "opnsense01.local",
+  "domain": "local",
+  "root_hash": "@ROOT_HASH@",
+  "root_email": "@ESDC_ADMIN_EMAIL@",
+  "root_shell": "/bin/sh",
+  "root_authorized_keys": "@ROOT_AUTHORIZED_KEYS@",
+  "root_api_key": "@OPNSENSE_API_KEY@",
+  "root_api_secret": "@OPNSENSE_API_SECRET@",
+  "timeservers": "@TIMESERVER@ 0.opnsense.pool.ntp.org",
+  "timeserver_preferred": "@TIMESERVER@",
+  "nic_public_if": "vtnet0",
+  "nic_public_name": "external",
+  "nic_public_ip": "dhcp",
+  "nic_public_blockprivnets": "@OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL@",
+  "nic_public_blockbogons": "1",
+  "nic_private_if": "vtnet1",
+  "nic_private_name": "admin",
+  "nic_private_ip": "dhcp",
+  "default_gw": "dynamic",
+  "opnsense_mgmt_port": "444",
+  "mgmt01_ip": "@MGMT_IP@",
+  "dns01_ip": "@DNS_IP@",
+  "web_ssl_cert": "@WEB_CERT@",
+  "web_ssl_key": "@WEB_KEY@"
+}
+
