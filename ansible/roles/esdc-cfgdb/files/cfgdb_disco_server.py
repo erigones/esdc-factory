@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+
 from socket import socket, AF_INET, SOCK_DGRAM
 from subprocess import check_output, CalledProcessError
 import sys
@@ -34,9 +34,9 @@ s.bind(('', PORT))
 while True:
     data, addr = s.recvfrom(BUFFER_SIZE)  # Wait for a packet
 
-    if data.startswith(DISCO_MESSAGE):
+    if data.startswith(DISCO_MESSAGE.encode()):
         if DISCO_REPLY is None:
             DISCO_REPLY = 'cfgdb_reply:%s' % get_dc_name()
 
         eprint('Got discovery request from %s, sending reply...' % addr[0])
-        s.sendto(DISCO_REPLY, addr)
+        s.sendto(DISCO_REPLY.encode(), addr)

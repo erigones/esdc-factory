@@ -8,28 +8,10 @@ import json
 import signal
 import logging
 import subprocess
+import urllib.parse
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
-try:
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    import urlparse
-except ImportError:
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from urllib import parse as urlparse
-
-try:
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-except ImportError:
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from http.server import BaseHTTPRequestHandler, HTTPServer
-
-PY3 = sys.version_info[0] >= 3
-
-if PY3:
-    string_types = (str,)
-else:
-    # noinspection PyUnresolvedReferences
-    string_types = (basestring,)
+string_types = (str,)
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
@@ -61,7 +43,7 @@ class RESTRequestHandler(BaseHTTPRequestHandler):
     @property
     def content(self):
         if self._content is None:
-            content_length = int(self.headers.getheader('Content-Length', 0))
+            content_length = int(self.headers.get('Content-Length', 0))
 
             if content_length:
                 self._content = self.rfile.read(content_length)
@@ -70,11 +52,11 @@ class RESTRequestHandler(BaseHTTPRequestHandler):
 
         return self._content
 
-    def send_json_response(self, data, status=200):
+    def send_json_response(self, data: dict, status=200):
         self.send_response(status)
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
-        self.wfile.write(json.dumps(data))
+        self.wfile.write(json.dumps(data).encode())
 
     def parse_json_content(self):
         content = self.content
@@ -174,14 +156,14 @@ class ZKRESTRequestHandler(RESTRequestHandler):
         logger.debug('Running command: %s', cmd)
         exc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
         stdout, stderr = exc.communicate()
-        res = {'returncode': exc.returncode, 'stdout': stdout.strip(), 'stderr': stderr.strip()}
+        res = {'returncode': exc.returncode, 'stdout': stdout.strip().decode(), 'stderr': stderr.strip().decode()}
         logger.info('Command "%s" finished with %s', cmd, res)
 
         return res
 
     def handle_request(self):
-        url = urlparse.urlparse(self.path)
-        qs = urlparse.parse_qs(url.query)
+        url = urllib.parse.urlparse(self.path)
+        qs = urllib.parse.parse_qs(url.query)
         zk_cmd = qs.get('cmd', None)
 
         if zk_cmd:
@@ -203,7 +185,7 @@ class ZKRESTRequestHandler(RESTRequestHandler):
                 raise TypeError
         except (TypeError, ValueError):
             logger.error('Request [%s %s] has invalid JSON content: "%s"', zk_cmd, url.path, self.content)
-            self.send_json_response('Malformed request', status=400)
+            self.send_json_response({'detail': 'Malformed request'}, status=400)
             return
         else:
             logger.debug('Request [%s %s] has JSON content: "%s"', zk_cmd, url.path, data)
@@ -220,9 +202,9 @@ class ZKRESTRequestHandler(RESTRequestHandler):
         if res['returncode'] == 0:
             status = 200
         else:
-            if 'node does not exist' in res['stderr']:
+            if 'node does not exist' in res['stderr'][0]:
                 status = 404
-            elif 'node already exists' in res['stderr']:
+            elif 'node already exists' in res['stderr'][0]:
                 status = 406
             else:
                 status = 400
