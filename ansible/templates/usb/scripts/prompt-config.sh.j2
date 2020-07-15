@@ -2933,6 +2933,7 @@ echo "esdc_install_password='${esdc_install_password}'" >>$tmp_config
 echo >>$tmp_config
 {% if usb_type == "hn" %}
 if [[ -n "${opnsense_admin_ip}" ]]; then
+	echo "opnsense_deploy='true'" >>$tmp_config
 	echo "opnsense_external_ip='${opnsense_external_ip}'" >>$tmp_config
 	echo "opnsense_external_netmask='${opnsense_external_netmask}'" >>$tmp_config
 	echo "opnsense_external_gw='${opnsense_external_gw}'" >>$tmp_config
@@ -2943,6 +2944,9 @@ if [[ -n "${opnsense_admin_ip}" ]]; then
 		echo "opnsense_external_mac=${opnsense_external_mac}" >>$tmp_config
 	fi
 	echo "opnsense_root_shadow='$(hash_opnsense_passwd "$root_shadow")'" >>$tmp_config
+	echo >>$tmp_config
+else
+	echo "opnsense_deploy='false'" >>$tmp_config
 	echo >>$tmp_config
 fi
 {% endif %}

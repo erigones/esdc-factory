@@ -3,6 +3,7 @@
 CFG=/conf/config.xml
 TMPCFG=/tmp/config.xml.$$
 MDGET=/usr/sbin/mdata-get
+MDPUT=/usr/sbin/mdata-put
 
 if [ ! -f "$CFG" ]; then
 	$MDGET config.xml > "$TMPCFG"
@@ -21,4 +22,6 @@ if [ ! -f "$CFG" ]; then
 	mkdir -p /conf/sshd
 
 	mv -f "$TMPCFG" "$CFG"
+
+	$MDPUT config_imported true
 fi

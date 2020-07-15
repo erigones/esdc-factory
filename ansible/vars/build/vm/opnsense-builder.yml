@@ -23,8 +23,8 @@ zone_disks:
     image_size: 10240
     image_uuid: "{{ fbsd_image_uuid }}"
   - boot: false
-    size: 3072
-    refreservation: 3072
+    size: 5120
+    refreservation: 5120
     compression: "zle"
 
 image_size: 10240

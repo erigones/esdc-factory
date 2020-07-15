@@ -357,15 +357,15 @@ function _build_vmmanifest() {
 			# OPNSENSE_CONFIG_XML_J2SEED_VARS + OPNSENSE_CONFIG_XML_TEMPLATE --(j2)-->
 			# OPNSENSE_CONFIG_XML
 			# 
-			# Embed OPNSENSE_CONFIG_XML into var in this script (+ escape newlines).
+			# Embed OPNSENSE_CONFIG_XML into var in this script (+ escape newlines and quotes).
 			#
 			# (VM config vars, OPNSENSE_CONFIG_XML) + ${template} --(sed)-->
 			# ${manifest}
 			#
 			# Final ${manifest} file contains embedded config.xml seed inside customer_metadata
-			# which is processed by configuration-importer inside opnsense VM.
+			# which is processed by configuration-importer at opnsense VM boot.
 			#
-			# The customer_metadata also contain opnsense API keys for easier API access.
+			# The customer_metadata also contain opnsense API keys for opnsense management.
 			# 
 			# 
 			OPNSENSE_TEMPLATE_DIR="${template%/*}"
@@ -426,6 +426,10 @@ function _build_vmmanifest() {
 function create_vm() {
 	vm=$1
 	ds_file="${USB_COPY}/zones/${vm}/dataset"
+
+	if [[ "${vm}" == "opnsense" && "${OPNSENSE_DEPLOY}" != "true" ]]; then
+		return 0
+	fi
 
 	cr_once
 
@@ -492,8 +496,18 @@ function create_vm() {
 				fi
 			;;
 			"kvm")
-				if [[ -n "$(json "customer_metadata.esdc_vm_installed" < "${zonepath}/config/metadata.json")" ]]; then
-					echo '{"remove_customer_metadata": ["esdc_vm_installed"]}' | vmadm update "${vm_uuid}" > /dev/null 2> /dev/null
+				if [[ "${vm}" == "opnsense" ]]; then
+					if [[ "${CONFIG_coal}" == "true" ]]; then
+						# opnsense doesn't boot in nested vmware virtualization so don't wait for it
+						break
+					fi
+					vm_installed_mdata_name="config_imported"
+				else
+					vm_installed_mdata_name="esdc_vm_installed"
+				fi
+
+				if [[ -n "$(json "customer_metadata.${vm_installed_mdata_name}" < "${zonepath}/config/metadata.json")" ]]; then
+					echo '{"remove_customer_metadata": ["${vm_installed_mdata_name}"]}' | vmadm update "${vm_uuid}" > /dev/null 2> /dev/null
 					break
 				fi
 			;;
@@ -501,12 +515,6 @@ function create_vm() {
 				break  # Unknown brand
 			;;
 		esac
-
-		if [[ "${CONFIG_coal}" == "true" && "${vm}" == "opnsense" ]]; then
-			# opnsense doesn't boot in nested virtualization in vmware
-			# so don't wait for it
-			break
-		fi
 
 		if [[ ${seconds} -gt ${VM_DEPLOY_TIMEOUT} ]]; then
 			timeout="true"
@@ -662,6 +670,8 @@ function configure_cfgdb() {
 	_zk creater "/esdc/nodes/headnodes" "${SYSINFO_UUID}"
 
 	for vm in {{ usb_vms|map(attribute='name')|list|join(' ') }}; do
+		[[ "${vm}" == "opnsense" && "${OPNSENSE_DEPLOY}" != "true" ]] && continue
+
 		vm_manifest="${USB_COPY}/zones/${vm}/vmmanifest"
 		[[ ! -f "${vm_manifest}" ]] && continue
 
@@ -675,6 +685,11 @@ function configure_cfgdb() {
 		_zk creater "/esdc/vms/${vm}/hosts/1/hostname" "$(echo ${vm_json} | json hostname)"
 		_zk creater "/esdc/vms/${vm}/hosts/1/ip" "${vm_ip}"
 		_zk creater "/esdc/vms/${vm}/hosts/1/node" "${SYSINFO_UUID}"
+
+		if [[ "${vm}" == "opnsense" ]]; then
+			_zk creater "/esdc/vms/${vm}/hosts/1/api_key" "${OPNSENSE_API_KEY}"
+			_zk creater "/esdc/vms/${vm}/hosts/1/api_secret" "${OPNSENSE_API_SECRET}"
+		fi
 
 		# Add MGMT ssh key to other VMs
 		if [[ -n "${vm_ip}" && -n "${MGMT_SSH_KEY}" ]]; then
@@ -882,6 +897,7 @@ DNS_RESOLVERS="${CONFIG_dns_resolvers}"
 domainname="${CONFIG_domainname:-"${CONFIG_dns_domain}"}"
 [[ -z "${domainname}" ]] && domainname="example.com"
 ZABBIX_SMTP_EMAIL="${CONFIG_sender_email:-"zabbix@mon01.local"}"
+OPNSENSE_DEPLOY="${CONFIG_opnsense_deploy:-false}"
 OPNSENSE_ADMIN_IP="${CONFIG_admin_gateway}"
 OPNSENSE_ADMIN_NETMASK="${CONFIG_admin_netmask}"
 OPNSENSE_ADMIN_VLAN_ID="${CONFIG_admin_vlan_id:-0}"
