@@ -56,6 +56,12 @@ Root filesystem is examined and resized if necessary at each boot. Just resize d
 Changelog
 ---------
 
+20200829
+~~~~~~~~
+
+- Version bump to CentOS 8.2 (2004).
+
+
 20191109
 ~~~~~~~~
 
