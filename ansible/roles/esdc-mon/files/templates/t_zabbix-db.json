@@ -1,6 +1,6 @@
 {
     "zabbix_export": {
-        "date": "2015-12-03T21:46:14Z",
+        "date": "2020-08-29T18:23:52Z",
         "templates": [
             {
                 "templates": [],
@@ -46,49 +46,6 @@
                         "snmpv3_privpassphrase": "",
                         "snmpv3_privprotocol": "0",
                         "name": "Database $1 average query duration",
-                        "applications": [
-                            {
-                                "name": "Zabbix database"
-                            }
-                        ],
-                        "privatekey": "",
-                        "allowed_hosts": "",
-                        "history": "7"
-                    },
-                    {
-                        "username": "",
-                        "snmpv3_contextname": "",
-                        "inventory_link": "0",
-                        "multiplier": "0",
-                        "trends": "365",
-                        "snmpv3_authpassphrase": "",
-                        "snmp_oid": "",
-                        "snmpv3_securitylevel": "0",
-                        "port": "",
-                        "logtimefmt": "",
-                        "delay": "60",
-                        "publickey": "",
-                        "params": "",
-                        "snmpv3_securityname": "",
-                        "formula": "1",
-                        "type": "0",
-                        "snmpv3_authprotocol": "0",
-                        "valuemap": [],
-                        "ipmi_sensor": "",
-                        "status": "0",
-                        "authtype": "0",
-                        "snmp_community": "",
-                        "description": "Number of connected clients to database pooler.",
-                        "data_type": "0",
-                        "delay_flex": "",
-                        "units": "",
-                        "value_type": "3",
-                        "key": "pgbouncer.pool.cl_active[zabbix]",
-                        "delta": "0",
-                        "password": "",
-                        "snmpv3_privpassphrase": "",
-                        "snmpv3_privprotocol": "0",
-                        "name": "Database $1 connected clients",
                         "applications": [
                             {
                                 "name": "Zabbix database"
@@ -169,92 +126,6 @@
                         "delay_flex": "",
                         "units": "",
                         "value_type": "3",
-                        "key": "pgsql.ping",
-                        "delta": "0",
-                        "password": "",
-                        "snmpv3_privpassphrase": "",
-                        "snmpv3_privprotocol": "0",
-                        "name": "Database is responding",
-                        "applications": [
-                            {
-                                "name": "Zabbix database"
-                            }
-                        ],
-                        "privatekey": "",
-                        "allowed_hosts": "",
-                        "history": "7"
-                    },
-                    {
-                        "username": "",
-                        "snmpv3_contextname": "",
-                        "inventory_link": "0",
-                        "multiplier": "0",
-                        "trends": "365",
-                        "snmpv3_authpassphrase": "",
-                        "snmp_oid": "",
-                        "snmpv3_securitylevel": "0",
-                        "port": "",
-                        "logtimefmt": "",
-                        "delay": "60",
-                        "publickey": "",
-                        "params": "",
-                        "snmpv3_securityname": "",
-                        "formula": "1",
-                        "type": "0",
-                        "snmpv3_authprotocol": "0",
-                        "valuemap": [],
-                        "ipmi_sensor": "",
-                        "status": "0",
-                        "authtype": "0",
-                        "snmp_community": "",
-                        "description": "Number of database processes.",
-                        "data_type": "0",
-                        "delay_flex": "",
-                        "units": "",
-                        "value_type": "3",
-                        "key": "proc.num[postgres]",
-                        "delta": "0",
-                        "password": "",
-                        "snmpv3_privpassphrase": "",
-                        "snmpv3_privprotocol": "0",
-                        "name": "Database is running",
-                        "applications": [
-                            {
-                                "name": "Zabbix database"
-                            }
-                        ],
-                        "privatekey": "",
-                        "allowed_hosts": "",
-                        "history": "7"
-                    },
-                    {
-                        "username": "",
-                        "snmpv3_contextname": "",
-                        "inventory_link": "0",
-                        "multiplier": "0",
-                        "trends": "365",
-                        "snmpv3_authpassphrase": "",
-                        "snmp_oid": "",
-                        "snmpv3_securitylevel": "0",
-                        "port": "",
-                        "logtimefmt": "",
-                        "delay": "60",
-                        "publickey": "",
-                        "params": "",
-                        "snmpv3_securityname": "",
-                        "formula": "1",
-                        "type": "0",
-                        "snmpv3_authprotocol": "0",
-                        "valuemap": [],
-                        "ipmi_sensor": "",
-                        "status": "0",
-                        "authtype": "0",
-                        "snmp_community": "",
-                        "description": "Application specific \"ping\" check",
-                        "data_type": "0",
-                        "delay_flex": "",
-                        "units": "",
-                        "value_type": "3",
                         "key": "pgbouncer.ping",
                         "delta": "0",
                         "password": "",
@@ -293,17 +164,17 @@
                         "status": "0",
                         "authtype": "0",
                         "snmp_community": "",
-                        "description": "Number of database pooler processes",
+                        "description": "Number of connected clients to database pooler.",
                         "data_type": "0",
                         "delay_flex": "",
                         "units": "",
                         "value_type": "3",
-                        "key": "proc.num[pgbouncer]",
+                        "key": "pgbouncer.pool.cl_active[zabbix]",
                         "delta": "0",
                         "password": "",
                         "snmpv3_privpassphrase": "",
                         "snmpv3_privprotocol": "0",
-                        "name": "Database pooler is running",
+                        "name": "Database $1 connected clients",
                         "applications": [
                             {
                                 "name": "Zabbix database"
@@ -433,6 +304,49 @@
                         "snmpv3_privpassphrase": "",
                         "snmpv3_privprotocol": "0",
                         "name": "Database zabbix - size",
+                        "applications": [
+                            {
+                                "name": "Zabbix database"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Application specific \"ping\" check",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "pgsql.ping",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Database is responding",
                         "applications": [
                             {
                                 "name": "Zabbix database"
@@ -785,8 +699,138 @@
                         "privatekey": "",
                         "allowed_hosts": "",
                         "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Number of database pooler processes",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[pgbouncer]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Database pooler is running",
+                        "applications": [
+                            {
+                                "name": "Zabbix database"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Number of database processes.",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[postgres]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Database is running (postgres process)",
+                        "applications": [
+                            {
+                                "name": "Zabbix database"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Number of database processes.",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[postmaster]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Database is running (postmaster process)",
+                        "applications": [
+                            {
+                                "name": "Zabbix database"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
                     }
                 ],
+                "description": "",
                 "screens": [],
                 "applications": [
                     {
@@ -802,7 +846,7 @@
                 "template": "t_zabbix-db"
             }
         ],
-        "version": "2.0",
+        "version": "3.0",
         "groups": [
             {
                 "name": "Templates"
@@ -832,11 +876,11 @@
                 "priority": "5",
                 "dependencies": [
                     {
-                        "expression": "{t_zabbix-db:proc.num[postgres].max(5m)}=0",
+                        "expression": "{t_zabbix-db:proc.num[postgres].max(5m)}=0 and {t_zabbix-db:proc.num[postmaster].max(5m)}=0",
                         "name": "Database is not running"
                     }
                 ],
-                "expression": "({TRIGGER.VALUE}=0 & {t_zabbix-db:pgsql.ping.min(3m)}>0) | ({TRIGGER.VALUE}=1 & {t_zabbix-db:pgsql.ping.max(5m)}>0)",
+                "expression": "({TRIGGER.VALUE}=0 and {t_zabbix-db:pgsql.ping.min(3m)}>0) or ({TRIGGER.VALUE}=1 and {t_zabbix-db:pgsql.ping.max(5m)}>0)",
                 "name": "Database is not responding"
             },
             {
@@ -851,7 +895,7 @@
                         "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
                     }
                 ],
-                "expression": "{t_zabbix-db:proc.num[postgres].max(5m)}=0",
+                "expression": "{t_zabbix-db:proc.num[postgres].max(5m)}=0 and {t_zabbix-db:proc.num[postmaster].max(5m)}=0",
                 "name": "Database is not running"
             },
             {
@@ -866,7 +910,7 @@
                         "name": "Database pooler is not running"
                     }
                 ],
-                "expression": "({TRIGGER.VALUE}=0 & {t_zabbix-db:pgbouncer.ping.min(3m)}>0) | ({TRIGGER.VALUE}=1 & {t_zabbix-db:pgbouncer.ping.max(5m)}>0)",
+                "expression": "({TRIGGER.VALUE}=0 and {t_zabbix-db:pgbouncer.ping.min(3m)}>0) or ({TRIGGER.VALUE}=1 and {t_zabbix-db:pgbouncer.ping.max(5m)}>0)",
                 "name": "Database pooler is not responding"
             },
             {
