@@ -38,6 +38,8 @@ ENOTFOUND=1
 EBADJSON=2
 EUNKNOWN=3
 
+INSTALLER_VERSION="{{ version }}"	# for answers.json
+
 # Defaults
 mail_to="root@localhost"
 ntp_hosts="0.smartos.pool.ntp.org"
@@ -2024,6 +2026,8 @@ export TERM=xterm-color
 
 trap sig_doshell SIGINT
 
+add_to_answers "installer_version" "${INSTALLER_VERSION}" "unknown"
+
 printheader "Danube Cloud"
 
 message="
@@ -2194,8 +2198,9 @@ The tags can be added or modified also later by the nictagadm command.
 {% if usb_type == "hn" -%}
 If you want to deploy OPNSense router during this install,
 you have to add 'external' network tag now.
-\n"
+
 {% endif %}
+"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
 		printf "$message"
