@@ -2,11 +2,11 @@
 builder_platform_url: 'http://localhost/output'
 builder_platform:
   - name: 'boot'
-    version: '20200628T235846Z'
+    version: '20200715T230801Z'
     desc: 'SmartOS grub boot loader'
     link: 'boot-latest'
   - name: 'platform'
-    version: '20200628T235846Z'
+    version: '20200715T230801Z'
     desc: 'SmartOS kernel and boot_archive'
     link: 'platform-latest'
 
