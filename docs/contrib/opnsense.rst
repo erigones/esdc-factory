@@ -46,7 +46,9 @@ How to do proper templating: fill the template seed variable by your parameters,
 
 Finally place the generated config.xml contents into VM metadata (see above in this document).
 
-**Note:** Please note that variables ``web_ssl_cert_b64`` and ``web_ssl_key_b64`` need to be base64 encoded. Use command ``cat CERT.pem | base64 -w 0 > CERT_B64.txt`` to do the conversion.
+**Note:** Please note that variables ``web_ssl_cert_b64`` and ``web_ssl_key_b64`` need to be base64 encoded. 
+
+Use command ``cat CERT.pem | base64 -w 0 > CERT_B64.txt`` to do the conversion.
 
 
 Changelog
