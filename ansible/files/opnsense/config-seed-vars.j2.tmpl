@@ -1,5 +1,5 @@
 {
-  "hostname": "opnsense01.local",
+  "hostname": "opnsense01",
   "domain": "local",
   "root_hash": "@ROOT_HASH@",
   "root_email": "@ESDC_ADMIN_EMAIL@",
@@ -13,7 +13,6 @@
   "nic_public_name": "external",
   "nic_public_ip": "dhcp",
   "nic_public_blockprivnets": "@OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL@",
-  "nic_public_blockbogons": "1",
   "nic_private_if": "vtnet1",
   "nic_private_name": "admin",
   "nic_private_ip": "dhcp",
@@ -21,7 +20,7 @@
   "opnsense_mgmt_port": "444",
   "mgmt01_ip": "@MGMT_IP@",
   "dns01_ip": "@DNS_IP@",
-  "web_ssl_cert": "@WEB_CERT@",
-  "web_ssl_key": "@WEB_KEY@"
+  "web_ssl_cert_b64": "@WEB_CERT@",
+  "web_ssl_key_b64": "@WEB_KEY@"
 }
 

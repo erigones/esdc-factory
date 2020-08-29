@@ -2,12 +2,12 @@
   "autoboot": true,
   "brand": "kvm",
   "vcpus": 1,
-  "cpu_cap": 150,
   "vnc_port": 20002,
   "disks": [
     {
       "image_uuid": "{{ IMAGE_UUID }}",
-      "image_size": 10240,
+      "image_size": 5120,
+      "size": 5120,
       "boot": true,
       "model": "virtio",
       "media": "disk",
@@ -32,7 +32,12 @@
       "netmask": "@ADMIN_NETMASK@",
       "vlan_id": "@ADMIN_VLAN_ID@",
       "network_uuid": "d42bc4c3-ba17-43ee-a02a-74e667bd41fa",
-      "model": "virtio"
+      "model": "virtio",
+      "allow_dhcp_spoofing": true,
+      "allow_ip_spoofing": true,
+      "allow_mac_spoofing": true,
+      "allow_restricted_traffic": false,
+      "allow_unfiltered_promisc": false
     }
   ],
   "ram": 512,

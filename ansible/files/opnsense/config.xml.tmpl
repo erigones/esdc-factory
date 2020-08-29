@@ -284,12 +284,14 @@
   <interfaces>
     <{{ nic_public_name | default("public") }}>
       <if>{{ nic_public_if | default("vtnet0") }}</if>
-      <descr>Danube Cloud network "{{ nic_public_name | default("public") }}"</descr>
+      <descr>{{ nic_public_name | default("public") }}</descr>
       <enable>1</enable>
       <lock>1</lock>
       <spoofmac/>
-      <blockpriv>{% if nic_public_blockprivnets is defined and nic_public_blockprivnets == "1" %}1{% else %}0{% endif %}</blockpriv>
-      <blockbogons>{% if nic_public_blockbogons is defined and nic_public_blockbogons == "0" %}0{% else %}1{% endif %}</blockbogons>
+      {%- if nic_public_blockprivnets is defined and nic_public_blockprivnets == "1" %}
+	  <blockpriv>1</blockpriv>
+	  <blockbogons>1</blockbogons>
+	  {%- endif %}
       <ipaddr>{{ nic_public_ip | default("dhcp") }}</ipaddr>
       <dhcphostname/>
       <alias-address/>
@@ -341,7 +343,7 @@
     </{{ nic_public_name | default("public") }}>
     <{{ nic_private_name | default("private") }}>
       <if>{{ nic_private_if | default("vtnet1") }}</if>
-      <descr>Danube Cloud network "{{ nic_private_name | default("private") }}"</descr>
+      <descr>{{ nic_private_name | default("private") }}</descr>
       <enable>{% if nic_private_name is defined %}1{% else %}0{% endif %}</enable>
       <lock>1</lock>
       <spoofmac/>
@@ -456,6 +458,7 @@
       <ipprotocol>inet</ipprotocol>
       <statetype>keep state</statetype>
       <descr>Allow public ICMP ping to this firewall</descr>
+      <disablereplyto>1</disablereplyto>
       <protocol>icmp</protocol>
       <icmptype>echoreq</icmptype>
       <source>
@@ -471,6 +474,7 @@
       <ipprotocol>inet46</ipprotocol>
       <statetype>keep state</statetype>
       <descr>CAUTION: Allow public remote access to this firewall via SSH</descr>
+      <disablereplyto>1</disablereplyto>
       <protocol>tcp</protocol>
       <source>
         <any>1</any>
@@ -487,6 +491,7 @@
       <statetype>keep state</statetype>
       <descr>CAUTION: Allow public remote access to this firewall via HTTPS</descr>
       <direction>in</direction>
+      <disablereplyto>1</disablereplyto>
       <quick>1</quick>
       <protocol>tcp</protocol>
       <source>
@@ -505,7 +510,7 @@
       <protocol>tcp</protocol>
       <ipprotocol>inet</ipprotocol>
       <destination>
-        <network>(self)</network>
+        <address>{{ mgmt01_ip }}</address>
         <port>443</port>
       </destination>
       <descr>NAT </descr>
@@ -519,7 +524,7 @@
       <protocol>tcp/udp</protocol>
       <ipprotocol>inet</ipprotocol>
       <destination>
-        <address>(self)</address>
+        <address>{{ dns01_ip }}</address>
         <port>53</port>
       </destination>
       <descr>NAT </descr>
@@ -803,8 +808,8 @@
   <cert>
     <refid>5ea86ca69a063</refid>
     <descr>Web GUI SSL certificate</descr>
-    <crt>{{ web_ssl_cert | b64encode }}</crt>
-    <prv>{{ web_ssl_key | b64encode }}</prv>
+    <crt>{{ web_ssl_cert_b64 }}</crt>
+    <prv>{{ web_ssl_key_b64 }}</prv>
   </cert>
   <ppps>
     <ppp/>
