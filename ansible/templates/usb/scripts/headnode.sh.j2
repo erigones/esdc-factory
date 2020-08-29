@@ -384,12 +384,14 @@ function _build_vmmanifest() {
 				-e "s|@ESDC_ADMIN_EMAIL@|${OPNSENSE_ADMIN_EMAIL}|" \
 				-e "s|@ROOT_AUTHORIZED_KEYS@|${ROOT_AUTHORIZED_KEYS}|" \
 				-e "s|@TIMESERVER@|${OPNSENSE_TIMESERVER}|" \
+				-e "s|@OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL@|0|" \
 				-e "s|@OPNSENSE_API_KEY@|${OPNSENSE_API_KEY}|" \
 				-e "s|@OPNSENSE_API_SECRET@|$(hash_opnsense_passwd "${OPNSENSE_API_SECRET}")|" \
-				-e "s|@OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL@|${OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL}|" \
 				-e "s|@WEB_CERT@|${SVC_CERT_BASE64}|" \
 				-e "s|@WEB_KEY@|${SVC_KEY_BASE64}|" \
 				"${OPNSENSE_CONFIG_XML_J2SEED_VARS_TEMPLATE}" > "${OPNSENSE_CONFIG_XML_J2SEED_VARS}"
+				# this line is disabled: -e "s|@OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL@|${OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL}|" \
+
 			# generate OPNSENSE_CONFIG_XML
 			run_in_virtualenv j2 --customize "${OPNSENSE_CONFIG_XML_J2_CUSTOM_FILTERS}" -f json "${OPNSENSE_CONFIG_XML_TEMPLATE}" "${OPNSENSE_CONFIG_XML_J2SEED_VARS}" > "${OPNSENSE_CONFIG_XML}"
 
@@ -720,7 +722,15 @@ function inform_user() {
 	printf_log "==>   Monitoring username: ${ZABBIX_ADMIN_USERNAME}\n"
 	printf_log "==>   Monitoring password: ${ZABBIX_ADMIN_PASSWORD}\n"
 	printf_log "==>   Configuration DB IP address: ${CFGDB_IP}\n"
-	printf_log "==> Press [enter] to get login prompt or visit https://${MGMT_IP}.\n"
+	if [[ "${OPNSENSE_DEPLOY}" == "true" ]]; then
+		printf_log "==>   Management portal external URL: https://${OPNSENSE_EXTERNAL_IP}/\n"
+		printf_log "==>   OPNSense management URL: https://${OPNSENSE_EXTERNAL_IP}:444/\n"
+		printf_log "==>   OPNSense username: root\n"
+		printf_log "==>   OPNSense password: (the same as compute node ssh)\n"
+		printf_log "==> Press [enter] to get login prompt or visit https://${OPNSENSE_EXTERNAL_IP}.\n"
+	else
+		printf_log "==> Press [enter] to get login prompt or visit https://${MGMT_IP}.\n"
+	fi
 }
 
 function generate_ssh_keys() {
@@ -799,23 +809,6 @@ function random_string() {
 	fi
 }
 
-#!! git merge opnsense !!
-# opnsense API keys
-# key="$(random_string 60 nostrip)"
-# secret="$(hash_opnsense_passwd "$(random_string 60 nostrip)")"
-#2DO:
-# generate opnsense-template_vars.json from opnsense-template_vars.json-tmpl
-# generate config.xml from config.xml-pre-deploy2 using j2
-	# . /opt/erigones/envs/bin/activate
-	# j2 --customize /usbkey/.../customize.py -f json config.xml-pre-deploy template_vars-j2dc.json | sed -e 's/\n/\\n/g' > config.xml-generated-j2dc
-# create zones/esdc-opnsense/vmmanifest.tmpl
-# add opnsense section to _build_vmmanifest (create vmmanifest) 
-# add opnsense info to cfgdb (raw api secret?, zisiel by sa aj v mgmt db (dat len tak do mdata?))
-# skusit pridat do opnsense zabbix_agenta?
-# build esdc-opnsense (add creating customer_metadata.esdc_vm_installed mdata in opnsense-importer) # alternativa: urobit len 1 image a dat tam vyhybku ak nieco uvidi v mdata, tak pushne mdata
-# pridat opnsense do usb_vms
-# pridat do fw cfg vypnute forwardy pre cfgdb & mon01?
-
 # using older hash (5) because opnsense doesn't understand the newest one (6)
 function hash_opnsense_passwd() {
 	local pass="$1"
@@ -840,16 +833,16 @@ function exec_from_eslib() {
 	"${app}" "$@"
 }
 
-# block private networks if external IP is public
-function opnsense_compute_block_privnets() {
-	local ip="$1"
-
-	if [[ "$(exec_from_eslib ip_is_private.py "${ip}")" == "True" ]]; then
-		printf "0"
-	else
-		printf "1"
-	fi
-}
+## block private networks if external IP is public
+#function opnsense_compute_block_privnets() {
+#	local ip="$1"
+#
+#	if [[ "$(exec_from_eslib ip_is_private.py "${ip}")" == "True" ]]; then
+#		printf "0"
+#	else
+#		printf "1"
+#	fi
+#}
 
 # run specified command with loaded esdc envs
 function run_in_virtualenv() {
@@ -911,7 +904,7 @@ OPNSENSE_ADMIN_EMAIL="${CONFIG_admin_email:-""}"
 OPNSENSE_TIMESERVER="$(awk -F, '{print $1}' <<< "${CONFIG_ntp_hosts}")"
 OPNSENSE_API_KEY="$(random_string 60 nostrip)"
 OPNSENSE_API_SECRET="$(random_string 60 nostrip)"
-OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL="$(opnsense_compute_block_privnets "${OPNSENSE_EXTERNAL_IP}")"
+#OPNSENSE_BLOCK_PRIVATE_NETS_ON_EXTERNAL="$(opnsense_compute_block_privnets "${OPNSENSE_EXTERNAL_IP}")"
 OPNSENSE_WEB_CERT=
 OPNSENSE_WEB_KEY=
 
