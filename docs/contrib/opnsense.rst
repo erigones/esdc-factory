@@ -10,7 +10,7 @@ The image supports following metadata:
 
 **Note:** You can also use ``config.xml`` file that was exported from another OPNSense installation.
 
-**Note:** All newlines in ``config.xml`` metadata variable need to be converted to `\n`. Danube Cloud GUI does this automatically.
+**Note:** All newlines in ``config.xml`` metadata variable need to be converted to ``\n``. Danube Cloud GUI does this automatically.
 
 
 Deploy within Danube Cloud
