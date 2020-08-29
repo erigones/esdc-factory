@@ -192,12 +192,12 @@
                         "delay_flex": "",
                         "units": "",
                         "value_type": "3",
-                        "key": "net.dns[,erigones.com,A,,]",
+                        "key": "net.dns[,google.com,A,,]",
                         "delta": "0",
                         "password": "",
                         "snmpv3_privpassphrase": "",
                         "snmpv3_privprotocol": "0",
-                        "name": "DNS resolution of erigones.com",
+                        "name": "DNS resolution of google.com",
                         "applications": [
                             {
                                 "name": "General"
@@ -1541,7 +1541,7 @@
                         "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
                     }
                 ],
-                "expression": "{t_erigones-zone:net.dns[,erigones.com,A,,].max(3m)}<1",
+                "expression": "{t_erigones-zone:net.dns[,google.com,A,,].max(3m)}<1",
                 "name": "DNS resolution problem"
             },
             {
