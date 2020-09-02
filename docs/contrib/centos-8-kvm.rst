@@ -12,6 +12,8 @@ The image supports following metadata:
 
 For **cloud-init** modules usage and configuration, see `cloud-init docs <https://cloudinit.readthedocs.io/en/18.5/topics/modules.html>`__.
 
+*Note:* this image can boot also in bhyve hypervisor. It just has DHCP configured on all network interfaces and it doesn't support UEFI boot. Use ``vmadm console`` and/or ``cloud-init`` for configuration.
+
 Cloud-init example:
 ===================
 This is example for changing root password and configuring remote rsyslog destination.
