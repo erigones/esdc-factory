@@ -82,60 +82,60 @@ Two network-connected Linux/Unix machines are required:
 Create build environment
 ========================
 
-* Create builder VM (on plain SmartOS or on Danube Cloud):
+Create builder VM (on plain SmartOS or on Danube Cloud):
 
-    * It is recommended to use the same image that is used for building official SmartOS: ``base-64-lts 18.4.0`` with UUID ``c193a558-1d63-11e9-97cf-97bb3ee5c14f``. But you can use any SunOS image, just follow the requirements for **builder** from previous sections. This sections will describe the recommended setup.
-    * 8 GB RAM, at least 20GB of disk space.
-    * Add a delegated dataset (optional, for builds speed up)
-    * Modify `fs_allowed`` property from the global zone:
+* It is recommended to use the same image that is used for building official SmartOS: ``base-64-lts 18.4.0`` with UUID ``c193a558-1d63-11e9-97cf-97bb3ee5c14f``. But you can use any SunOS image, just follow the requirements for **builder** from previous sections. This sections will describe the recommended setup.
+* 8 GB RAM, at least 20GB of disk space.
+* Add a delegated dataset (optional, for builds speed up)
+* Modify `fs_allowed`` property from the global zone:
 
-        .. code-block:: shell
-        
-            vmadm update <vm_uuid> fs_allowed="ufs,pcfs,tmpfs"
-            vmadm reboot <vm_uuid>
+    .. code-block:: shell
+    
+        vmadm update <vm_uuid> fs_allowed="ufs,pcfs,tmpfs"
+        vmadm reboot <vm_uuid>
 
-    * Log into the VM and set up packages (as root user):
+* Log into the VM and set up packages (as root user):
 
-        .. code-block:: shell
+    .. code-block:: shell
 
-            pkgin up
-            pkgin fug
-            pkgin in git gmake ansible nginx
-            ssh-keygen -t ecdsa
-            mkdir /data
-            cd /data        # this is build_base_dir
-            git clone https://github.com/erigones/esdc-factory.git
-            cd esdc-factory/etc
-            cp config.sample.yml config.yml
-            cp hosts.sample.cfg hosts.cfg
-            cd ..
+        pkgin up
+        pkgin fug
+        pkgin in git gmake ansible nginx
+        ssh-keygen -t ecdsa
+        mkdir /data
+        cd /data        # this is build_base_dir
+        git clone https://github.com/erigones/esdc-factory.git
+        cd esdc-factory/etc
+        cp config.sample.yml config.yml
+        cp hosts.sample.cfg hosts.cfg
+        cd ..
 
-    * edit ``etc/config.yml``
-      * ``build_base_url`` - use the IP address of this builder VM (e.g. `http://10.111.10.206`)
-      * ``build_base_dir`` - `/data` by default
-      * ``build_ssh_key`` - content of ``~/.ssh/id_ecdsa.pub`` on the builder VM. This ssh key needs to be pushed to buildnode (SmartOS global zone).
-      * ``build_ip`` - IP address of a temporary VM that will be created during image builds
-      * ``build_gateway``, ``build_netmask``, ``build_nic_tag``, ``build_vlan_id`` - network settings that will be used by temporary VMs during image builds
+* edit ``etc/config.yml``
+  * ``build_base_url`` - use the IP address of this builder VM (e.g. `http://10.111.10.206`)
+  * ``build_base_dir`` - `/data` by default
+  * ``build_ssh_key`` - content of ``~/.ssh/id_ecdsa.pub`` on the builder VM. This ssh key needs to be pushed to buildnode (SmartOS global zone).
+  * ``build_ip`` - IP address of a temporary VM that will be created during image builds
+  * ``build_gateway``, ``build_netmask``, ``build_nic_tag``, ``build_vlan_id`` - network settings that will be used by temporary VMs during image builds
 
-    * edit ``etc/hosts.yml``
-      * edit IP address of ``buildnode`` (SmartOS global zone that will be used for creating VMs)
+* edit ``etc/hosts.yml``
+  * edit IP address of ``buildnode`` (SmartOS global zone that will be used for creating VMs)
 
-    * push ssh public key from ``~/.ssh/id_ecdsa.pub`` to the buildnode's ``/root/.ssh/authorized_keys`` so the `buildnode` VM can access the `builder` without a password
+* push ssh public key from ``~/.ssh/id_ecdsa.pub`` to the buildnode's ``/root/.ssh/authorized_keys`` so the `buildnode` VM can access the `builder` without a password
 
-    * configure and enable nginx on the ``buildnode`` VM. You can find the sample nginx config in ``etc/nginx.conf.sample``:
+* configure and enable nginx on the ``buildnode`` VM. You can find the sample nginx config in ``etc/nginx.conf.sample``:
 
-        .. code-block:: shell
+    .. code-block:: shell
 
-            cp -f /data/esdc-factory/etc/nginx.conf.sample /opt/local/etc/nginx/nginx.conf
-            svcadm enable nginx
-            svcs nginx
+        cp -f /data/esdc-factory/etc/nginx.conf.sample /opt/local/etc/nginx/nginx.conf
+        svcadm enable nginx
+        svcs nginx
 
-    * initialize factory on builder VM
+* initialize factory on builder VM
 
-        .. code-block:: shell
+    .. code-block:: shell
 
-            cd /data/esdc-factory
-            gmake init
+        cd /data/esdc-factory
+        gmake init
 
 
 Usage
@@ -145,10 +145,21 @@ Usage
 
     $ make help
 
-.. make help > docs/make-help.txt
+Examples (more examples are in `make help`):
 
-.. include:: docs/make-help.txt
-    :code: bash
+.. code-block:: bash
+
+    $ make base-64-es
+    $ make base-centos-7
+    $ make archives
+    $ make isos
+    $ make platform     # this needs setup of smartos compile environment
+    $ make esdc
+    $ env EXTRA_VARS="usb_type=cn" gmake usb-image
+    $ env EXTRA_VARS="usb_type=hn" gmake usb-image
+
+
+** See also: docs/make-help.txt
 
 
 Parallel builds
