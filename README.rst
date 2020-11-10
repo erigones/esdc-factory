@@ -85,7 +85,7 @@ Create build environment
 Create builder VM (on plain SmartOS or on Danube Cloud):
 
 * It is recommended to use the same image that is used for building official SmartOS: ``base-64-lts 18.4.0`` with UUID ``c193a558-1d63-11e9-97cf-97bb3ee5c14f``. But you can use any SunOS image, just follow the requirements for **builder** from previous sections. This sections will describe the recommended setup.
-* 8 GB RAM, at least 20GB of disk space.
+* 8 GB RAM, at least 20GB of disk space. Use of `ZLE` disk compression is recommended.
 * Add a delegated dataset (optional, for builds speed up)
 * Modify `fs_allowed`` property from the global zone:
 
@@ -110,14 +110,16 @@ Create builder VM (on plain SmartOS or on Danube Cloud):
         cp hosts.sample.cfg hosts.cfg
         cd ..
 
-* edit ``etc/config.yml``
+* edit ``etc/config.yml``:
+
   * ``build_base_url`` - use the IP address of this builder VM (e.g. `http://10.111.10.206`)
   * ``build_base_dir`` - `/data` by default
   * ``build_ssh_key`` - content of ``~/.ssh/id_ecdsa.pub`` on the builder VM. This ssh key needs to be pushed to buildnode (SmartOS global zone).
   * ``build_ip`` - IP address of a temporary VM that will be created during image builds
   * ``build_gateway``, ``build_netmask``, ``build_nic_tag``, ``build_vlan_id`` - network settings that will be used by temporary VMs during image builds
 
-* edit ``etc/hosts.yml``
+* edit ``etc/hosts.yml``:
+
   * edit IP address of ``buildnode`` (SmartOS global zone that will be used for creating VMs)
 
 * push ssh public key from ``~/.ssh/id_ecdsa.pub`` to the buildnode's ``/root/.ssh/authorized_keys`` so the `buildnode` VM can access the `builder` without a password
