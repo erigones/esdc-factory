@@ -137,6 +137,8 @@ Create builder VM (on plain SmartOS or on Danube Cloud):
     .. code-block:: shell
 
         cd /data/esdc-factory
+        eval `ssh-agent -s`
+        ssh-add
         gmake init
 
 
@@ -151,6 +153,8 @@ Examples (more examples are in `make help`):
 
 .. code-block:: bash
 
+    $ eval `ssh-agent -s`
+    $ ssh-add
     $ make base-64-es
     $ make base-centos-7
     $ make archives
@@ -170,6 +174,26 @@ Parallel builds
 If you want to use parallel builds, you need to specify multiple temporary IPs and multiple VNC ports so the VMs won't create collisions. Define ``build_ips`` and ``build_vnc_ports`` dicts with names of future temporary VMs as keys. See example in config file.
 
 
+Compilation of Danube Cloud platform
+====================================
+
+To build complete USB image, you need to compile the platform (based on slightly modified SmartOS).
+
+.. code-block:: bash
+
+    # useradd -g 1 -s /bin/bash -d /data/compile -m compile
+    # usermod -P 'Primary Administrator' compile
+    # su - compile
+    $ git clone git://github.com/erigones/smartos-live
+    $ cd smartos-live/
+    $ git branch -av | grep new_release
+    $ git checkout new_release_20201105     # choose the newest one
+    $ ./configure
+    $ gmake live
+
+This has enabled you to use ``make platform`` command from `esdc-factory`.
+
+
 Links
 =====
 
@@ -180,13 +204,15 @@ Links
 - Twitter: https://twitter.com/danubecloud
 - Gitter: https://gitter.im/erigones/DanubeCloud
 
+- More info: https://github.com/erigones/esdc-ce/wiki/Building-Danube-Cloud
+
 
 License
 =======
 
 ::
 
-    Copyright 2016-2018 Erigones, s. r. o.
+    Copyright 2016-2020 Erigones, s. r. o.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this project except in compliance with the License.
