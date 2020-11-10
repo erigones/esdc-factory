@@ -1,12 +1,13 @@
 # builder IP & HTTP server port serving
 # the content of 'build_base_dir'
-build_base_url: 'http://192.168.23.100'
+build_base_url: 'http://192.168.5.100'
 # htdocs dir path on builder
 build_base_dir: '/data'
 #build_uuid_generator: 'uuidgen'
+
 # this key will be temporarily pushed into created VMs,
 # so ansible can log in an configure them
-build_ssh_key: 'ssh-rsa blabla user@host'
+build_ssh_key: 'ssh-rsa ..... user@host'
 # root pwd that will be set in VMs
 build_image_password: 'nbusr123'
 build_disk_compression: lz4
@@ -18,34 +19,37 @@ build_resolvers:
 # nic tag of the interface on buildhost which will be used by VMs to access the network
 build_nic_tag: admin
 # network config of VMs
-build_gateway: 192.168.23.1
+build_gateway: 192.168.5.1
 build_netmask: 255.255.255.0
 
-# the actual IP of the created VM (or VMs)
+## the actual IP of the created VM (or VMs)
 build_ips:
-  base_centos6: 192.168.23.81
-  base_centos7: 192.168.23.82
-  base64: 192.168.23.83
-  contrib_centos6: 192.168.23.84
-  contrib_centos7: 192.168.23.85
-  esdc_cfgdb: 192.168.23.86
-  esdc_dns: 192.168.23.87
-  esdc_img: 192.168.23.88
-  esdc_mgmt: 192.168.23.89
-  esdc_mon: 192.168.23.91
-  esdc_node: 192.168.23.93
+#  base_centos6: 192.168.5.81
+#  base_centos7: 192.168.5.82
+#  base64: 192.168.5.83
+#  contrib_centos6: 192.168.5.84
+#  contrib_centos7: 192.168.5.85
+#  esdc_cfgdb: 192.168.5.86
+#  esdc_dns: 192.168.5.87
+#  esdc_img: 192.168.5.88
+#  esdc_mgmt: 192.168.5.89
+#  esdc_mon: 192.168.5.91
+#  esdc_node: 192.168.5.93
+#
 # Or specify only one, which will be used by all VMs (=> no parallel builds).
 # When using this, "build_ips" must be defined as empty list.
-#build_ip: 192.168.23.42
+build_ip: 192.168.5.42
+
+#build_vlan_id: 0
 
 # if you have multiple VMs, you have to use diferrent VNC ports
 build_vnc_ports:
-  base_centos6: 65081
   base_centos7: 65082
-  contrib_centos6: 65084
-  contrib_centos7: 65085
+  base_centos8: 65083
+  contrib_centos7: 65084
+  contrib_centos8: 65085
   esdc_mgmt: 65089
   esdc_mon: 65091
 # Or specify only one, which will be used by all VMs (=> no parallel builds)
 # When using this, "build_vnc_ports" must be defined as empty list.
-#build_vnc_port: 40000
+build_vnc_port: 40000

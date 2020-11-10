@@ -42,14 +42,14 @@ Two network-connected Linux/Unix machines are required:
 * **buildnode** remote host:
     * A SmartOS/ErigonOS machine that is capable of running KVM and OS virtual machines.
     * Required software:
-        * Python 2.7
+        * Python 2.7+
 
 * **builder** local host:
     * The machine (can be a VM), which has this repository checked out.
     * Required software:
         * git
-        * Ansible >= 2.0
-        * GNU make
+        * Ansible >= 2.3
+        * GNU make (gmake)
         * sshpass
         * OpenSSH client
         * a working ssh-agent with loaded ``build_ssh_key`` (for running git clone on remote host)
@@ -79,19 +79,63 @@ Two network-connected Linux/Unix machines are required:
     * **NOTE**: Building the usb-image target currently requires an ErigonOS/SmartOS machine or a zone with ``fs_allowed`` property set to ``"ufs,pcfs,tmpfs"``.
 
 
-Configuration
-=============
+Create build environment
+========================
 
-Edit ``etc/hosts.cfg`` and ``etc/config.yml``.
+* Create builder VM (on plain SmartOS or on Danube Cloud):
 
-* **etc/hosts.cfg**:
-    * Adjust the *builder* and *buildnode* IP addresses and python interpreter.
+    * It is recommended to use the same image that is used for building official SmartOS: ``base-64-lts 18.4.0`` with UUID ``c193a558-1d63-11e9-97cf-97bb3ee5c14f``. But you can use any SunOS image, just follow the requirements for **builder** from previous sections. This sections will describe the recommended setup.
+    * 8 GB RAM, at least 20GB of disk space.
+    * Add a delegated dataset (optional, for builds speed up)
+    * Modify `fs_allowed`` property from the global zone:
 
-* **etc/config.yml**:
-    * ``build_base_url``
-    * ``build_base_dir``
-    * ``build_ssh_key`` - the *buildnode* must be accessible from the *builder* machine via SSH.
-    * ``build_nic_tag``, ``build_gateway``, ``build_netmask`` and ``build_ips`` - modify according to your network settings.
+        .. code-block:: shell
+        
+            vmadm update <vm_uuid> fs_allowed="ufs,pcfs,tmpfs"
+            vmadm reboot <vm_uuid>
+
+    * Log into the VM and set up packages (as root user):
+
+        .. code-block:: shell
+
+            pkgin up
+            pkgin fug
+            pkgin in git gmake ansible nginx
+            ssh-keygen -t ecdsa
+            mkdir /data
+            cd /data        # this is build_base_dir
+            git clone https://github.com/erigones/esdc-factory.git
+            cd esdc-factory/etc
+            cp config.sample.yml config.yml
+            cp hosts.sample.cfg hosts.cfg
+            cd ..
+
+    * edit ``etc/config.yml``
+      * ``build_base_url`` - use the IP address of this builder VM (e.g. `http://10.111.10.206`)
+      * ``build_base_dir`` - `/data` by default
+      * ``build_ssh_key`` - content of ``~/.ssh/id_ecdsa.pub`` on the builder VM. This ssh key needs to be pushed to buildnode (SmartOS global zone).
+      * ``build_ip`` - IP address of a temporary VM that will be created during image builds
+      * ``build_gateway``, ``build_netmask``, ``build_nic_tag``, ``build_vlan_id`` - network settings that will be used by temporary VMs during image builds
+
+    * edit ``etc/hosts.yml``
+      * edit IP address of ``buildnode`` (SmartOS global zone that will be used for creating VMs)
+
+    * push ssh public key from ``~/.ssh/id_ecdsa.pub`` to the buildnode's ``/root/.ssh/authorized_keys`` so the `buildnode` VM can access the `builder` without a password
+
+    * configure and enable nginx on the ``buildnode`` VM. You can find the sample nginx config in ``etc/nginx.conf.sample``:
+
+        .. code-block:: shell
+
+            cp -f /data/esdc-factory/etc/nginx.conf.sample /opt/local/etc/nginx/nginx.conf
+            svcadm enable nginx
+            svcs nginx
+
+    * initialize factory on builder VM
+
+        .. code-block:: shell
+
+            cd /data/esdc-factory
+            gmake init
 
 
 Usage
@@ -107,16 +151,21 @@ Usage
     :code: bash
 
 
+Parallel builds
+===============
+
+If you want to use parallel builds, you need to specify multiple temporary IPs and multiple VNC ports so the VMs won't create collisions. Define ``build_ips`` and ``build_vnc_ports`` dicts with names of future temporary VMs as keys. See example in config file.
+
+
 Links
 =====
 
-- Homepage: https://danubecloud.org
-- User guide: https://docs.danubecloud.org
+- Homepage: https://danube.cloud
+- User guide: https://docs.danube.cloud
 - Wiki: https://github.com/erigones/esdc-ce/wiki
 - Bug Tracker: https://github.com/erigones/esdc-factory/issues
 - Twitter: https://twitter.com/danubecloud
 - Gitter: https://gitter.im/erigones/DanubeCloud
-- IRC: `irc.freenode.net#danubecloud <https://webchat.freenode.net/#danubecloud>`__
 
 
 License

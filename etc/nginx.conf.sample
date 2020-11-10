@@ -1,0 +1,48 @@
+
+user   www  www;
+worker_processes  1;
+
+events {
+    worker_connections  100;
+}
+
+
+http {
+    include       /opt/local/etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    #access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+		root /data;  # build_base_url
+		autoindex on;
+		
+		# image server
+		location /images {
+		    index manifest;
+		    default_type application/json;
+		}
+		
+		# image server config
+		location ~ /images/(.*)/(file|.*.zfs.gz)$ {
+		    default_type application/octet-stream;
+		}
+
+		# for downloading platform .tgz
+        location /output {
+            root   /data/compile/smartos-live/;
+        }
+
+		# for testing local docs changes
+        location /html {
+            root   /data/compile/esdc-docs/user-guide/_build/;
+        }
+    }
+}
