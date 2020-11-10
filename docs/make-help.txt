@@ -24,18 +24,23 @@
 
     base-centos-6
     base-centos-7
+    base-centos-8-kvm
     base-64-es
+    base-lx-debian-9
     esdc-mon
     esdc-mgmt
     esdc-cfgdb
     esdc-dns
     esdc-img
     esdc-node
+    network-access-zone
     contrib-centos-6
     contrib-centos-7
+    contrib-centos-8-kvm
     contrib-gitlab-ce
     contrib-centos-7-desktop
-    network-access-zone
+    contrib-odoo
+    contrib-opnsense
 
     NOTE: The build order is rather important.
 
@@ -46,6 +51,16 @@
   EXTRA_VARS   override ansible variables, e.g.:
     - usb_type={hn,cn}  (default: hn)
     - release_edition={ce,ee}  (default: ce)
-    - esdc_source_repo=https://github.com/erigones/esdc-ce.git
-    - esdc_prod_repo=
+    - esdc_source_repo="https://github.com/erigones/esdc-ce.git"
+    - esdc_prod_repo=""
     - image_debug={false,true}  (default: false)
+
+  EXAMPLES:
+  gmake esdc-mon
+  env EXTRA_VARS="builder_platform_url='http://smartos-builder/output'" gmake platform
+  env VERSION="v4.0-beta2" EXTRA_VARS="software_branch=master" gmake esdc-mgmt
+  env VERSION="v4.0-rc1" gmake esdc-mgmt
+  env VERSION="v4.0" gmake archive-monitoring
+  env VERSION="v4.0" EXTRA_VARS="appliance_name=esdc-dns src_version=latest" gmake vm-optlocal
+  env VERSION="v4.0" EXTRA_VARS="usb_type=hn" gmake usb-image
+  env VERSION="v4.0" EXTRA_VARS="usb_type=cn" gmake usb-image
