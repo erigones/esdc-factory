@@ -100,7 +100,7 @@ Create builder VM (on plain SmartOS or on Danube Cloud):
 
         pkgin up
         pkgin fug
-        pkgin in git gmake ansible nginx
+        pkgin in git gmake ansible sshpass nginx
         ssh-keygen -t ecdsa
         mkdir /data
         cd /data        # this is build_base_dir
