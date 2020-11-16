@@ -6,10 +6,12 @@ HOW TO CREATE BLANK USB IMAGE WITH BSD LOADER AND HYBRID UEFI/MBR BOOT:
     SMARTOS_REPO=/data/compile/smartos-live
     cd $SMARTOS_REPO
     gmake live
-    tools/build_boot_image -p 4gb -r .
+    tools/build_boot_image -p 6gb -r .
+    tools/build_boot_image -p 2gb -r .
     cd proto.images
-    xz 4gb.img
-    # copy 4gb.img.xz and 4gb.partition.map to esdc-factory into ansible/files/usb/images
+    xz 6gb.img
+    xz 2gb.img
+    # copy [26]gb.img.xz and [26]gb.partition.map to esdc-factory into ansible/files/usb/images
 
 
 LEGACY USB CREATION WITH GRUB AND MBR BOOT, do not use for new images:
