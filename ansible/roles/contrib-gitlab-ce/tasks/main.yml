@@ -1,5 +1,5 @@
 - fail: msg="Invalid OS; Only CentOS 7 is supported."
-  when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "7"
+  when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "8"
 
 - name: Install required packages
   yum: name="{{ item }}" state=present
@@ -19,7 +19,7 @@
 # Using the yum module directly with the RPM URL does not work
 # Downloading to /tmp (tmpfs on RHEL 7) => we don't have to delete it
 - name: Download GitLab CE {{ gitlab_ce_version }} RPM package
-  get_url: url="https://packages.gitlab.com/gitlab/gitlab-ce/packages/el/7/gitlab-ce-{{ gitlab_ce_version }}-ce.0.el7.x86_64.rpm/download"
+  get_url: url="https://packages.gitlab.com/gitlab/gitlab-ce/packages/el/8/gitlab-ce-{{ gitlab_ce_version }}-ce.0.el8.x86_64.rpm/download"
            dest="/tmp/gitlab-ce.rpm"
            checksum="sha1:{{ gitlab_ce_checksum }}"
 
