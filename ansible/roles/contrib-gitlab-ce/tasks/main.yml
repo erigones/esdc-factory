@@ -1,4 +1,4 @@
-- fail: msg="Invalid OS; Only CentOS 7 is supported."
+- fail: msg="Invalid OS; Only CentOS 8 is supported."
   when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "8"
 
 - name: Install required packages
