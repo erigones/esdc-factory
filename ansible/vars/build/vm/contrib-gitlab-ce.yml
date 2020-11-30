@@ -1,6 +1,6 @@
 # Dependencies: base.yml, zone.yml
 image_name: gitlab-ce
-image_desc: "GitLab Community Edition (Omnibus) {{ gitlab_ce_version }} on CentOS 7"
+image_desc: "GitLab Community Edition (Omnibus) {{ gitlab_ce_version }} on CentOS 8"
 image_homepage: "{{ image_contrib_homepage }}/gitlab-ce.rst"
 image_requirements:
   min_ram: 1024

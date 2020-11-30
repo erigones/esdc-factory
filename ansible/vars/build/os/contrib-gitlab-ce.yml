@@ -14,5 +14,5 @@ firewall_allowed_tcp_ports:
 selinux_permissive_domains:
   - zabbix_agent_t
 
-gitlab_ce_version: "9.5.6"
-gitlab_ce_checksum: "815733529d0ec5da6c47928c46503ed20fd860d7"  # sha1
+gitlab_ce_version: "13.6.1"
+gitlab_ce_checksum: "6bf4441113db9f67916375f94477fe3b34815a8a"  # sha1
