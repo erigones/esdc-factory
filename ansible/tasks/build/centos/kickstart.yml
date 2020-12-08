@@ -17,7 +17,7 @@
 - name: Download kernel and initrd
   get_url: url="{{ centos_mirror }}/{{ item.file }}"
            dest="/zones/{{ zone_uuid }}/root/{{ item.file }}"
-           sha256sum="{{ item.sha256sum }}"
+           checksum="sha256:{{ item.sha256sum }}"
   with_items: "{{ centos_files }}"
 
 - name: Ensure VM is running

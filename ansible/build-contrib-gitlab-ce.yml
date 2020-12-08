@@ -16,6 +16,7 @@
   tasks:
     - include: tasks/build/centos/register-host.yml
         hostname=contrib-gitlab-ce
+        ansible_python_interpreter="{{ python_path | default('/usr/bin/python3') }}"
 
 - name: Install and configure appliance
   hosts: contrib-gitlab-ce
