@@ -4,13 +4,15 @@ import json
 import subprocess
 import re
 import os
+import glob
 
 command = ('vmadm list -Hpo uuid,type,alias,state')
 
 regex = r'^(.*):(.*):(.*):(.*)$'
-regex_disks = r'^(.*)-(disk[0-9]+)$'
+regex_disks = r'^(.*)[-/](disk[0-9]+)$'
 
-disks = [f for f in os.listdir("/dev/zvol/dsk/zones") if re.search(r'^[a-z0-9-]+-disk[0-9]+$', f)]
+os.chdir("/dev/zvol/dsk/zones")
+disks = [f for f in glob.glob('*-disk*') + glob.glob('*-*-*/*disk*') if re.search(r'^[a-z0-9-]+[-/]disk[0-9]+$', f)]
 
 p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
