@@ -2,11 +2,11 @@
 builder_platform_url: 'http://localhost/output'
 builder_platform:
   - name: 'boot'
-    version: '20201111T142959Z'
+    version: '20210711T112647Z'
     desc: 'SmartOS grub boot loader'
     link: 'boot-latest'
   - name: 'platform'
-    version: '20201111T142959Z'
+    version: '20210711T112647Z'
     desc: 'SmartOS kernel and boot_archive'
     link: 'platform-latest'
 
@@ -27,12 +27,12 @@ builder_archives:
     desc: '/opt/custom directory on hypervisor'
     link: 'opt-custom-latest'
 
-rescuecd_version: '6.1.8'
+rescuecd_version: '8.03'
 builder_isos_url: ''
 builder_isos:
   - name: 'rescuecd'
     version: "{{ rescuecd_version }}"
-    url: 'https://sourceforge.net/projects/systemrescuecd/files/sysresccd-x86/{{ rescuecd_version }}/systemrescuecd-amd64-{{ rescuecd_version }}.iso/download'
+    url: 'https://sourceforge.net/projects/systemrescuecd/files/sysresccd-x86/{{ rescuecd_version }}/systemrescue-{{ rescuecd_version }}-amd64.iso/download'
     link: 'rescuecd-latest'
 
 bootstrap_local_archive: "{{ bootstrap|default(false) }}"

@@ -11,8 +11,10 @@ zone_nic_0_ip: "{{ build_ips.opnsense | default(build_ip) }}"
 fbsd_image_uuid: c6d1d6d0-6691-11e9-9385-1f6fb989898c # freebsd-12 (20190424)
 #fbsd_image_uuid: 37603d78-10c7-11e8-9c60-1f1a4f40d849 # freebsd-11 (2018)
 
-opnsense_version: 20.7
-opnsense_img_source: "https://mirror.dns-root.de/opnsense/releases/{{ opnsense_version }}/OPNsense-{{ opnsense_version }}-OpenSSL-nano-amd64.img.bz2"
+opnsense_version: 21.1
+#opnsense_mirror: "mirror.dns-root.de"
+opnsense_mirror: "mirror.fra10.de.leaseweb.net"
+opnsense_img_source: "https://{{ opnsense_mirror }}/opnsense/releases/{{ opnsense_version }}/OPNsense-{{ opnsense_version }}-OpenSSL-nano-amd64.img.bz2"
 opnsense_local_file: "/var/tmp/{{ opnsense_img_source | basename }}"
 image_version: "{{ opnsense_version }}"
 image_pass:     # don't use image pass (implies ssh key auth)
