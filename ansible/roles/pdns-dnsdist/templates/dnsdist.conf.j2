@@ -16,7 +16,12 @@ includeDirectory('/opt/local/etc/dnsdist.conf.d')
 -- https://web1.powerdns.com/advanced/xpf.html
 addAction(RecordsTypeCountRule(DNSSection.Additional, 65280, 1, 65535), DropAction())
 
--- route according to recurse-allowed subnets (subnets present in local Danube installation)
+-- Route AXFR/IXFR always directly to authoritative
+addAction(OrRule({QTypeRule(DNSQType.AXFR), QTypeRule(DNSQType.IXFR)}), PoolAction('authoritative'))
+
+-- Route according to recurse-allowed subnets (subnets present in local Danube installation)
 addAction(NetmaskGroupRule(recursive_ips), PoolAction('recursor'))
+
+-- Default rule
 addAction(AllRule(), PoolAction('authoritative'))
 
