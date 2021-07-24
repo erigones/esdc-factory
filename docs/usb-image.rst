@@ -19,6 +19,14 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
+4.5
+=====
+Released on 2021-07-24
+
+- Change `BHYVE` VM disk size without reboot (based on `WIP of mgerdts <https://smartos.org/bugview/OS-6632>`__) - `#79f241f <https://github.com/erigones/illumos-joyent/commit/79f241f0621bf5997c36fd623cac5ee41b629a89>`__
+- Add COM3 and COM4 ports to `BHYVE` (FreeBSD upstream)- `#eed1cc6cdfa <https://cgit.freebsd.org/src/commit/?id=eed1cc6cdfa>`__
+
+
 4.2
 =====
 Released on 2019-11-03
