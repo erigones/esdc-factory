@@ -14,19 +14,6 @@
 - name: Disable pdns-recursor service
   command: svcadm disable pdns-recursor
 
-- name: Copy SMF manifests to the remote hosts
-  copy: src=pdns-recursor.xml
-        dest=/opt/local/lib/svc/manifest/pdns-recursor.xml
-        owner=root
-        group=root
-        mode=0644
-
-- name: Import pdns-recursor SMF manifest
-  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns-recursor.xml
-
-- name: Disable pdns-recursor service
-  command: svcadm disable pdns
-
 - name: Create pdns-recursor group
   group: name={{ recursor_setgid }}
          gid={{ recursor_gid }}
