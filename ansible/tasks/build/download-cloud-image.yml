@@ -1,0 +1,3 @@
+---
+- name: Download cloud image
+  get_url: url="{{ ubuntu_cloud_img_source }}" dest="{{ cloud_img_local_file }}" validate_certs=no timeout=30

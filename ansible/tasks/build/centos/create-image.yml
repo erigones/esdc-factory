@@ -15,12 +15,12 @@
            type=zvol
            nic_driver=virtio
            disk_driver=virtio
-           cpu_type=qemu64
+           {% if zone_brand == "kvm" %}cpu_type=qemu64{% endif %}
            image_size="{{ image_size | default(zone_disks[0].image_size) }}"
            state="active"
            disabled="false"
            description='"{{ image_desc | default("") }}"'
-           homepage='"{{ image_homepage | default("https://danubecloud.org") }}"'
+           homepage='"{{ image_homepage | default("https://danube.cloud") }}"'
            {% if image_requirements is defined and image_requirements %}requirements='{{ image_requirements | to_json }}'{% endif %}
 
 - name: Rename image file

@@ -1,6 +1,15 @@
 ---
 - meta: flush_handlers
 
+- name: Place image cleanup script
+  copy:
+    src: files/imgtools/ubuntu-prepare-image
+    dest: /usr/local/bin/prepare-image
+    owner: root
+    group: root
+    mode: '0755'
+  when: ansible_distribution == "Ubuntu"
+
 - name: Inspect the VM before final image preparation begins
   pause:
   when: image_debug is defined and image_debug
@@ -10,17 +19,23 @@
   register: os_info_centos
   when: ansible_distribution == "CentOS"
 
+- name: Register OS information (Ubuntu)
+  shell: cat /etc/os-release
+  register: os_info_ubuntu
+  when: ansible_distribution == "Ubuntu"
+
 - name: Register OS information (SmartOS)
   shell: cat /etc/pkgsrc_version
   register: os_info_smartos
   when: ansible_distribution == "SmartOS"
 
-- name: Prepare virtual machine for snapshotting (CentOS)
+- name: Prepare virtual machine for snapshotting (CentOS|Ubuntu)
   shell: |
     rm -f /root/.ssh/authorized_keys
     prepare-image
-  when: ansible_distribution == "CentOS"
-
+  when: ansible_distribution == "CentOS" or
+        ansible_distribution == "Ubuntu"
+        
 - name: Prepare virtual machine for snapshotting (SmartOS)
   shell: |
     rm -f /root/.ssh/authorized_keys
@@ -35,6 +50,11 @@
   debug:
     var: os_info_centos
   when: ansible_distribution == "CentOS"
+
+- name: Display OS information (Ubuntu)
+  debug:
+    var: os_info_ubuntu
+  when: ansible_distribution == "Ubuntu"
 
 - name: Display OS information (SmartOS)
   debug:

@@ -1,0 +1,43 @@
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+# deploy a generic fbsd VM
+# that will be used to build k3os artifacts
+- name: Create virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-ubuntu-focal.yml
+  pre_tasks:
+    - include: tasks/build/cleanup.yml
+    - include: tasks/build/download-cloud-image.yml
+  vars:
+    vm_start: false
+  roles:
+    - smartos-vm
+  tasks:
+    - include: tasks/build/ubuntu/write-image.yml
+    - include: tasks/build/centos/register-host.yml
+        hostname=ubuntu-build
+        python_path=/usr/bin/python3
+
+- name: Modify image
+  hosts: ubuntu-build
+  gather_facts: true
+  remote_user: ubuntu
+  become: true
+  #pre_tasks:
+  #  - include: tasks/build/ubuntu/enable-root-login.yml
+  roles:
+    - mdata-client
+    - rc-scripts
+    - vm-image
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-ubuntu-focal.yml
+  tasks:
+    - include: tasks/build/centos/create-image.yml

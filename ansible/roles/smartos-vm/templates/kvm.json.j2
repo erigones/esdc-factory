@@ -29,6 +29,9 @@
 {% if zone_vnc_port is defined and zone_vnc_port %}
   "vnc_port": {{ zone_vnc_port }},
 {% endif %}
+{% if zone_brand == "bhyve" %}
+  "bootrom": "{{ bootrom | default("uefi") }}",
+{% endif %}
 {% if zone_zfs_io_priority is defined and zone_zfs_io_priority %}
   "zfs_io_priority": {{ zone_zfs_io_priority }},
 {% endif %}

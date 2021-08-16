@@ -1,0 +1,31 @@
+ubuntu_version_name: focal
+cloud_img_upstream_date: current
+
+image_name: "ubuntu-{{ ubuntu_version_name }}"
+image_desc: ""
+image_homepage: "{{ image_contrib_homepage }}/{{ image_name }}.rst"
+remove_base_image: false
+builder_dir: "{{ builder.appliance.dir }}/{{ image_name }}"
+zone_brand: bhyve
+zone_dns_domain: local
+zone_uuid: "8f72de0f-51a9-c44d-ecc5-97c6c6a4535e"
+zone_hostname: "{{ image_name }}-builder"
+zone_nic_0_ip: "{{ build_ips.focal | default(build_ip) }}"
+
+cloud_img_filename: "{{ ubuntu_version_name }}-server-cloudimg-amd64.img"
+cloud_img_local_file: "/var/tmp/{{ cloud_img_filename }}"
+ubuntu_cloud_img_source: "https://cloud-images.ubuntu.com/{{ ubuntu_version_name }}/{{ cloud_img_upstream_date }}/{{ cloud_img_filename }}"
+
+image_size: 10240 
+
+zone_disks:
+  - boot: true
+    compression: "zle"
+    size: 10240
+    refreservation: 10240
+
+image_requirements:
+    bootrom: uefi
+    ssh_key: true
+
+bhyve_bootrom: uefi

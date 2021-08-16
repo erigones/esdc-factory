@@ -9,7 +9,7 @@
   template: src=kvm.json.j2
             dest=/tmp/{{ zone_uuid }}.json
             validate="vmadm validate create kvm -f %s"
-  when: zone_brand == "kvm"
+  when: zone_brand == "kvm" or zone_brand == "bhyve"
 
 - name: Create VM (LX) configuration file
   template: src=lx.json.j2
@@ -27,6 +27,6 @@
   when: vm_start | default(true)
 
 - name: Disable fsync for the virtual machine disk
-  shell: zfs set sync=disabled "$(vmadm get {{ zone_uuid }} | json {% if zone_brand == 'kvm' %}disks.0.{% endif %}zfs_filesystem)"
+  shell: zfs set sync=disabled "$(vmadm get {{ zone_uuid }} | json {% if zone_brand == 'kvm' or zone_brand == 'bhyve' %}disks.0.{% endif %}zfs_filesystem)"
   when: vm_fsync_off | default(true)
   ignore_errors: True

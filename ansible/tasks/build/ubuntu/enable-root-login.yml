@@ -1,0 +1,6 @@
+
+- name: Allow logging in as root
+  shell: sed -i'' -re 's/^.* (ssh-[-a-zA-Z0-9]+)/\1/' /root/.ssh/authorized_keys
+  remote_user: ubuntu
+  become: true
+
