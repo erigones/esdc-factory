@@ -31,8 +31,10 @@
   #pre_tasks:
   #  - include: tasks/build/ubuntu/enable-root-login.yml
   roles:
+    - ubuntu
     - mdata-client
     - rc-scripts
+    - qemu-ga-bhyve
     - vm-image
 
 - name: Create and save image

@@ -6,7 +6,7 @@
   #shell: /opt/local/bin/gdd "if={{ cloud_img_local_file }}" "of=/dev/zvol/rdsk/$(vmadm get {{ zone_uuid }} | json disks.0.zfs_filesystem)" bs=16M conv=sparse oflag=dsync
   shell: /opt/erigones/bin/qemu-img convert -O host_device "{{ cloud_img_local_file }}" "/dev/zvol/rdsk/$(vmadm get {{ zone_uuid }} | json disks.0.zfs_filesystem)"
 
-- name: Remove downloaded opnsense image
+- name: Remove downloaded image
   shell: rm -f "{{ cloud_img_local_file }}" #"{{ opnsense_local_file }}.unpacked"
 
 - name: Start VM

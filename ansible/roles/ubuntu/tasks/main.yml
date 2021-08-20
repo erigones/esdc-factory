@@ -1,0 +1,12 @@
+
+- name: Upgrade OS
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install basic packages
+  apt:
+    name:
+      - unzip
+      - screen
+      - tmux

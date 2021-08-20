@@ -1,0 +1,38 @@
+
+- name: Install qemu-ga with deps
+  apt:
+    name:
+      - qemu-guest-agent
+      - virt-what
+
+- name: Disable default qemu-ga service
+  service:
+    name: qemu-guest-agent
+    state: stopped
+    enabled: no
+
+- name: Place qemu-ga-bhyve script
+  copy:
+    src: qemu-ga-bhyve-start.sh
+    dest: /etc/init.d/qemu-ga-bhyve.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Place qemu-ga-bhyve service
+  copy:
+    src: qemu-guest-agent.service
+    dest: /etc/systemd/system/qemu-guest-agent-bhyve.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Enable new qemu-ga service
+  service:
+    name: qemu-guest-agent-bhyve
+    state: started
+    enabled: yes
+

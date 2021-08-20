@@ -1,11 +1,11 @@
 ubuntu_version_name: focal
 cloud_img_upstream_date: current
 
-image_name: "ubuntu-{{ ubuntu_version_name }}"
-image_desc: ""
+image_name: "ubuntu-{{ ubuntu_version_name }}-uefi"
+image_desc: "Ubuntu 20.04 image for BHYVE with UEFI support"
 image_homepage: "{{ image_contrib_homepage }}/{{ image_name }}.rst"
 remove_base_image: false
-builder_dir: "{{ builder.appliance.dir }}/{{ image_name }}"
+builder_dir: "{{ builder.appliance.dir }}/contrib-{{ image_name }}"
 zone_brand: bhyve
 zone_dns_domain: local
 zone_uuid: "8f72de0f-51a9-c44d-ecc5-97c6c6a4535e"

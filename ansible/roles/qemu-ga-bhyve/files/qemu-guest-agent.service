@@ -1,0 +1,10 @@
+[Unit]
+Description=QEMU Guest Agent for BHYVE
+
+[Service]
+ExecStart=-/etc/init.d/qemu-ga-bhyve.sh
+Restart=always
+RestartSec=0
+
+[Install]
+WantedBy=multi-user.target
