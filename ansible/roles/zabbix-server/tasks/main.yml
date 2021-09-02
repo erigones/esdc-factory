@@ -75,11 +75,6 @@
             owner=apache
             group=apache
 
-- name: Change default DocumentRoot in /etc/httpd/conf/httpd.conf
-  lineinfile: dest="/etc/httpd/conf/httpd.conf"
-              regexp='^DocumentRoot'
-              line='DocumentRoot "/usr/share/zabbix"'
-
 - name: Create externalscripts and alertscripts symlinks in /etc/zabbix
   file: src="/usr/lib/zabbix/{{ item }}"
         dest="/etc/zabbix/{{ item }}"
