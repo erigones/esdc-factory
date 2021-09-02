@@ -17,6 +17,7 @@
     state: present
     name:
       - zabbix-server-pgsql
+      - zabbix-agent
       - zabbix-get
       - centos-release-scl
       - mod_ssl
