@@ -50,12 +50,12 @@
             option="{{ item.option }}"
             value="{{ item.value }}"
   with_items:
-    - { option: php_value[max_execution_time],     value: 300 }
-    - { option: php_value[memory_limit],           value: 128M }
-    - { option: php_value[post_max_size],          value: 16M }
-    - { option: php_value[upload_max_filesize],    value: 2M }
-    - { option: php_value[max_input_time],         value: 300 }
-    - { option: php_value[date.timezone],          value: UTC, section: Date }
+    - { option: "php_value[max_execution_time]",     value: 300 }
+    - { option: "php_value[memory_limit]",           value: 128M }
+    - { option: "php_value[post_max_size]",          value: 16M }
+    - { option: "php_value[upload_max_filesize]",    value: 2M }
+    - { option: "php_value[max_input_time]",         value: 300 }
+    - { option: "php_value[date.timezone]",          value: UTC, section: Date }
 
 - name: Update /etc/zabbix/zabbix_server.conf
   lineinfile: dest="/etc/zabbix/zabbix_server.conf"
