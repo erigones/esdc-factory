@@ -23,10 +23,8 @@
       - php-opcache
       - libsemanage-python
 
-- name: Enable Zabbix Frontend repo in /etc/yum.repos.d/zabbix.repo
-  lineinfile: dest="/etc/yum.repos.d/zabbix.repo"
-              regexp='^enabled'
-              line='"enabled=1"'
+- name: Enable Zabbix Frontend repo
+  command: yum-config-manager --enable zabbix-frontend
 
 - name: Install Zabbix frontend packages
   yum:
@@ -46,7 +44,6 @@
 
 - name: Modify PHP configuration for Zabbix
   ini_file: dest=/etc/opt/rh/rh-php72/php-fpm.d/zabbix.conf
-            section="{{ item.section | default('PHP') }}"
             option="{{ item.option }}"
             value="{{ item.value }}"
   with_items:
@@ -55,7 +52,7 @@
     - { option: "php_value[post_max_size]",          value: 16M }
     - { option: "php_value[upload_max_filesize]",    value: 2M }
     - { option: "php_value[max_input_time]",         value: 300 }
-    - { option: "php_value[date.timezone]",          value: UTC, section: Date }
+    - { option: "php_value[date.timezone]",          value: UTC }
 
 - name: Update /etc/zabbix/zabbix_server.conf
   lineinfile: dest="/etc/zabbix/zabbix_server.conf"
