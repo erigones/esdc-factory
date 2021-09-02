@@ -18,7 +18,7 @@
     name:
       - zabbix-server-pgsql
       - zabbix-get
-      - httpd
+      - centos-release-scl
       - mod_ssl
       - php-opcache
       - libsemanage-python
@@ -32,8 +32,8 @@
   yum:
     state: present
     name:
-      - centos-release-scl
       - zabbix-web-pgsql-scl
+      - zabbix-apache-conf-scl
 
 - name: Get Zabbix server version
   shell: rpm -q --queryformat "%{VERSION}" zabbix-server-pgsql
@@ -45,17 +45,17 @@
     PGPASSWORD: "{{ zabbix_db_password }}"
 
 - name: Modify PHP configuration for Zabbix
-  ini_file: dest=/etc/php.ini
+  ini_file: dest=/etc/opt/rh/rh-php72/php-fpm.d/zabbix.conf
             section="{{ item.section | default('PHP') }}"
             option="{{ item.option }}"
             value="{{ item.value }}"
   with_items:
-    - { option: max_execution_time,     value: 300 }
-    - { option: memory_limit,           value: 128M }
-    - { option: post_max_size,          value: 16M }
-    - { option: upload_max_filesize,    value: 2M }
-    - { option: max_input_time,         value: 300 }
-    - { option: date.timezone,          value: UTC, section: Date }
+    - { option: php_value[max_execution_time],     value: 300 }
+    - { option: php_value[memory_limit],           value: 128M }
+    - { option: php_value[post_max_size],          value: 16M }
+    - { option: php_value[upload_max_filesize],    value: 2M }
+    - { option: php_value[max_input_time],         value: 300 }
+    - { option: php_value[date.timezone],          value: UTC, section: Date }
 
 - name: Update /etc/zabbix/zabbix_server.conf
   lineinfile: dest="/etc/zabbix/zabbix_server.conf"
@@ -101,3 +101,5 @@
   with_items:
     - httpd
     - zabbix-server
+    - zabbix-agent
+    - rh-php72-php-fpm 
