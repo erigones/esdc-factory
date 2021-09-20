@@ -2118,8 +2118,8 @@ configure a NIC so that you can access the Danube Cloud node. Then you will
 have the option to create additional network tags and to configure
 additional NICs for accessing the compute node or virtual machines.
 {% if usb_type == "hn" %}You will also be asked whether to deploy OPNSense VM as a router from admin network.
-
 {% endif %}
+
 Press [enter] to continue"
 
 	if [[ $(getanswer "skip_instructions") != "true" ]]; then
