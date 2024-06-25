@@ -56,6 +56,7 @@
 
 - name: Remove virtual machine
   vmadm: name="{{ zone_uuid }}" state=absent
+  when: keep_source_vm | default(False) | bool == false
 
 - name: Remove used base Linux (CentOS) image
   shell: imgadm delete -P zones "{{ image_uuid }}"

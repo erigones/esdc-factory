@@ -1,0 +1,34 @@
+# This only cleans the OS and creates an image.
+# Update the VM ubuntu-imager.danube.cloud and run this script.
+#
+- name: Check builder host
+  hosts: builder
+  tasks:
+    - include: tasks/build/check.yml
+      when: skip_check is not defined or not skip_check
+
+- name: Register virtual machine
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-ubuntu-jammy.yml
+  tasks:
+    - include: tasks/build/centos/register-host.yml
+        hostname=ubuntu-build
+        python_path=/usr/bin/python3
+    - name: Get VM json
+      shell: vmadm get "{{ zone_uuid }}" > "/tmp/{{ zone_uuid }}.json"
+
+- name: Clean image
+  hosts: ubuntu-build
+  gather_facts: true
+  remote_user: ubuntu
+  become: true
+  roles:
+    - vm-image
+
+- name: Create and save image
+  hosts: buildnode
+  vars_files:
+    - vars/build/vm/contrib-ubuntu-jammy.yml
+  tasks:
+    - include: tasks/build/centos/create-image.yml
